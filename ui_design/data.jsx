@@ -162,4 +162,53 @@ const APPROVALS = [
   },
 ];
 
-window.MOCK = { AGENTS, USER, WORKSPACES, PROJECTS, TASKS, TASK_MESSAGES, APPROVALS };
+const MEMBERS = [
+  { id: "u-me",   name: "Alice",  handle: "alice",  color: "oklch(15% 0 0)", email: "alice@lumen.dev", role: "owner" },
+  { id: "u-bob",  name: "Bob",    handle: "bob",    color: "oklch(40% 0 0)", email: "bob@lumen.dev",   role: "member" },
+  { id: "u-carol",name: "Carol",  handle: "carol",  color: "oklch(55% 0 0)", email: "carol@lumen.dev", role: "member" },
+];
+
+const RUNTIMES = [
+  { id: "rt-1", name: "alice-mbp",     host: "192.168.1.20", os: "darwin", arch: "arm64", capacity: 4, online: true,  lastHeartbeat: Date.now() - 12_000 },
+  { id: "rt-2", name: "ci-runner-01",  host: "10.0.0.55",    os: "linux",  arch: "amd64", capacity: 8, online: true,  lastHeartbeat: Date.now() - 4_000 },
+  { id: "rt-3", name: "office-imac",   host: null,           os: "darwin", arch: "x86_64",capacity: 2, online: false, lastHeartbeat: Date.now() - 5 * 60_000 },
+];
+
+const ARTIFACTS = [
+  { id: "art-1", taskId: "t-hero",    filename: "hero-copy-v2.md",        mime: "text/markdown",       sizeBytes: 1432, source: "writer",  created: Date.now() - 25 * 60_000 },
+  { id: "art-2", taskId: "t-hero",    filename: "hero-mockup.png",        mime: "image/png",           sizeBytes: 88_120, source: "ux",   created: Date.now() - 20 * 60_000 },
+  { id: "art-3", taskId: "t-pricing", filename: "pricing-bullets.md",     mime: "text/markdown",       sizeBytes: 904,  source: "writer",  created: Date.now() - 90 * 60_000 },
+];
+
+const ASSETS = [
+  { id: "as-1", projectId: "p-launch", filename: "brand-tokens.json", mime: "application/json", sizeBytes: 1180, uploadedBy: "u-me",   created: Date.now() - 2 * 86_400_000 },
+  { id: "as-2", projectId: "p-launch", filename: "hero-ref.png",       mime: "image/png",        sizeBytes: 245_900, uploadedBy: "u-bob", created: Date.now() - 86_400_000 },
+];
+
+/**
+ * Tracks which tasks have a currently-active run; cancel-run targets the most
+ * recent entry. Mutated by data.jsx helpers; consumed by TaskDetail.
+ * @type {{ [taskId: string]: { runId: string, agentId: string }[] }}
+ */
+const ACTIVE_RUNS = {
+  "t-hero": [{ runId: "c3d4", agentId: "ag-eng" }],
+};
+
+/**
+ * Generate a one-time install token for the Runtimes flow. Returns a token
+ * string and an ISO expiry 1h in the future.
+ * @returns {{ token: string, expiresAt: string }}
+ */
+function installToken() {
+  const rnd = Math.random().toString(36).slice(2, 10) + Math.random().toString(36).slice(2, 10);
+  return {
+    token: "bri_" + rnd,
+    expiresAt: new Date(Date.now() + 60 * 60_000).toISOString(),
+  };
+}
+
+window.MOCK = {
+  AGENTS, USER, WORKSPACES, PROJECTS, TASKS, TASK_MESSAGES, APPROVALS,
+  MEMBERS, RUNTIMES, ARTIFACTS, ASSETS, ACTIVE_RUNS,
+  installToken,
+};
