@@ -93,15 +93,9 @@ function fmtCountdown(secs) {
   return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
 }
 
-// --- empty state ---
+// --- empty state (thin wrapper for legacy callers; new code uses <EmptyState />) ---
 function Empty({ glyph, title, sub }) {
-  return (
-    <div className="empty">
-      <div className="glyph">{glyph}</div>
-      <div style={{ fontWeight: 800, fontSize: 16, color: "var(--ink)" }}>{title}</div>
-      <div style={{ marginTop: 4, fontSize: 13 }}>{sub}</div>
-    </div>
-  );
+  return <window.EmptyState glyph={glyph} title={title} description={sub} />;
 }
 
 Object.assign(window, { Icon, Avatar, AgentAvatar, StatusChip, useCountdown, fmtCountdown, Empty });
