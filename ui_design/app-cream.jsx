@@ -83,7 +83,7 @@ function Sidebar({ route, ws, projects, activeProjectId, onNavigate, pendingAppr
           <div style={{ fontWeight: 700, fontSize: 13 }}>{MOCK.USER.name}</div>
           <div className="text-muted mono" style={{ fontSize: 11 }}>@{MOCK.USER.handle}</div>
         </div>
-        <button className="btn ghost sm icon-only"><Icon name="settings" size={14} /></button>
+        <button className="btn ghost sm icon-only" onClick={() => onNavigate({ name: "login" })} title="登出"><Icon name="x" size={14} /></button>
       </div>
     </aside>
   );
@@ -178,6 +178,20 @@ function App() {
     setApprovals(a => a.filter(x => x.id !== apId));
     // (could surface a toast here)
   };
+
+  // Login / Register intercept the shell entirely (no sidebar/topbar)
+  if (route.name === "login") {
+    return <window.Login
+      onLoggedIn={() => setRoute({ name: "home" })}
+      onGotoRegister={() => setRoute({ name: "register" })}
+    />;
+  }
+  if (route.name === "register") {
+    return <window.Register
+      onRegistered={() => setRoute({ name: "login" })}
+      onGotoLogin={() => setRoute({ name: "login" })}
+    />;
+  }
 
   let content;
   if (route.name === "home") {
