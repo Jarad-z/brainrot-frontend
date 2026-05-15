@@ -252,6 +252,11 @@ function TaskDetail({ project, task, tasks, onOpenTask, onBack }) {
   const [thinking, setThinking] = useState(false);
   const [queuedMessageIds, setQueuedMessageIds] = useState(new Set());
   const scrollRef = useRef(null);
+  const [cancelDisabled, setCancelDisabled] = useState(false);
+  const [confirmCancelOpen, setConfirmCancelOpen] = useState(false);
+  const { toasts: cancelToasts, push: pushCancelToast } = window.useToast();
+  const [activeRunsTick, setActiveRunsTick] = useState(0);
+  const bumpActiveRunsTick = () => setActiveRunsTick(t => t + 1);
 
   useEffect(() => {
     setMessages(MOCK.TASK_MESSAGES[task.id] || []);
@@ -266,6 +271,25 @@ function TaskDetail({ project, task, tasks, onOpenTask, onBack }) {
 
   const decide = (msgId, decision) => {
     setDecisions(d => ({ ...d, [msgId]: decision }));
+  };
+
+  const activeRuns = MOCK.ACTIVE_RUNS[task.id] || [];
+  const hasActiveRun = activeRuns.length > 0;
+  // silence unused-var warning; the tick var IS used to drive re-renders by being referenced here
+  void activeRunsTick;
+
+  const doCancel = () => {
+    if (cancelDisabled) return;
+    setCancelDisabled(true);
+    const list = MOCK.ACTIVE_RUNS[task.id] || [];
+    const removed = list.length > 0 ? list[list.length - 1] : null;
+    if (removed) {
+      MOCK.ACTIVE_RUNS[task.id] = list.slice(0, -1);
+      bumpActiveRunsTick();
+    }
+    pushCancelToast(removed ? `已取消 run #${removed.runId}` : "运行已结束", "info");
+    setConfirmCancelOpen(false);
+    setTimeout(() => setCancelDisabled(false), 5000);
   };
 
   const send = ({ text, mentions }) => {
@@ -302,6 +326,7 @@ function TaskDetail({ project, task, tasks, onOpenTask, onBack }) {
       const runId = Math.random().toString(36).slice(2, 6);
       if (!MOCK.ACTIVE_RUNS[task.id]) MOCK.ACTIVE_RUNS[task.id] = [];
       MOCK.ACTIVE_RUNS[task.id].push({ runId, agentId: agent.id });
+      bumpActiveRunsTick();
 
       setThinking(true);
       setTimeout(() => {
@@ -323,6 +348,7 @@ function TaskDetail({ project, task, tasks, onOpenTask, onBack }) {
         setMessages(ms => [...ms, reply, result]);
         // Run completed: remove from ACTIVE_RUNS
         MOCK.ACTIVE_RUNS[task.id] = (MOCK.ACTIVE_RUNS[task.id] || []).filter(r => r.runId !== runId);
+        bumpActiveRunsTick();
         setThinking(false);
       }, 1500);
     }
@@ -385,7 +411,16 @@ function TaskDetail({ project, task, tasks, onOpenTask, onBack }) {
                 )}
               </div>
               <div className="row" style={{ gap: 6 }}>
-                <button className="btn ghost sm"><Icon name="stop" size={12} /> 取消运行</button>
+                {hasActiveRun && (
+                  <button
+                    className="btn ghost sm"
+                    disabled={cancelDisabled}
+                    onClick={() => setConfirmCancelOpen(true)}
+                    title={cancelDisabled ? "请等待 5 秒后再试" : "取消当前活跃 run"}
+                  >
+                    <Icon name="stop" size={12} /> 取消运行
+                  </button>
+                )}
                 <button className="btn ghost sm icon-only"><Icon name="more" size={16} /></button>
               </div>
             </div>
@@ -487,6 +522,43 @@ function TaskDetail({ project, task, tasks, onOpenTask, onBack }) {
           </div>
         </div>
       </div>
+
+      {confirmCancelOpen && (
+        <div role="dialog" aria-modal="true" style={{
+          position: "fixed", inset: 0, background: "rgba(27,24,32,0.4)",
+          display: "grid", placeItems: "center", zIndex: 200,
+        }}>
+          <div style={{
+            background: "var(--paper-0, #fdfaf2)", padding: 24,
+            border: "1.5px solid var(--ink-0, #1b1820)", borderRadius: 12,
+            maxWidth: 420, boxShadow: "var(--shadow-current, 4px 4px 0 #1b1820)",
+          }}>
+            <div style={{ fontWeight: 700, marginBottom: 12, fontSize: 16 }}>取消当前运行？</div>
+            <div style={{ fontSize: 14, color: "var(--ink-1, #3b3540)", marginBottom: 16, lineHeight: 1.5 }}>
+              这只取消当前 run，排队中的同 agent 消息会自动晋升并跑。
+            </div>
+            <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+              <button onClick={() => setConfirmCancelOpen(false)} style={{
+                padding: "6px 14px", border: "1.5px solid var(--ink-0, #1b1820)",
+                background: "var(--paper-0, #fdfaf2)", borderRadius: 6, cursor: "pointer",
+              }}>不取消</button>
+              <button onClick={doCancel} style={{
+                padding: "6px 14px", border: "1.5px solid var(--ink-0, #1b1820)",
+                background: "var(--state-failed, #c25036)", color: "var(--paper-0, #fdfaf2)",
+                borderRadius: 6, cursor: "pointer", fontWeight: 600,
+              }}>取消运行</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {cancelToasts.length > 0 && (
+        <div style={{ position: "fixed", right: 24, bottom: 24, display: "flex", flexDirection: "column", gap: 8, zIndex: 1000 }}>
+          {cancelToasts.map(t => (
+            <window.ErrorBanner key={t.id} kind="toast" variant={t.variant} message={t.message} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
