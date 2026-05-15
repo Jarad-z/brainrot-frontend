@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8" />
+<title>lib/* tests</title>
+<style>
+  body { font: 14px/1.5 ui-monospace, monospace; padding: 24px; background: #f4ede1; color: #1b1820; }
+  h1 { margin: 0 0 16px; }
+  #results > div { padding: 4px 8px; border-radius: 4px; margin: 2px 0; }
+  .pass { background: #d4e7c5; color: #2a4a14; }
+  .fail { background: #f3c7c0; color: #7a1d10; font-weight: 700; }
+  .group { margin-top: 16px; font-weight: 700; color: #6f6878; }
+  .summary { margin-top: 24px; padding: 12px; border: 2px solid #1b1820; border-radius: 8px; font-weight: 700; }
+</style>
+</head>
+<body>
+<h1>lib/* tests</h1>
+<div id="results"></div>
+<div id="summary" class="summary"></div>
+
+<script src="../lib/codec.js"></script>
+<script>
+const results = document.getElementById("results");
+const summary = document.getElementById("summary");
+let pass = 0, fail = 0;
+
+function group(name) {
+  const el = document.createElement("div");
+  el.className = "group";
+  el.textContent = name;
+  results.appendChild(el);
+}
+function assert(name, cond, detail) {
+  const el = document.createElement("div");
+  el.className = cond ? "pass" : "fail";
+  el.textContent = (cond ? "[pass] " : "[fail] ") + name + (cond ? "" : "  ← " + (detail || ""));
+  results.appendChild(el);
+  cond ? pass++ : fail++;
+}
+
+// ---- codec ----
+group("codec.js");
+(function () {
+  const { decodeJSON, encodeJSON, CodecError } = window.BR_LIB.codec;
+  // valid round-trip
+  const obj = { text: "hi @writer", n: 3 };
+  const b64 = encodeJSON(obj);
+  const back = decodeJSON(b64);
+  assert("encodeJSON → decodeJSON round-trip", JSON.stringify(back) === JSON.stringify(obj));
+
+  // nested
+  const nested = { a: { b: [1, 2, { c: "x" }] } };
+  assert("nested object round-trip", JSON.stringify(decodeJSON(encodeJSON(nested))) === JSON.stringify(nested));
+
+  // malformed base64 throws CodecError
+  let err = null;
+  try { decodeJSON("@@@not-base64@@@"); } catch (e) { err = e; }
+  assert("malformed base64 throws CodecError", err instanceof CodecError, err && err.name);
+
+  // valid base64 but not JSON throws CodecError
+  err = null;
+  try { decodeJSON(btoa("not json")); } catch (e) { err = e; }
+  assert("base64 of non-JSON throws CodecError", err instanceof CodecError);
+
+  // non-string input throws
+  err = null;
+  try { decodeJSON(123); } catch (e) { err = e; }
+  assert("non-string input throws CodecError", err instanceof CodecError);
+})();
+
+// finalize
+const total = pass + fail;
+summary.textContent = `${pass}/${total} passed${fail ? `, ${fail} FAILED` : ""}`;
+summary.style.background = fail ? "#f3c7c0" : "#d4e7c5";
+</script>
+</body>
+</html>
