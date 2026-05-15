@@ -6,6 +6,7 @@ const AGENTS = [
   { id: "ag-eng",    handle: "ux",     name: "UX-Eng", desc: "Prototype + design", color: "oklch(55% 0 0)", online: false, model: "claude-opus-4-7" },
   { id: "ag-data",   handle: "data",   name: "Analyst",desc: "SQL + data spelunking", color: "oklch(70% 0 0)",  online: true, model: "claude-sonnet-4-5" },
   { id: "ag-qa",     handle: "qa",     name: "QA",     desc: "Playwright + test plans", color: "oklch(45% 0 0)", online: true, model: "claude-haiku-4-5" },
+  { id: "ag-old",   handle: "old-bot", name: "Old Bot", desc: "legacy", color: "oklch(70% 0 0)", online: false, model: "claude-haiku-4-5", archived: true },
 ];
 
 const USER = { id: "u-me", name: "Alice", handle: "alice", color: "oklch(15% 0 0)" };

@@ -212,7 +212,11 @@ function App() {
     content = <ApprovalsPage approvals={approvals} onDecided={decideApproval}
                 onOpenTask={(t) => navigate({ name: "task", taskId: t.id })} />;
   } else if (route.name === "agents") {
-    content = <AgentsPage />;
+    content = <window.AgentsList onNew={() => setRoute({ name: "agents-new" })} />;
+  } else if (route.name === "agents-new") {
+    content = <window.AgentNew
+      onCancel={() => setRoute({ name: "agents" })}
+      onCreated={() => setRoute({ name: "agents" })} />;
   } else if (route.name === "runtimes") {
     content = <RuntimesPage />;
   } else if (route.name === "settings") {
