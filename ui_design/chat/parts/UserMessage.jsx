@@ -26,7 +26,7 @@ function MentionedText({ text }) {
   );
 }
 
-function UserMessage({ msg }) {
+function UserMessage({ msg, pairing }) {
   return (
     <div className="chat-msg">
       <div className="av"><Avatar name={msg.author.name} color={msg.author.color} size={36} /></div>
@@ -35,6 +35,14 @@ function UserMessage({ msg }) {
           <span className="name">{msg.author.name}</span>
           <span className="handle">@{msg.author.handle}</span>
           <span className="time">· {msg.time}</span>
+          {pairing && pairing.queued && (
+            <span style={{
+              marginLeft: 8, padding: "1px 8px", fontSize: 11,
+              color: "var(--ink-2, #6f6878)",
+              border: "1.5px dashed var(--ink-2, #6f6878)",
+              borderRadius: 999,
+            }} title="等待 agent 完成当前 run 后自动触发">排队中</span>
+          )}
         </div>
         <div className="bubble user">
           <MentionedText text={msg.parsed.text} />

@@ -250,6 +250,7 @@ function TaskDetail({ project, task, tasks, onOpenTask, onBack }) {
   const [decisions, setDecisions] = useState({}); // msgId -> {kind, note}
   const [activeTab, setActiveTab] = useState("artifacts");
   const [thinking, setThinking] = useState(false);
+  const [queuedMessageIds, setQueuedMessageIds] = useState(new Set());
   const scrollRef = useRef(null);
 
   useEffect(() => {
@@ -268,25 +269,48 @@ function TaskDetail({ project, task, tasks, onOpenTask, onBack }) {
   };
 
   const send = ({ text, mentions }) => {
+    const userId = "u" + Date.now();
+    // mentions are agent IDs (per API.md and new Composer). Resolve first one.
+    const firstAgentId = mentions[0];
+    const agent = firstAgentId ? (MOCK.AGENTS.find(a => a.id === firstAgentId) || MOCK.AGENTS[0]) : null;
+
+    // Check if this agent already has an active run on this task → mark queued
+    const activeForTask = MOCK.ACTIVE_RUNS[task.id] || [];
+    const alreadyActive = agent && activeForTask.some(r => r.agentId === agent.id);
+
     const userMsg = {
-      id: "u" + Date.now(),
+      id: userId,
       role: "user",
       author: MOCK.USER,
       time: new Date().toTimeString().slice(0, 5),
-      parsed: { type: "user", text, mentions }
+      parsed: { type: "user", text, mentions },
+      metadata: alreadyActive ? { queued: true } : undefined,
     };
     setMessages(ms => [...ms, userMsg]);
-    if (mentions.length > 0) {
+
+    if (alreadyActive) {
+      setQueuedMessageIds(prev => {
+        const next = new Set(prev);
+        next.add(userId);
+        return next;
+      });
+      return; // queued; do not start a new run
+    }
+
+    if (agent) {
+      // Register active run in mock store
+      const runId = Math.random().toString(36).slice(2, 6);
+      if (!MOCK.ACTIVE_RUNS[task.id]) MOCK.ACTIVE_RUNS[task.id] = [];
+      MOCK.ACTIVE_RUNS[task.id].push({ runId, agentId: agent.id });
+
       setThinking(true);
-      // fake agent reply
-      const agent = MOCK.AGENTS.find(a => a.handle === mentions[0]) || MOCK.AGENTS[0];
       setTimeout(() => {
         const reply = {
           id: "a" + Date.now(),
           role: "assistant",
           author: agent,
           time: new Date().toTimeString().slice(0, 5),
-          runId: Math.random().toString(36).slice(2, 6),
+          runId,
           parsed: { type: "assistant_text", text: "收到，开始处理。" }
         };
         const result = {
@@ -297,6 +321,8 @@ function TaskDetail({ project, task, tasks, onOpenTask, onBack }) {
           parsed: { type: "result", durationMs: 1240, tools: 0, status: "done" }
         };
         setMessages(ms => [...ms, reply, result]);
+        // Run completed: remove from ACTIVE_RUNS
+        MOCK.ACTIVE_RUNS[task.id] = (MOCK.ACTIVE_RUNS[task.id] || []).filter(r => r.runId !== runId);
         setThinking(false);
       }, 1500);
     }
@@ -369,7 +395,7 @@ function TaskDetail({ project, task, tasks, onOpenTask, onBack }) {
             {messages.length === 0 ? (
               <Empty glyph="@" title="还没有人发言" sub="发一条带 @agent 的消息，把一个 agent 拽进来。" />
             ) : (
-              <MessageList messages={messages} decisions={decisions} onDecide={decide} />
+              <MessageList messages={messages} decisions={decisions} onDecide={decide} queuedMessageIds={queuedMessageIds} />
             )}
           </div>
 
