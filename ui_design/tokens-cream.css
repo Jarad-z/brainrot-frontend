@@ -1,3 +1,5 @@
+@import url("./tokens/palette.css");
+
 :root {
   /* MOONLIT CREAM — refined oat paper + plum ink + poppy red + moss */
   --accent: #cf4040;          /* poppy red */
