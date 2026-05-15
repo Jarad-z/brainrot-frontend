@@ -37,7 +37,7 @@ function Sidebar({ route, ws, projects, activeProjectId, onNavigate, pendingAppr
       <div className="ws-switcher">
         <div className="ws-avatar" style={{ background: ws.color }}>{ws.initials}</div>
         <div className="ws-info">
-          <div className="ws-name">{ws.name}</div>
+          <div className="ws-name" title={ws.name}>{ws.name}</div>
           <div className="ws-meta mono">{ws.slug}</div>
         </div>
         <Icon name="chevron" size={14} />
@@ -68,7 +68,7 @@ function Sidebar({ route, ws, projects, activeProjectId, onNavigate, pendingAppr
                     teal:  "oklch(55% 0.09 200)",
                   })[p.swatch] || "var(--ink)"
                 }} />
-          <span style={{ flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.name}</span>
+          <span title={p.name} style={{ flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.name}</span>
           <span className="text-muted" style={{ fontSize: 11, fontWeight: 700 }}>{p.open}</span>
         </div>
       ))}

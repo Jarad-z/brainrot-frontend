@@ -1484,3 +1484,78 @@ input, textarea { font-family: inherit; }
   font-size: 28px;
   margin-bottom: 14px;
 }
+
+/* ================================================================
+   DESIGN.md §5 — Six locked layout rules
+   These rules are NOT subject to per-iteration retuning.
+   Any change here requires updating DESIGN.md §5 first.
+   ================================================================ */
+
+/* Rule 1: hero header keeps button inline (do not wrap to next row).
+   Applies to the hero CTA group. The CTA wrapper sets the min-width
+   to ensure both buttons fit without wrap on viewports ≥ 1100px. */
+.home-page .hero-cta {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 12px;
+}
+.home-page .hero-cta .btn { white-space: nowrap; }
+
+/* Rule 2: WorkspaceHome 2x2 page grid — left col (hero + projects),
+   right col (stat-grid + rail). The "项目" and "待审批" headings must
+   sit on the same baseline row. */
+.home-page .home-grid {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  grid-template-rows: auto 1fr;
+  gap: 24px;
+}
+.home-page .hero         { grid-column: 1; grid-row: 1; min-width: 0; }
+.home-page .stat-grid    { grid-column: 2; grid-row: 1; min-width: 0; }
+.home-page .home-projects{ grid-column: 1; grid-row: 2; min-width: 0; }
+.home-page .home-rail    { grid-column: 2; grid-row: 2; min-width: 0; }
+
+/* Rule 3: near-square stat tiles. Internal label-on-top + big-number-below
+   wants slightly taller than wide. */
+.home-page .stat-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.home-page .stat-grid .stat-card {
+  aspect-ratio: 1 / 0.78;
+  min-width: 0;
+}
+
+/* Rule 4: sidebar text never truncates silently. Every flex child gets
+   min-width: 0 + ellipsis. title= attribute is set in JSX consumers. */
+.sidebar * { min-width: 0; }
+.sidebar .ws-name,
+.sidebar .ws-meta,
+.sidebar .brand-text,
+.sidebar .brand-sub,
+.sidebar .proj-item > span,
+.sidebar .nav-item > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Rule 5: project card title — keep-all word break, max 2 lines + ellipsis */
+.proj-card .name {
+  word-break: keep-all;
+  overflow-wrap: break-word;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Rule 6: sidebar icons are monochrome. No colored chip behind nav icons.
+   Color is reserved for status badges and accent CTAs. */
+.sidebar .nav-item svg,
+.sidebar .nav-item .icn {
+  color: var(--ink-1);
+  background: transparent !important;
+}
