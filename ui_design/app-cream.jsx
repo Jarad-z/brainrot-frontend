@@ -195,14 +195,14 @@ function App() {
 
   let content;
   if (route.name === "home") {
-    content = <WorkspaceHome workspace={ws} projects={MOCK.PROJECTS}
+    content = <window.WorkspaceHome workspace={ws} projects={MOCK.PROJECTS}
                 approvals={approvals}
                 onOpenProject={(p) => navigate({ name: "project", projectId: p.id })}
                 onOpenTask={(t) => navigate({ name: "task", taskId: t.id })}
                 onDecideApproval={decideApproval}
                 onNavigate={navigate} />;
   } else if (route.name === "project" && project) {
-    content = <ProjectBoard project={project} tasks={projTasks}
+    content = <window.ProjectBoard project={project} tasks={projTasks}
                 onOpenTask={(t) => navigate({ name: "task", taskId: t.id })}
                 activeTab="tasks"
                 onTabChange={(t) => {
@@ -214,7 +214,7 @@ function App() {
   } else if (route.name === "project-artifacts" && project) {
     content = <window.ProjectArtifacts project={project} />;
   } else if (route.name === "task" && project && task) {
-    content = <TaskDetail project={project} task={task} tasks={projTasks}
+    content = <window.TaskDetail project={project} task={task} tasks={projTasks}
                 onOpenTask={(t) => navigate({ name: "task", taskId: t.id })}
                 onBack={() => navigate({ name: "project", projectId: project.id })} />;
   } else if (route.name === "approvals") {
