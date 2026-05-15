@@ -68,6 +68,38 @@ group("codec.js");
   assert("non-string input throws CodecError", err instanceof CodecError);
 })();
 
+// ---- mention-parse ----
+group("mention-parse.js");
+(function () {
+  const { filterCandidates, parseSubmit, activePrefix } = window.BR_LIB.mention;
+  const agents = [
+    { id: "a1", handle: "writer" },
+    { id: "a2", handle: "writer2", archived: true },
+    { id: "a3", handle: "coder" },
+    { id: "a4", handle: "ux" },
+  ];
+
+  // candidates
+  assert("empty prefix returns all non-archived", filterCandidates("", agents).length === 3);
+  assert("prefix 'wr' returns writer (not archived writer2)", JSON.stringify(filterCandidates("wr", agents).map(a => a.id)) === JSON.stringify(["a1"]));
+  assert("prefix is case-insensitive", filterCandidates("WR", agents).length === 1);
+  assert("unknown prefix returns empty", filterCandidates("xyz", agents).length === 0);
+
+  // parseSubmit
+  const m1 = { id: "a1", handle: "writer" };
+  const m3 = { id: "a3", handle: "coder" };
+  const sub = parseSubmit("@writer @coder hi", [m1, m3]);
+  assert("parseSubmit ids in click order", JSON.stringify(sub.mentions) === JSON.stringify(["a1", "a3"]));
+  assert("parseSubmit dedupes duplicate ids", JSON.stringify(parseSubmit("hi", [m1, m1, m3]).mentions) === JSON.stringify(["a1", "a3"]));
+
+  // activePrefix
+  assert("activePrefix '@wr|' returns 'wr'", activePrefix("@wr", 3) === "wr");
+  assert("activePrefix 'hi @wr|' returns 'wr'", activePrefix("hi @wr", 6) === "wr");
+  assert("activePrefix mid-word returns null", activePrefix("hi@wr", 5) === null);
+  assert("activePrefix after whitespace returns null", activePrefix("@wr hi", 6) === null);
+  assert("activePrefix empty '@|' returns ''", activePrefix("@", 1) === "");
+})();
+
 // finalize
 const total = pass + fail;
 summary.textContent = `${pass}/${total} passed${fail ? `, ${fail} FAILED` : ""}`;
