@@ -1,0 +1,14 @@
+/* tokens/shadow.css — solid-offset "block" shadows + one soft */
+:root {
+  --shadow-0: none;
+  --shadow-1: 3px 3px 0 var(--ink-0);
+  --shadow-2: 4px 4px 0 var(--ink-0);
+  --shadow-3: 6px 6px 0 var(--ink-0);
+
+  /* For float surfaces only (dropdown, toast, modal) */
+  --shadow-soft: 0 2px 8px rgb(27 24 32 / 0.08);
+
+  /* Tweaks block-depth runtime override */
+  --depth: 4px;
+  --shadow-current: var(--depth) var(--depth) 0 var(--ink-0);
+}

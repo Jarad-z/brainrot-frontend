@@ -15,11 +15,31 @@
 
 ## 3. Typography
 
-(filled in Task 3)
+| Token | Value | Used for |
+|---|---|---|
+| `--font-display` | Bricolage Grotesque | headings, hero, CTA |
+| `--font-body` | Bricolage Grotesque | body, chat |
+| `--font-mono` | JetBrains Mono | code, tokens, blob keys |
+| `--wdth-tight: 88` | | confident headlines, big stat numbers |
+| `--wdth-normal: 100` | | body |
+| `--wdth-wide: 96` | | CTA buttons (calmer, fuller) |
+| `--text-xs: 12px` | | meta, timestamps |
+| `--text-sm: 14px` | | UI controls, buttons |
+| `--text-base: 16px` | | chat messages, paragraphs |
+| `--text-lg: 18px` | | card titles |
+| `--text-xl: 22px` | | page H2 |
+| `--text-2xl: 32px` | | page section header |
+| `--text-hero: 64px` | | WorkspaceHome hero only |
+
+Hard rule: chat msg 16px, UI control 14px, meta 12px. Anything outside this scale needs an entry here first.
 
 ## 4. Spacing / Radii / Shadow
 
-(filled in Task 3)
+Spacing scale is 4px-based (`--sp-1` through `--sp-12`). Use spacing tokens, never hard-coded px. Density multiplier (`--sp-base-mult`) attaches via `[data-density]` on `<html>`.
+
+Radii: `--r-sm 6px` (buttons, badges), `--r-md 12px` (cards), `--r-lg 16px` (bubbles), `--r-xl 20px` (hero cards).
+
+Shadow is solid-offset block-style — `Npx Npx 0 var(--ink-0)`. Three tiers: `--shadow-1` (3px), `--shadow-2` (4px), `--shadow-3` (6px). Tweaks panel writes `--depth` which `--shadow-current` consumes. `--shadow-soft` is the ONLY blur shadow — reserved for dropdown/toast/modal floats.
 
 ## 5. Component visual specs
 
@@ -44,11 +64,40 @@ Reads happen once on boot in `app-cream.jsx`; writes happen in `tweaks-panel.jsx
 
 ## 8. Dark theme placeholder
 
-(filled in Task 3)
+Each light token has a paired dark slot; values are intentionally blank in S0 and filled in M6.
 
-## 9. Tailwind v4 mapping
+| Token | Light | Dark |
+|---|---|---|
+| `--paper-0` | `#fdfaf2` | _(M6)_ |
+| `--paper-1` | `#f4ede1` | _(M6)_ |
+| `--paper-2` | `#ece3d2` | _(M6)_ |
+| `--ink-0` | `#1b1820` | _(M6)_ |
+| `--ink-1` | `#3b3540` | _(M6)_ |
+| `--ink-2` | `#6f6878` | _(M6)_ |
+| `--ink-3` | `#a8a2b0` | _(M6)_ |
+| `--hairline` | `#d8cfbe` | _(M6)_ |
+| `--accent-poppy` | `#cf4040` | _(M6)_ |
+| `--accent-moss` | `#5d7a3a` | _(M6)_ |
+| `--accent-honey` | `#c79029` | _(M6)_ |
+| `--accent-plum` | `#6f3b6b` | _(M6)_ |
+| `--accent-fg` | `#fdfaf2` | _(M6)_ |
 
-(filled in Task 3)
+## 9. Tailwind v4 mapping (for S1 migration)
+
+In S1's `app/globals.css`, every token here lands in an `@theme` block. The CSS variable name stays identical — Tailwind v4 reads them directly.
+
+| Our token | Tailwind v4 `@theme` entry | Tailwind utility |
+|---|---|---|
+| `--paper-0` | `--color-paper-0: var(--paper-0)` | `bg-paper-0` |
+| `--ink-0` | `--color-ink-0: var(--ink-0)` | `text-ink-0` |
+| `--hairline` | `--color-hairline: var(--hairline)` | `border-hairline` |
+| `--accent` | `--color-accent: var(--accent)` | `bg-accent` |
+| `--text-base` | `--text-base: var(--text-base)` | `text-base` |
+| `--sp-4` | `--spacing-4: var(--sp-4)` | `p-4`, `gap-4` |
+| `--r-md` | `--radius-md: var(--r-md)` | `rounded-md` |
+| `--shadow-1` | `--shadow-1: var(--shadow-1)` | `shadow-1` |
+
+(Full table at S1 spec time. The structure proves the migration is mechanical.)
 
 ## 10. Acceptance checklist (S0 → S1 gate)
 
