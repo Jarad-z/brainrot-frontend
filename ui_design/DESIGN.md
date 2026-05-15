@@ -11,7 +11,25 @@
 
 ## 2. Palette
 
-(filled in Task 4)
+Three families: paper (warm-white surfaces), ink (foreground hierarchy), accent (one of four candidates).
+
+| Token | Value | Role |
+|---|---|---|
+| `--paper-0` | `#fdfaf2` | card backgrounds |
+| `--paper-1` | `#f4ede1` | page background (Moonlit Cream base) |
+| `--paper-2` | `#ece3d2` | hover, subtle divisions, mention chip |
+| `--ink-0` | `#1b1820` | primary text, block shadows |
+| `--ink-1` | `#3b3540` | secondary text |
+| `--ink-2` | `#6f6878` | meta, timestamps |
+| `--ink-3` | `#a8a2b0` | disabled, placeholder |
+| `--hairline` | `#d8cfbe` | 1px borders, dividers |
+| `--accent-poppy` | `#cf4040` | default accent |
+| `--accent-moss` | `#5d7a3a` | secondary accent option |
+| `--accent-honey` | `#c79029` | secondary accent option |
+| `--accent-plum` | `#6f3b6b` | secondary accent option |
+| `--accent-fg` | `#fdfaf2` | foreground on accent backgrounds |
+
+Tweaks panel writes the chosen accent to `--accent` at runtime.
 
 ## 3. Typography
 
@@ -41,13 +59,84 @@ Radii: `--r-sm 6px` (buttons, badges), `--r-md 12px` (cards), `--r-lg 16px` (bub
 
 Shadow is solid-offset block-style — `Npx Npx 0 var(--ink-0)`. Three tiers: `--shadow-1` (3px), `--shadow-2` (4px), `--shadow-3` (6px). Tweaks panel writes `--depth` which `--shadow-current` consumes. `--shadow-soft` is the ONLY blur shadow — reserved for dropdown/toast/modal floats.
 
-## 5. Component visual specs
+## 5. Component visual specs (and the six layout rules)
 
-(filled in Task 4; locks the six layout fixes)
+### Buttons
+- Primary: filled `--ink-0` bg, `--paper-0` fg, `--r-sm`, `--shadow-current`. Used for the single most important action per surface.
+- Ghost: transparent bg, `--ink-0` fg, `1.5px` `--hairline` border. Used for everything else.
+- Destructive: filled `--state-denied` bg, `--paper-0` fg, with a confirm dialog gate (see Danger Zone in §5.6).
+- Icon-only: 32×32 ghost; tooltip mandatory on hover.
+
+### Inputs / textarea
+- 1.5px `--hairline` border, `--r-sm`, `--paper-0` bg.
+- Focus: 2px `--accent` ring.
+- Invalid: 1.5px `--state-failed` border + 1 line of `--state-failed` helper text below.
+- mono font for code/path inputs.
+
+### Cards
+- Surface `--paper-0`, 1.5px `--hairline` border, `--r-md`, `--shadow-1` (chunky variant: `--shadow-current`).
+- Internal padding: `--sp-5` (20px) cozy, scales with density.
+
+### Status badges
+- See §6 master table for visual and color rules. Always shape-driven, color secondary.
+
+### Avatars
+- Square with 28% corner radius (matches `--r-sm` to `--r-md` scale).
+- Agent: `--ink-0` border 1.5px; user: no border.
+- Status indicator (online/offline): 8px square in bottom-right, hairline border.
+
+### Mention chip (Composer)
+- Inline `<span>` with `--paper-2` bg, `--hairline` 1px border, `--r-sm`, padding `2px 6px`.
+- Deletes as one unit (Backspace removes the chip whole, not character-by-character).
+
+### Approval card
+- Two modes: `inline` (in chat) and `hub` (in /approvals).
+- Header bar: `--role-approval-bg` (ink-0) with `--role-approval-fg` text, diagonal stripe pattern overlay on the right 40%.
+- Body: `--paper-0`, command in mono font.
+- Buttons: `[拒绝]` ghost, `[批准]` primary. Note textarea opens on demand.
+- Status states: pending (default), approved (collapsed 1-line), denied (collapsed), timeout (gray + 60% opacity + disabled buttons).
+
+### Empty state
+- Centered card 320px wide, paper-1 bg, 64px glyph at top, then title (16px bold) + sub (13px ink-2). Optional CTA below.
+
+### Error banner
+- `inline`: full-width bar above content, padding `--sp-3` `--sp-5`, left-side icon + message + close X. variant info → ink, warn → honey-tinted, error → poppy-tinted.
+- `toast`: bottom-right, 4s auto-close, click to dismiss early. Max 3 stacked.
+- `card`: full content area replacement; use for terminal page errors only.
+
+### Six locked layout rules (post-mortem of prior iterations)
+
+These six rules are NOT subject to per-iteration retuning:
+
+1. **Hero "新建项目" must not wrap.** `WorkspaceHome` header is `display: grid; grid-template-columns: 1fr auto;` with the button column `min-width: 160px`. Below 1100px viewport, button degrades to icon + "新建" but stays inline.
+2. **WorkspaceHome page grid.** `grid-template-columns: 1fr 360px; grid-template-rows: auto 1fr;`. Top-left = hero, top-right = stat 2×2, bottom-left = project cards, bottom-right = approval rail. "项目" heading and "待审批" heading must sit on the same grid-row start line.
+3. **Stat cards are near-square, not horizontal rectangles.** Each stat tile: `aspect-ratio: 1 / 0.78` (internal layout puts label on top, big number below, so slightly taller than wide).
+4. **Sidebar text never truncates silently.** Every flex child gets `min-width: 0`. Text uses `text-overflow: ellipsis` + `title=` attribute for full-text on hover.
+5. **Project card titles do not break per-character.** `word-break: keep-all; overflow-wrap: break-word; -webkit-line-clamp: 2; display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden;`.
+6. **Sidebar icons are monochrome.** No colored chips behind nav icons. Color is reserved for status badges, accent CTAs, and approval header bars.
 
 ## 6. Status semantics master table
 
-(filled in Task 4)
+This is the single source for every status-bearing UI element. New components reference this table; new colors do NOT enter the codebase without an entry here.
+
+| Domain | Value | Shape / Pattern | Foreground | Background |
+|---|---|---|---|---|
+| Task | `open` | hollow square stroke (1.5px) | — | — |
+| Task | `in_progress` | filled square + 1s pulse | `--status-in_progress-fg` | `--status-in_progress-bg` |
+| Task | `done` | filled gray dot | `--paper-0` | `--status-done-bg` |
+| Task | `blocked` | diagonal stripe pattern fill | `--ink-0` | striped |
+| Task | `archived` | text only, faded | `--status-archived-fg` | — |
+| Run | `running` | accent dot with 1s pulse | `--accent-fg` | `--state-running` |
+| Run | `queued` | dashed 1.5px circle | `--state-queued` | transparent |
+| Run | `canceled` | strikethrough text | `--state-canceled` | — |
+| Run | `failed` | ✗ icon | `--state-failed` | — |
+| Approval | `pending` | clock + countdown text | `--ink-0` | `--role-approval-bg` |
+| Approval | `<10min` | clock + RED countdown, 1s blink | `--countdown-urgent` | — |
+| Approval | `approved` | ✓ + relative time, collapsed | `--state-approved` | — |
+| Approval | `denied` | ✗ + relative time, collapsed | `--state-denied` | — |
+| Approval | `timeout` | clock crossed, opacity 60% | `--state-timeout` | — |
+
+Allowed transitions: `open → in_progress → done`; `open|in_progress → blocked → in_progress|done`; any → `archived`. Approvals: `pending → approved|denied|approved_with_edits|timeout` (terminal).
 
 ## 7. Tweaks panel & persistence
 

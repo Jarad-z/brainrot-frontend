@@ -1,0 +1,22 @@
+/* tokens/status.css — semantic state colors. Shape > color (DESIGN.md §1). */
+:root {
+  /* TaskCard.status */
+  --status-open-stroke:        var(--ink-2);
+  --status-in_progress-bg:     var(--ink-0);
+  --status-in_progress-fg:     var(--paper-0);
+  --status-done-bg:            #b8b0a0;
+  --status-archived-fg:        var(--ink-3);
+
+  /* Run state */
+  --state-running:    var(--accent);
+  --state-queued:     var(--ink-2);
+  --state-canceled:   var(--ink-3);
+  --state-failed:     #c25036;
+  --state-pending:    var(--ink-0);
+  --state-approved:   #5d7a3a;
+  --state-denied:     #c25036;
+  --state-timeout:    var(--ink-3);
+
+  /* Approval countdown */
+  --countdown-urgent: var(--accent-poppy);
+}

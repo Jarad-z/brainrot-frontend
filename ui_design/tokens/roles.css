@@ -1,0 +1,13 @@
+/* tokens/roles.css — who is speaking */
+:root {
+  --role-user-bg:        var(--paper-0);
+  --role-user-border:    var(--hairline);
+  --role-agent-bg:       var(--paper-0);
+  --role-agent-border:   var(--ink-0);
+  --role-tool-bg:        #f7f1e0;
+  --role-tool-border:    #e1d4a8;
+  --role-thinking-bg:    transparent;
+  --role-thinking-rail:  var(--ink-3);
+  --role-approval-bg:    var(--ink-0);
+  --role-approval-fg:    var(--paper-0);
+}
