@@ -170,7 +170,7 @@ function RailApprovalRow({ ap, last, onDecide, onOpen }) {
   );
 }
 
-function ProjectBoard({ project, tasks, onOpenTask }) {
+function ProjectBoard({ project, tasks, onOpenTask, activeTab, onTabChange }) {
   const cols = [
     { key: "open", label: "待办" },
     { key: "in_progress", label: "进行中" },
@@ -191,6 +191,24 @@ function ProjectBoard({ project, tasks, onOpenTask }) {
           <button className="btn ghost"><Icon name="upload" size={14} /> 上传素材</button>
           <button className="btn primary"><Icon name="plus" size={14} stroke={2.5} /> 新建任务</button>
         </div>
+      </div>
+
+      <div style={{ display: "flex", gap: 16, borderBottom: "1.5px solid var(--hairline)", marginBottom: 16 }}>
+        {[
+          { key: "tasks", label: "任务" },
+          { key: "assets", label: "素材" },
+          { key: "artifacts", label: "产物" },
+        ].map(t => (
+          <a key={t.key} onClick={() => onTabChange && onTabChange(t.key)}
+             style={{
+               padding: "8px 0", cursor: "pointer",
+               borderBottom: (activeTab || "tasks") === t.key ? "2px solid var(--ink-0)" : "2px solid transparent",
+               fontWeight: (activeTab || "tasks") === t.key ? 700 : 500,
+               color: (activeTab || "tasks") === t.key ? "var(--ink-0)" : "var(--ink-2)",
+             }}>
+            {t.label}
+          </a>
+        ))}
       </div>
 
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>

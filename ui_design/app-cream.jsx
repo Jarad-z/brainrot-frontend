@@ -163,8 +163,8 @@ function App() {
     if (r.name === "task" && r.taskId) {
       const task = MOCK.TASKS.find(t => t.id === r.taskId);
       setRoute({ name: "task", projectId: task.projectId, taskId: task.id });
-    } else if (r.name === "project") {
-      setRoute({ name: "project", projectId: r.projectId });
+    } else if (r.name === "project" || r.name === "project-assets" || r.name === "project-artifacts") {
+      setRoute({ name: r.name, projectId: r.projectId });
     } else {
       setRoute({ name: r.name });
     }
@@ -203,13 +203,22 @@ function App() {
                 onNavigate={navigate} />;
   } else if (route.name === "project" && project) {
     content = <ProjectBoard project={project} tasks={projTasks}
-                onOpenTask={(t) => navigate({ name: "task", taskId: t.id })} />;
+                onOpenTask={(t) => navigate({ name: "task", taskId: t.id })}
+                activeTab="tasks"
+                onTabChange={(t) => {
+                  if (t === "assets") navigate({ name: "project-assets", projectId: project.id });
+                  else if (t === "artifacts") navigate({ name: "project-artifacts", projectId: project.id });
+                }} />;
+  } else if (route.name === "project-assets" && project) {
+    content = <window.ProjectAssets project={project} />;
+  } else if (route.name === "project-artifacts" && project) {
+    content = <window.ProjectArtifacts project={project} />;
   } else if (route.name === "task" && project && task) {
     content = <TaskDetail project={project} task={task} tasks={projTasks}
                 onOpenTask={(t) => navigate({ name: "task", taskId: t.id })}
                 onBack={() => navigate({ name: "project", projectId: project.id })} />;
   } else if (route.name === "approvals") {
-    content = <ApprovalsPage approvals={approvals} onDecided={decideApproval}
+    content = <window.ApprovalsHub approvals={approvals} onDecide={decideApproval}
                 onOpenTask={(t) => navigate({ name: "task", taskId: t.id })} />;
   } else if (route.name === "agents") {
     content = <window.AgentsList onNew={() => setRoute({ name: "agents-new" })} />;
@@ -220,32 +229,7 @@ function App() {
   } else if (route.name === "runtimes") {
     content = <window.RuntimesList />;
   } else if (route.name === "settings") {
-    content = (
-      <div className="page">
-        <div className="page-header">
-          <div style={{ flex: 1 }}>
-            <div style={{ color: "var(--muted)", fontSize: 12, fontWeight: 700 }}>工作区</div>
-            <h1 className="page-title">设置</h1>
-            <div className="page-sub">成员、角色、危险操作。</div>
-          </div>
-        </div>
-        <div className="card chunky" style={{ padding: 22 }}>
-          <div className="section-title">成员 (3)</div>
-          <div style={{ marginTop: 12, display: "grid", gap: 8 }}>
-            {[MOCK.USER, { id: "u2", name: "Bob", handle: "bob", color: "oklch(45% 0 0)" }, { id: "u3", name: "Carol", handle: "carol", color: "oklch(60% 0 0)" }].map(u => (
-              <div key={u.id} className="row" style={{ padding: 8, borderRadius: 12, border: "1.5px solid var(--border)", background: "var(--surface)" }}>
-                <Avatar name={u.name} color={u.color} size={32} />
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontWeight: 700, fontSize: 13 }}>{u.name}</div>
-                  <div className="text-muted mono" style={{ fontSize: 11 }}>@{u.handle}</div>
-                </div>
-                <span className="tag">{u.id === MOCK.USER.id ? "owner" : "member"}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
+    content = <window.WorkspaceSettings ws={ws} />;
   }
 
   return (
