@@ -218,7 +218,7 @@ function App() {
       onCancel={() => setRoute({ name: "agents" })}
       onCreated={() => setRoute({ name: "agents" })} />;
   } else if (route.name === "runtimes") {
-    content = <RuntimesPage />;
+    content = <window.RuntimesList />;
   } else if (route.name === "settings") {
     content = (
       <div className="page">
