@@ -4,7 +4,7 @@
 
 const { useState } = React;
 
-function ToolUse({ msg, result }) {
+function ToolUse({ msg, result, pairing }) {
   const [open, setOpen] = useState(true);
   const inp = msg.parsed.input || {};
   return (

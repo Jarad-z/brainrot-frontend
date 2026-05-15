@@ -1,33 +1,6 @@
 // ====== Chat / Message rendering ======
-// Sub-components live in chat/parts/*.jsx (loaded before this file).
-// This file only contains MessageList (dispatcher) and Composer.
-
-function MessageList({ messages, decisions, onDecide }) {
-  // pair tool_use ↔ tool_result by tool_use_id
-  const resultByUse = useMemo(() => {
-    const m = {};
-    messages.forEach(x => {
-      if (x.parsed.type === "tool_result") m[x.parsed.tool_use_id] = x;
-    });
-    return m;
-  }, [messages]);
-
-  return (
-    <>
-      {messages.map((msg) => {
-        const t = msg.parsed.type;
-        if (t === "user") return <window.UserMessage key={msg.id} msg={msg} />;
-        if (t === "assistant_text" || t === "thinking") return <window.AssistantMessage key={msg.id} msg={msg} />;
-        if (t === "tool_use") return <window.ToolBlock key={msg.id} useMsg={msg} resultMsg={resultByUse[msg.parsed.tool_use_id]} />;
-        if (t === "tool_result") return null;
-        if (t === "permission_request") return <window.PermBlock key={msg.id} msg={msg} decision={decisions[msg.id]} onDecide={(d) => onDecide(msg.id, d)} />;
-        if (t === "result") return <window.ResultBanner key={msg.id} msg={msg} />;
-        if (t === "system") return <window.SystemLine key={msg.id} text={msg.parsed.text} />;
-        return null;
-      })}
-    </>
-  );
-}
+// MessageList and MessageItem now live in chat/MessageList.jsx and chat/MessageItem.jsx.
+// This file only contains Composer.
 
 // ====== Composer with @mention pop ======
 function Composer({ agents, onSend }) {
@@ -121,4 +94,4 @@ function Composer({ agents, onSend }) {
   );
 }
 
-Object.assign(window, { MessageList, Composer });
+Object.assign(window, { Composer });
