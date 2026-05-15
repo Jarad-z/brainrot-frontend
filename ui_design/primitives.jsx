@@ -79,21 +79,18 @@ function StatusChip({ status }) {
   );
 }
 
-// --- format countdown mm:ss ---
+// --- countdown (delegates to lib/countdown.js) ---
+// Legacy callers expect a `seconds-remaining` number; adapt by accepting an
+// `initialSec` and converting to an expiry, then projecting back.
+function useCountdown(initialSec) {
+  const expiresAt = useMemo(() => Date.now() + initialSec * 1000, [initialSec]);
+  const state = window.BR_LIB.countdown.useCountdown(expiresAt);
+  return Math.floor(state.remainingMs / 1000);
+}
 function fmtCountdown(secs) {
   const m = Math.floor(secs / 60);
   const s = secs % 60;
   return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
-}
-
-function useCountdown(initialSec) {
-  const [s, setS] = useState(initialSec);
-  useEffect(() => {
-    if (s <= 0) return;
-    const t = setTimeout(() => setS(v => v - 1), 1000);
-    return () => clearTimeout(t);
-  }, [s]);
-  return s;
 }
 
 // --- empty state ---

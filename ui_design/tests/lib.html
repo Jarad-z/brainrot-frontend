@@ -19,6 +19,8 @@
 <div id="summary" class="summary"></div>
 
 <script src="../lib/codec.js"></script>
+<script src="../lib/mention-parse.js"></script>
+<script src="../lib/countdown.js"></script>
 <script>
 const results = document.getElementById("results");
 const summary = document.getElementById("summary");
@@ -98,6 +100,39 @@ group("mention-parse.js");
   assert("activePrefix mid-word returns null", activePrefix("hi@wr", 5) === null);
   assert("activePrefix after whitespace returns null", activePrefix("@wr hi", 6) === null);
   assert("activePrefix empty '@|' returns ''", activePrefix("@", 1) === "");
+})();
+
+// ---- countdown ----
+group("countdown.js");
+(function () {
+  const { computeCountdown, URGENT_MS } = window.BR_LIB.countdown;
+  const now = 1_000_000_000_000;
+
+  // 30 min remaining → not urgent, not expired
+  let s = computeCountdown(now + 30 * 60_000, now);
+  assert("30min: not urgent", !s.urgent);
+  assert("30min: not expired", !s.expired);
+  assert("30min: label '30:00'", s.label === "30:00");
+
+  // 9 min remaining → urgent
+  s = computeCountdown(now + 9 * 60_000, now);
+  assert("9min: urgent", s.urgent && !s.expired);
+  assert("9min: label '09:00'", s.label === "09:00");
+
+  // exactly URGENT_MS → urgent
+  s = computeCountdown(now + URGENT_MS, now);
+  assert("exactly 10min: urgent", s.urgent);
+
+  // expired (negative remainder)
+  s = computeCountdown(now - 5000, now);
+  assert("expired: expired=true", s.expired);
+  assert("expired: label '已超时'", s.label === "已超时");
+  assert("expired: remainingMs clamped to 0", s.remainingMs === 0);
+
+  // ISO string input
+  const iso = new Date(now + 90_000).toISOString();
+  s = computeCountdown(iso, now);
+  assert("ISO input: label '01:30'", s.label === "01:30");
 })();
 
 // finalize
