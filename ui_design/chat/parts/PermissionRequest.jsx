@@ -1,57 +1,62 @@
 // ui_design/chat/parts/PermissionRequest.jsx
-// Reads: window.React, window.Icon, window.useCountdown, window.fmtCountdown
-// Writes: window.PermissionRequest, window.PermBlock
+// Reads: window.React, window.ApprovalCard.
+// Writes: window.PermissionRequest, window.PermBlock.
 
-const { useState } = React;
-
+/**
+ * Thin adapter that maps the legacy mock message shape to ApprovalLite
+ * and delegates rendering to the shared ApprovalCard component.
+ *
+ * Legacy decision shape received from screens.jsx:
+ *   approved:            { kind: "approved", note }
+ *   approved with edits: { kind: "approved", note, edited: true }
+ *   rejected:            { kind: "rejected", note }
+ *
+ * ApprovalCard callback signature: (id, decision, note)
+ *   where decision is "approved" | "denied" | "approved_with_edits"
+ *
+ * @param {{ msg: object, decision: object|null, onDecide: function }} props
+ */
 function PermissionRequest({ msg, decision, onDecide }) {
-  const left = useCountdown(msg.parsed.expiresInSec);
-  const [note, setNote] = useState("");
+  const parsed = msg.parsed || {};
+  const expiresAt = parsed.expiresAt
+    || (parsed.expiresInSec
+        ? new Date(Date.now() + parsed.expiresInSec * 1000).toISOString()
+        : new Date(Date.now() + 3600 * 1000).toISOString());
+
+  // Map legacy decision → ApprovalLite status
+  let status = "pending";
   if (decision) {
-    return (
-      <div className={"perm-resolved " + decision.kind}>
-        <Icon name={decision.kind === "approved" ? "check" : "x"} size={14} stroke={2.5} />
-        <span>{decision.kind === "approved" ? "已批准" : "已拒绝"} · {msg.parsed.tool}</span>
-        {decision.note && <span style={{ color: "var(--muted)", fontWeight: 500 }}>「{decision.note}」</span>}
-      </div>
-    );
+    if (decision.kind === "approved" && decision.edited) {
+      status = "approved_with_edits";
+    } else if (decision.kind === "approved") {
+      status = "approved";
+    } else {
+      // legacy "rejected" → new "denied"
+      status = "denied";
+    }
   }
-  return (
-    <div className="perm-card">
-      <div className="perm-head">
-        <Icon name="warn" size={16} stroke={2.5} />
-        <span>{msg.parsed.tool} 请求批准</span>
-        <span className="countdown">{fmtCountdown(left)}</span>
-      </div>
-      <div className="perm-body">
-        {msg.parsed.note && (
-          <div style={{ fontSize: 13, color: "var(--ink-2)", marginBottom: 10 }}>{msg.parsed.note}</div>
-        )}
-        <div className="perm-args">
-          {Object.entries(msg.parsed.input).map(([k, v]) => (
-            <div key={k}><span className="k">{k}</span><span className="v">{String(v)}</span></div>
-          ))}
-        </div>
-        <textarea
-          className="perm-note"
-          placeholder="可选备注（会进入审批历史）…"
-          value={note}
-          onChange={e => setNote(e.target.value)}
-        />
-        <div className="perm-actions">
-          <button className="btn primary" onClick={() => onDecide({ kind: "approved", note })}>
-            <Icon name="check" size={14} stroke={2.5} /> 批准
-          </button>
-          <button className="btn" onClick={() => onDecide({ kind: "approved", note, edited: true })}>
-            批准并修改
-          </button>
-          <button className="btn danger" onClick={() => onDecide({ kind: "rejected", note })}>
-            <Icon name="x" size={14} stroke={2.5} /> 拒绝
-          </button>
-        </div>
-      </div>
-    </div>
-  );
+
+  const approval = {
+    id: msg.id,
+    tool: parsed.tool,
+    input: parsed.input || {},
+    expiresAt,
+    status,
+  };
+
+  function handleDecide(_id, kind, note) {
+    if (!onDecide) return;
+    // Translate new decision token back to legacy shape
+    if (kind === "approved_with_edits") {
+      onDecide({ kind: "approved", note, edited: true });
+    } else if (kind === "denied") {
+      onDecide({ kind: "rejected", note });
+    } else {
+      onDecide({ kind, note });
+    }
+  }
+
+  return <window.ApprovalCard approval={approval} mode="inline" onDecide={handleDecide} />;
 }
 
 function PermBlock({ msg, decision, onDecide }) {
