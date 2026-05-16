@@ -54,16 +54,25 @@ export default function OnboardingPage() {
   return (
     <div className="p-8 max-w-xl mx-auto">
       <Card className="p-8 bg-paper-0 border-hairline shadow-1">
-        <h1 className="text-xl font-display font-bold mb-2 text-ink-0">{messages.workspace.onboardingTitle}</h1>
+        <h1 className="text-xl font-display font-bold mb-2 text-ink-0">
+          {messages.workspace.onboardingTitle}
+        </h1>
         <p className="text-sm text-ink-2 mb-6">{messages.workspace.onboardingHelp}</p>
         <form onSubmit={onSubmit} className="space-y-4">
-          {formError && <ErrorBanner kind="inline" variant="error">{formError}</ErrorBanner>}
+          {formError && (
+            <ErrorBanner kind="inline" variant="error">
+              {formError}
+            </ErrorBanner>
+          )}
           <div className="space-y-1">
             <Label htmlFor="wsId">工作区 ID</Label>
             <Input
               id="wsId"
               value={wsId}
-              onChange={(e) => { setWsId(e.target.value); setFieldError(null); }}
+              onChange={(e) => {
+                setWsId(e.target.value);
+                setFieldError(null);
+              }}
               placeholder="00000000-0000-0000-0000-000000000000"
               autoFocus
               aria-invalid={!!fieldError}

@@ -29,9 +29,18 @@ export function RegisterForm() {
 
   function validate(): boolean {
     let ok = true;
-    if (!name.trim()) { setNameError("请填写姓名"); ok = false; }
-    if (!isValidEmail(email)) { setEmailError(messages.auth.invalidEmail); ok = false; }
-    if (!isValidPassword(password)) { setPasswordError(messages.auth.shortPassword); ok = false; }
+    if (!name.trim()) {
+      setNameError("请填写姓名");
+      ok = false;
+    }
+    if (!isValidEmail(email)) {
+      setEmailError(messages.auth.invalidEmail);
+      ok = false;
+    }
+    if (!isValidPassword(password)) {
+      setPasswordError(messages.auth.shortPassword);
+      ok = false;
+    }
     return ok;
   }
 
@@ -61,13 +70,20 @@ export function RegisterForm() {
 
   return (
     <form onSubmit={onSubmit} className="space-y-4">
-      {formError && <ErrorBanner kind="inline" variant="error">{formError}</ErrorBanner>}
+      {formError && (
+        <ErrorBanner kind="inline" variant="error">
+          {formError}
+        </ErrorBanner>
+      )}
       <div className="space-y-1">
         <Label htmlFor="name">姓名</Label>
         <Input
           id="name"
           value={name}
-          onChange={(e) => { setName(e.target.value); setNameError(null); }}
+          onChange={(e) => {
+            setName(e.target.value);
+            setNameError(null);
+          }}
           aria-invalid={!!nameError}
           autoFocus
         />
@@ -79,8 +95,13 @@ export function RegisterForm() {
           id="email"
           type="email"
           value={email}
-          onChange={(e) => { setEmail(e.target.value); setEmailError(null); }}
-          onBlur={() => { if (email && !isValidEmail(email)) setEmailError(messages.auth.invalidEmail); }}
+          onChange={(e) => {
+            setEmail(e.target.value);
+            setEmailError(null);
+          }}
+          onBlur={() => {
+            if (email && !isValidEmail(email)) setEmailError(messages.auth.invalidEmail);
+          }}
           aria-invalid={!!emailError}
         />
         {emailError && <p className="text-xs text-state-failed">{emailError}</p>}
@@ -91,8 +112,14 @@ export function RegisterForm() {
           id="password"
           type="password"
           value={password}
-          onChange={(e) => { setPassword(e.target.value); setPasswordError(null); }}
-          onBlur={() => { if (password && !isValidPassword(password)) setPasswordError(messages.auth.shortPassword); }}
+          onChange={(e) => {
+            setPassword(e.target.value);
+            setPasswordError(null);
+          }}
+          onBlur={() => {
+            if (password && !isValidPassword(password))
+              setPasswordError(messages.auth.shortPassword);
+          }}
           aria-invalid={!!passwordError}
         />
         {passwordError && <p className="text-xs text-state-failed">{passwordError}</p>}
@@ -101,7 +128,10 @@ export function RegisterForm() {
         {pending ? "注册中…" : messages.auth.registerCta}
       </Button>
       <p className="text-xs text-ink-2 text-center">
-        已有账号？<Link href="/login" className="underline">登录 →</Link>
+        已有账号？
+        <Link href="/login" className="underline">
+          登录 →
+        </Link>
       </p>
     </form>
   );

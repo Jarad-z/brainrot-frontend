@@ -5,9 +5,7 @@ const config: NextConfig = {
   async rewrites() {
     const apiBase = process.env.NEXT_PUBLIC_API_BASE;
     if (apiBase) return [];
-    return [
-      { source: "/api/:path*", destination: "http://localhost:8080/api/:path*" },
-    ];
+    return [{ source: "/api/:path*", destination: "http://localhost:8080/api/:path*" }];
   },
   webpack(config) {
     config.module.rules.push({ test: /ui_design[\\/]/, loader: "ignore-loader" });

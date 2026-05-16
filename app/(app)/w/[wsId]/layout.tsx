@@ -31,7 +31,9 @@ export default function WorkspaceLayout({ children, params }: LayoutProps) {
   if (error instanceof ApiError && (error.status === 403 || error.status === 404)) {
     return (
       <ErrorBanner kind="card" variant="error">
-        <p className="mb-3">{error.status === 403 ? messages.workspace.notMember : messages.workspace.notFound}</p>
+        <p className="mb-3">
+          {error.status === 403 ? messages.workspace.notMember : messages.workspace.notFound}
+        </p>
         <Button
           variant="outline"
           onClick={() => {

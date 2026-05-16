@@ -25,17 +25,26 @@ describe("parseMessageContent variants", () => {
   });
 
   it("tool_use", () => {
-    const r = parsed({ type: "tool_use", payload: { tool_name: "Write", tool_use_id: "u1", input: { path: "/x" } } });
+    const r = parsed({
+      type: "tool_use",
+      payload: { tool_name: "Write", tool_use_id: "u1", input: { path: "/x" } },
+    });
     expect(r.type).toBe("tool_use");
   });
 
   it("tool_result", () => {
-    const r = parsed({ type: "tool_result", payload: { tool_use_id: "u1", is_error: false, content: "ok" } });
+    const r = parsed({
+      type: "tool_result",
+      payload: { tool_use_id: "u1", is_error: false, content: "ok" },
+    });
     expect(r.type).toBe("tool_result");
   });
 
   it("permission_request", () => {
-    const r = parsed({ type: "permission_request", payload: { tool_use_id: "u1", tool_name: "Bash" } });
+    const r = parsed({
+      type: "permission_request",
+      payload: { tool_use_id: "u1", tool_name: "Bash" },
+    });
     expect(r.type).toBe("permission_request");
   });
 

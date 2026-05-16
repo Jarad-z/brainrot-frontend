@@ -1,8 +1,7 @@
 export const isValidEmail = (s: string): boolean =>
   typeof s === "string" && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
 
-export const isValidPassword = (s: string): boolean =>
-  typeof s === "string" && s.length >= 8;
+export const isValidPassword = (s: string): boolean => typeof s === "string" && s.length >= 8;
 
 export const isValidUuid = (s: string): boolean =>
   typeof s === "string" &&

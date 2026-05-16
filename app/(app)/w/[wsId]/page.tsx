@@ -38,7 +38,9 @@ export default function WorkspaceHomePage({ params }: PageProps) {
           <Tooltip>
             <TooltipTrigger asChild>
               <span>
-                <Button disabled style={{ minWidth: 160 }}>新建项目</Button>
+                <Button disabled style={{ minWidth: 160 }}>
+                  新建项目
+                </Button>
               </span>
             </TooltipTrigger>
             <TooltipContent>{messages.shell.writesDisabled}</TooltipContent>

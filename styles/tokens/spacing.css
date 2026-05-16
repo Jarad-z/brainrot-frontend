@@ -12,6 +12,12 @@
 }
 
 /* Density scaling — multiplier on --sp-* via data-density */
-[data-density="compact"] { --sp-base-mult: 0.75; }
-[data-density="cozy"]    { --sp-base-mult: 1; }
-[data-density="airy"]    { --sp-base-mult: 1.25; }
+[data-density="compact"] {
+  --sp-base-mult: 0.75;
+}
+[data-density="cozy"] {
+  --sp-base-mult: 1;
+}
+[data-density="airy"] {
+  --sp-base-mult: 1.25;
+}

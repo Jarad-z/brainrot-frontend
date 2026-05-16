@@ -8,9 +8,17 @@ describe("useAppStore", () => {
 
   it("setSelection merges partial patch", () => {
     useAppStore.getState().setSelection({ wsId: "ws-1" });
-    expect(useAppStore.getState().selection).toEqual({ wsId: "ws-1", projectId: null, taskId: null });
+    expect(useAppStore.getState().selection).toEqual({
+      wsId: "ws-1",
+      projectId: null,
+      taskId: null,
+    });
     useAppStore.getState().setSelection({ projectId: "p-1" });
-    expect(useAppStore.getState().selection).toEqual({ wsId: "ws-1", projectId: "p-1", taskId: null });
+    expect(useAppStore.getState().selection).toEqual({
+      wsId: "ws-1",
+      projectId: "p-1",
+      taskId: null,
+    });
   });
 
   it("setWsStatus updates lastConnectedAt only on 'connected'", () => {

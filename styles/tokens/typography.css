@@ -3,33 +3,33 @@
    ================================================================ */
 :root {
   --font-display: "Bricolage Grotesque", system-ui, sans-serif;
-  --font-body:    "Bricolage Grotesque", system-ui, sans-serif;
-  --font-mono:    "JetBrains Mono", ui-monospace, monospace;
+  --font-body: "Bricolage Grotesque", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
 
   /* Variable axis presets (Bricolage `wdth`) */
-  --wdth-tight:  88;
+  --wdth-tight: 88;
   --wdth-normal: 100;
-  --wdth-wide:   96;
+  --wdth-wide: 96;
 
   /* Size scale (px) — see DESIGN.md §3 rationale */
-  --text-xs:   12px;
-  --text-sm:   14px;
+  --text-xs: 12px;
+  --text-sm: 14px;
   --text-base: 16px;
-  --text-lg:   18px;
-  --text-xl:   22px;
-  --text-2xl:  32px;
+  --text-lg: 18px;
+  --text-xl: 22px;
+  --text-2xl: 32px;
   --text-hero: 64px;
 
   /* Line heights */
-  --lh-tight:  1.15;
-  --lh-snug:   1.25;
-  --lh-base:   1.5;
-  --lh-loose:  1.6;
+  --lh-tight: 1.15;
+  --lh-snug: 1.25;
+  --lh-base: 1.5;
+  --lh-loose: 1.6;
 
   /* Weights */
-  --w-regular:  400;
-  --w-medium:   500;
+  --w-regular: 400;
+  --w-medium: 500;
   --w-semibold: 600;
-  --w-bold:     700;
-  --w-black:    800;
+  --w-bold: 700;
+  --w-black: 800;
 }

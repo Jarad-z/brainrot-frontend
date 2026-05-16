@@ -20,10 +20,10 @@
 
   /* Accent candidates (Tweaks panel chooses one → --accent) */
   --accent-poppy: #cf4040;
-  --accent-moss:  #5d7a3a;
+  --accent-moss: #5d7a3a;
   --accent-honey: #c79029;
-  --accent-plum:  #6f3b6b;
-  --accent-fg:    #fdfaf2;
+  --accent-plum: #6f3b6b;
+  --accent-fg: #fdfaf2;
 
   /* Default accent (overridden at runtime by applyAccent()) */
   --accent: var(--accent-poppy);

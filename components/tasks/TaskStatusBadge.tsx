@@ -23,7 +23,10 @@ export function TaskStatusBadge({ status }: TaskStatusBadgeProps) {
   }
   if (status === "in_progress") {
     return (
-      <span className="inline-flex items-center gap-1.5 text-xs" style={{ color: "var(--status-in_progress-fg)" }}>
+      <span
+        className="inline-flex items-center gap-1.5 text-xs"
+        style={{ color: "var(--status-in_progress-fg)" }}
+      >
         <span
           className="inline-block w-3 h-3 animate-pulse"
           style={{ background: "var(--status-in_progress-bg)" }}

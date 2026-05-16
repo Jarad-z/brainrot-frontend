@@ -24,10 +24,10 @@ describe("filterCandidates", () => {
 
 describe("parseSubmit", () => {
   it("dedupes mention ids", () => {
-    const result = parseSubmit(
-      "hi @writer @writer",
-      [{ id: "1", handle: "writer" }, { id: "1", handle: "writer" }],
-    );
+    const result = parseSubmit("hi @writer @writer", [
+      { id: "1", handle: "writer" },
+      { id: "1", handle: "writer" },
+    ]);
     expect(result).toEqual({ text: "hi @writer @writer", mentions: ["1"] });
   });
 });

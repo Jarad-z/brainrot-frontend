@@ -4,14 +4,9 @@ export interface AgentLike {
   archived?: boolean;
 }
 
-export function filterCandidates(
-  prefix: string,
-  agents: ReadonlyArray<AgentLike>,
-): AgentLike[] {
+export function filterCandidates(prefix: string, agents: ReadonlyArray<AgentLike>): AgentLike[] {
   const p = (prefix || "").toLowerCase();
-  return agents
-    .filter((a) => !a.archived)
-    .filter((a) => a.handle.toLowerCase().startsWith(p));
+  return agents.filter((a) => !a.archived).filter((a) => a.handle.toLowerCase().startsWith(p));
 }
 
 export function parseSubmit(

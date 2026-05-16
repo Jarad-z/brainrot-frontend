@@ -16,8 +16,12 @@ export function TaskCard({ task }: TaskCardProps) {
         <TooltipTrigger asChild>
           <div className="select-none">
             <Card className="p-4 bg-paper-0 border-hairline shadow-1 opacity-60 cursor-not-allowed h-full">
-              <h4 className="text-sm font-display font-semibold text-ink-0 mb-1 line-clamp-2">{task.title}</h4>
-              {task.summary && <p className="text-xs text-ink-2 line-clamp-2 mb-3">{task.summary}</p>}
+              <h4 className="text-sm font-display font-semibold text-ink-0 mb-1 line-clamp-2">
+                {task.title}
+              </h4>
+              {task.summary && (
+                <p className="text-xs text-ink-2 line-clamp-2 mb-3">{task.summary}</p>
+              )}
               <div className="flex items-center justify-between mt-auto">
                 <TaskStatusBadge status={task.status} />
                 <span className="text-xs text-ink-2">{relativeTime(task.created_at)}</span>

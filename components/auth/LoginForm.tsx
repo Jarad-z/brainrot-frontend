@@ -28,8 +28,14 @@ export function LoginForm() {
 
   function validate(): boolean {
     let ok = true;
-    if (!isValidEmail(email)) { setEmailError(messages.auth.invalidEmail); ok = false; }
-    if (!isValidPassword(password)) { setPasswordError(messages.auth.shortPassword); ok = false; }
+    if (!isValidEmail(email)) {
+      setEmailError(messages.auth.invalidEmail);
+      ok = false;
+    }
+    if (!isValidPassword(password)) {
+      setPasswordError(messages.auth.shortPassword);
+      ok = false;
+    }
     return ok;
   }
 
@@ -58,15 +64,24 @@ export function LoginForm() {
 
   return (
     <form onSubmit={onSubmit} className="space-y-4">
-      {formError && <ErrorBanner kind="inline" variant="error">{formError}</ErrorBanner>}
+      {formError && (
+        <ErrorBanner kind="inline" variant="error">
+          {formError}
+        </ErrorBanner>
+      )}
       <div className="space-y-1">
         <Label htmlFor="email">邮箱</Label>
         <Input
           id="email"
           type="email"
           value={email}
-          onChange={(e) => { setEmail(e.target.value); setEmailError(null); }}
-          onBlur={() => { if (email && !isValidEmail(email)) setEmailError(messages.auth.invalidEmail); }}
+          onChange={(e) => {
+            setEmail(e.target.value);
+            setEmailError(null);
+          }}
+          onBlur={() => {
+            if (email && !isValidEmail(email)) setEmailError(messages.auth.invalidEmail);
+          }}
           aria-invalid={!!emailError}
           autoFocus
         />
@@ -78,8 +93,14 @@ export function LoginForm() {
           id="password"
           type="password"
           value={password}
-          onChange={(e) => { setPassword(e.target.value); setPasswordError(null); }}
-          onBlur={() => { if (password && !isValidPassword(password)) setPasswordError(messages.auth.shortPassword); }}
+          onChange={(e) => {
+            setPassword(e.target.value);
+            setPasswordError(null);
+          }}
+          onBlur={() => {
+            if (password && !isValidPassword(password))
+              setPasswordError(messages.auth.shortPassword);
+          }}
           aria-invalid={!!passwordError}
         />
         {passwordError && <p className="text-xs text-state-failed">{passwordError}</p>}
@@ -88,7 +109,10 @@ export function LoginForm() {
         {pending ? "登录中…" : messages.auth.loginCta}
       </Button>
       <p className="text-xs text-ink-2 text-center">
-        还没有账号？<Link href="/register" className="underline">注册 →</Link>
+        还没有账号？
+        <Link href="/register" className="underline">
+          注册 →
+        </Link>
       </p>
     </form>
   );

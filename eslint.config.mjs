@@ -4,7 +4,7 @@ import nextPlugin from "eslint-config-next";
 
 export default [
   {
-    ignores: ["node_modules/", ".next/", "ui_design/", "_design_pkg/", "coverage/", "eslint.config.mjs", "next.config.ts", "postcss.config.mjs", "tailwind.config.ts", "**/*.css"],
+    ignores: ["node_modules/", ".next/", "ui_design/", "_design_pkg/", "coverage/", "eslint.config.mjs", "next.config.ts", "postcss.config.mjs", "tailwind.config.ts", "**/*.css", "next-env.d.ts"],
   },
   {
     files: ["**/*.{js,jsx,ts,tsx}"],

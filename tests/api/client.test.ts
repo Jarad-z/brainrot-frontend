@@ -7,7 +7,15 @@ describe("apiFetch", () => {
   });
 
   it("returns parsed JSON on 200", async () => {
-    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(JSON.stringify({ ok: true }), { status: 200, headers: { "Content-Type": "application/json" } })));
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(
+        new Response(JSON.stringify({ ok: true }), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        }),
+      ),
+    );
     const result = await apiFetch<{ ok: boolean }>("/api/v1/me");
     expect(result).toEqual({ ok: true });
   });
@@ -19,7 +27,10 @@ describe("apiFetch", () => {
   });
 
   it("throws ApiError on !ok with status and body", async () => {
-    vi.stubGlobal("fetch", vi.fn().mockImplementation(() => Promise.resolve(new Response("nope", { status: 401 }))));
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockImplementation(() => Promise.resolve(new Response("nope", { status: 401 }))),
+    );
     await expect(apiFetch("/api/v1/me")).rejects.toMatchObject({
       name: "ApiError",
       status: 401,

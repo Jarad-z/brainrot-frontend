@@ -14,64 +14,72 @@
   --color-paper-0: var(--paper-0);
   --color-paper-1: var(--paper-1);
   --color-paper-2: var(--paper-2);
-  --color-ink-0:   var(--ink-0);
-  --color-ink-1:   var(--ink-1);
-  --color-ink-2:   var(--ink-2);
-  --color-ink-3:   var(--ink-3);
-  --color-hairline:      var(--hairline);
-  --color-accent:        var(--accent);
-  --color-accent-fg:     var(--accent-fg);
-  --color-accent-poppy:  var(--accent-poppy);
-  --color-accent-moss:   var(--accent-moss);
-  --color-accent-honey:  var(--accent-honey);
-  --color-accent-plum:   var(--accent-plum);
+  --color-ink-0: var(--ink-0);
+  --color-ink-1: var(--ink-1);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-hairline: var(--hairline);
+  --color-accent: var(--accent);
+  --color-accent-fg: var(--accent-fg);
+  --color-accent-poppy: var(--accent-poppy);
+  --color-accent-moss: var(--accent-moss);
+  --color-accent-honey: var(--accent-honey);
+  --color-accent-plum: var(--accent-plum);
   --color-role-approval-bg: var(--role-approval-bg);
   --color-role-approval-fg: var(--role-approval-fg);
-  --color-state-failed:        var(--state-failed);
-  --color-state-running:       var(--state-running);
-  --color-state-queued:        var(--state-queued);
-  --color-state-denied:        var(--state-denied);
-  --color-state-approved:      var(--state-approved);
-  --color-state-timeout:       var(--state-timeout);
-  --color-state-canceled:      var(--state-canceled);
+  --color-state-failed: var(--state-failed);
+  --color-state-running: var(--state-running);
+  --color-state-queued: var(--state-queued);
+  --color-state-denied: var(--state-denied);
+  --color-state-approved: var(--state-approved);
+  --color-state-timeout: var(--state-timeout);
+  --color-state-canceled: var(--state-canceled);
   --color-status-in_progress-bg: var(--status-in_progress-bg);
   --color-status-in_progress-fg: var(--status-in_progress-fg);
-  --color-status-done-bg:        var(--status-done-bg);
-  --color-status-archived-fg:    var(--status-archived-fg);
-  --color-countdown-urgent:      var(--countdown-urgent);
+  --color-status-done-bg: var(--status-done-bg);
+  --color-status-archived-fg: var(--status-archived-fg);
+  --color-countdown-urgent: var(--countdown-urgent);
 
-  --text-xs:   var(--text-xs);
-  --text-sm:   var(--text-sm);
+  --text-xs: var(--text-xs);
+  --text-sm: var(--text-sm);
   --text-base: var(--text-base);
-  --text-lg:   var(--text-lg);
-  --text-xl:   var(--text-xl);
-  --text-2xl:  var(--text-2xl);
+  --text-lg: var(--text-lg);
+  --text-xl: var(--text-xl);
+  --text-2xl: var(--text-2xl);
   --text-hero: var(--text-hero);
 
-  --spacing-1:  var(--sp-1);
-  --spacing-2:  var(--sp-2);
-  --spacing-3:  var(--sp-3);
-  --spacing-4:  var(--sp-4);
-  --spacing-5:  var(--sp-5);
-  --spacing-6:  var(--sp-6);
-  --spacing-8:  var(--sp-8);
+  --spacing-1: var(--sp-1);
+  --spacing-2: var(--sp-2);
+  --spacing-3: var(--sp-3);
+  --spacing-4: var(--sp-4);
+  --spacing-5: var(--sp-5);
+  --spacing-6: var(--sp-6);
+  --spacing-8: var(--sp-8);
   --spacing-10: var(--sp-10);
   --spacing-12: var(--sp-12);
 
-  --radius-sm:  var(--r-sm);
-  --radius-md:  var(--r-md);
-  --radius-lg:  var(--r-lg);
-  --radius-xl:  var(--r-xl);
-  --shadow-1:       var(--shadow-1);
-  --shadow-2:       var(--shadow-2);
-  --shadow-3:       var(--shadow-3);
+  --radius-sm: var(--r-sm);
+  --radius-md: var(--r-md);
+  --radius-lg: var(--r-lg);
+  --radius-xl: var(--r-xl);
+  --shadow-1: var(--shadow-1);
+  --shadow-2: var(--shadow-2);
+  --shadow-3: var(--shadow-3);
   --shadow-current: var(--shadow-current);
-  --shadow-soft:    var(--shadow-soft);
+  --shadow-soft: var(--shadow-soft);
 
   --font-display: var(--font-display);
-  --font-body:    var(--font-display);
-  --font-mono:    var(--font-mono);
+  --font-body: var(--font-display);
+  --font-mono: var(--font-mono);
 }
 
-html, body { background: var(--paper-1); color: var(--ink-0); }
-body { font-family: var(--font-body); font-size: var(--text-base); line-height: 1.5; }
+html,
+body {
+  background: var(--paper-1);
+  color: var(--ink-0);
+}
+body {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: 1.5;
+}

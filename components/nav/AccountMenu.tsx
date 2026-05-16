@@ -39,7 +39,10 @@ export function AccountMenu({ user }: AccountMenuProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button type="button" className="rounded-md focus:outline-none focus:ring-2 focus:ring-accent">
+        <button
+          type="button"
+          className="rounded-md focus:outline-none focus:ring-2 focus:ring-accent"
+        >
           <Avatar className="h-8 w-8 bg-ink-0 text-paper-0">
             <AvatarFallback className="bg-ink-0 text-paper-0 text-sm font-semibold">
               {initial}

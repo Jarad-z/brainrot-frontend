@@ -18,8 +18,7 @@ interface AppState {
 
 export const useAppStore = create<AppState>((set) => ({
   selection: { wsId: null, projectId: null, taskId: null },
-  setSelection: (patch) =>
-    set((s) => ({ selection: { ...s.selection, ...patch } })),
+  setSelection: (patch) => set((s) => ({ selection: { ...s.selection, ...patch } })),
   ws: { status: "idle", lastConnectedAt: null },
   setWsStatus: (status) =>
     set((s) => ({

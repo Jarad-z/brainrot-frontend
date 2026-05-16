@@ -13,7 +13,9 @@
   align-items: center;
   gap: 12px;
 }
-.home-page .hero-cta .btn { white-space: nowrap; }
+.home-page .hero-cta .btn {
+  white-space: nowrap;
+}
 
 /* Rule 2: WorkspaceHome 2x2 page grid — left col (hero + projects),
    right col (stat-grid + rail). The "项目" and "待审批" headings must
@@ -24,10 +26,26 @@
   grid-template-rows: auto 1fr;
   gap: 24px;
 }
-.home-page .hero         { grid-column: 1; grid-row: 1; min-width: 0; }
-.home-page .stat-grid    { grid-column: 2; grid-row: 1; min-width: 0; }
-.home-page .home-projects{ grid-column: 1; grid-row: 2; min-width: 0; }
-.home-page .home-rail    { grid-column: 2; grid-row: 2; min-width: 0; }
+.home-page .hero {
+  grid-column: 1;
+  grid-row: 1;
+  min-width: 0;
+}
+.home-page .stat-grid {
+  grid-column: 2;
+  grid-row: 1;
+  min-width: 0;
+}
+.home-page .home-projects {
+  grid-column: 1;
+  grid-row: 2;
+  min-width: 0;
+}
+.home-page .home-rail {
+  grid-column: 2;
+  grid-row: 2;
+  min-width: 0;
+}
 
 /* Rule 3: near-square stat tiles. Internal label-on-top + big-number-below
    wants slightly taller than wide. */
@@ -43,7 +61,9 @@
 
 /* Rule 4: sidebar text never truncates silently. Every flex child gets
    min-width: 0 + ellipsis. title= attribute is set in JSX consumers. */
-.sidebar * { min-width: 0; }
+.sidebar * {
+  min-width: 0;
+}
 .sidebar .ws-name,
 .sidebar .ws-meta,
 .sidebar .brand-text,
