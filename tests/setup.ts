@@ -1,1 +1,22 @@
 import "@testing-library/jest-dom/vitest";
+
+// Tiptap calls Range.getBoundingClientRect; jsdom lacks it.
+if (typeof Range !== "undefined" && !("getBoundingClientRect" in Range.prototype)) {
+  Range.prototype.getBoundingClientRect = function () {
+    return { x: 0, y: 0, top: 0, left: 0, bottom: 0, right: 0, width: 0, height: 0, toJSON: () => ({}) } as DOMRect;
+  };
+}
+if (typeof Range !== "undefined" && !("getClientRects" in Range.prototype)) {
+  Range.prototype.getClientRects = function () {
+    return { length: 0, item: () => null, [Symbol.iterator]: function* () {} } as unknown as DOMRectList;
+  };
+}
+
+// react-virtual / Tiptap consumers expect ResizeObserver.
+if (typeof globalThis.ResizeObserver === "undefined") {
+  globalThis.ResizeObserver = class {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  } as unknown as typeof ResizeObserver;
+}
