@@ -3,6 +3,7 @@
 import { useEffect, useMemo } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAppStore } from "@/lib/store";
+import { useChatUIStore } from "@/lib/store/chat-ui";
 import { WSClient } from "./client";
 import { WSClientContext } from "./context";
 import { registerHandlers } from "./handlers";
@@ -26,12 +27,10 @@ export function WSProvider({ children }: WSProviderProps) {
 
   useEffect(() => {
     client.connect();
-    // Stub chatUI: T16 will add the real useChatUIStore from @/lib/store/chat-ui;
-    // T17 replaces this stub with `() => useChatUIStore.getState()`.
     const unsubscribeHandlers = registerHandlers(
       client,
       queryClient,
-      () => ({ recordDecision: () => {} }),
+      () => useChatUIStore.getState(),
     );
     return () => {
       unsubscribeHandlers();
