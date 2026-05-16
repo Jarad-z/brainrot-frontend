@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 // eslint-disable-next-line camelcase
 import { Bricolage_Grotesque, JetBrains_Mono } from "next/font/google";
+import { QueryProvider } from "@/providers/QueryProvider";
 import "./globals.css";
 
 const display = Bricolage_Grotesque({
@@ -24,7 +25,9 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="zh" className={`${display.variable} ${mono.variable}`}>
-      <body>{children}</body>
+      <body>
+        <QueryProvider>{children}</QueryProvider>
+      </body>
     </html>
   );
 }
