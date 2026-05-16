@@ -2,8 +2,14 @@
 
 import { use } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Button } from "@/components/ui/button";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Button } from "@/components/brand/button";
+import {
+  TooltipProvider,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/brand/tooltip";
+import { PageHeader, PageTitle, PageSub } from "@/components/brand/page-header";
 import { EmptyState } from "@/components/common/EmptyState";
 import { TaskGrid } from "@/components/tasks/TaskGrid";
 import { useProject } from "@/hooks/useProject";
@@ -20,44 +26,37 @@ export default function ProjectHomePage({ params }: PageProps) {
   const { data: tasks, isPending } = useTasks(projectId);
 
   return (
-    <div className="p-8">
-      <header
-        className="flex items-start justify-between mb-8 gap-4"
-        style={{ display: "grid", gridTemplateColumns: "1fr auto" }}
-      >
-        <div>
-          <h1 className="text-2xl font-display font-extrabold text-ink-0">
-            {project?.name ?? "…"}
-          </h1>
-          {project?.description && <p className="text-ink-2 text-sm mt-2">{project.description}</p>}
-        </div>
-        <TooltipProvider>
+    <TooltipProvider>
+      <div className="p-8">
+        <PageHeader>
+          <div className="flex-1 min-w-0">
+            <PageTitle>{project?.name ?? "…"}</PageTitle>
+            {project?.description && <PageSub>{project.description}</PageSub>}
+          </div>
           <Tooltip>
             <TooltipTrigger asChild>
               <span>
-                <Button disabled style={{ minWidth: 160 }}>
-                  新建任务
-                </Button>
+                <Button disabled>新建任务</Button>
               </span>
             </TooltipTrigger>
             <TooltipContent>{messages.shell.writesDisabled}</TooltipContent>
           </Tooltip>
-        </TooltipProvider>
-      </header>
+        </PageHeader>
 
-      {isPending && (
-        <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {Array.from({ length: 8 }).map((_, i) => (
-            <Skeleton key={i} className="h-32" />
-          ))}
-        </div>
-      )}
+        {isPending && (
+          <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <Skeleton key={i} className="h-32" />
+            ))}
+          </div>
+        )}
 
-      {!isPending && tasks && tasks.length === 0 && (
-        <EmptyState title={messages.empty.noTasks.title} />
-      )}
+        {!isPending && tasks && tasks.length === 0 && (
+          <EmptyState title={messages.empty.noTasks.title} />
+        )}
 
-      {!isPending && tasks && tasks.length > 0 && <TaskGrid tasks={tasks} />}
-    </div>
+        {!isPending && tasks && tasks.length > 0 && <TaskGrid tasks={tasks} />}
+      </div>
+    </TooltipProvider>
   );
 }
