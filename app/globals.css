@@ -73,6 +73,34 @@
   --font-mono: var(--font-mono);
 }
 
+@utility font-tight {
+  font-variation-settings: "wdth" 88;
+  letter-spacing: -0.015em;
+}
+@utility font-wide {
+  font-variation-settings: "wdth" 96;
+  letter-spacing: -0.005em;
+}
+@utility font-normal-wdth {
+  font-variation-settings: "wdth" 100;
+  letter-spacing: 0;
+}
+@utility hero-title {
+  font-variation-settings: "wdth" 84;
+  letter-spacing: -0.035em;
+  line-height: 0.92;
+  text-wrap: balance;
+}
+@utility stat-num {
+  font-variation-settings: "wdth" 78;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+@utility page-title {
+  font-variation-settings: "wdth" 88;
+  letter-spacing: -0.02em;
+}
+
 html,
 body {
   background: var(--paper-1);
