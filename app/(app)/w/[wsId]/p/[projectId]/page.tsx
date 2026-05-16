@@ -27,7 +27,7 @@ export default function ProjectHomePage({ params }: PageProps) {
 
   return (
     <TooltipProvider>
-      <div className="p-8">
+      <div className="p-8 h-full overflow-y-auto">
         <PageHeader>
           <div className="flex-1 min-w-0">
             <PageTitle>{project?.name ?? "…"}</PageTitle>

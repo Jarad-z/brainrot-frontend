@@ -46,7 +46,7 @@ export default function WorkspaceHomePage({ params }: PageProps) {
 
   return (
     <TooltipProvider>
-      <div className="p-7 home-page">
+      <div className="p-7 home-page h-full overflow-y-auto">
         <div className="home-grid">
           <section className="hero relative flex flex-col justify-end">
             <HeroEyebrow>
