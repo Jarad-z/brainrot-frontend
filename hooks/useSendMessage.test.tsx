@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any -- vi mock helpers + react-query interop in tests */
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { renderHook, act, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -47,7 +48,7 @@ describe("useSendMessage", () => {
     (sendMessage as any).mockRejectedValueOnce(new Error("boom"));
     const { result } = renderHook(() => useSendMessage("t1"), { wrapper });
     await act(async () => {
-      try { await result.current.mutateAsync({ text: "hi", mentions: [] }); } catch {}
+      try { await result.current.mutateAsync({ text: "hi", mentions: [] }); } catch { /* expected rejection */ }
     });
     await waitFor(() => expect(result.current.isError).toBe(true));
   });

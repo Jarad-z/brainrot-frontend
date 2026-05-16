@@ -1,3 +1,4 @@
+/* eslint-disable camelcase -- snake_case identifiers come from backend wire format */
 import { describe, it, expect } from "vitest";
 import { pairToolMessages } from "./pair-tool-messages";
 import type { ClientMessage } from "@/lib/api/types";

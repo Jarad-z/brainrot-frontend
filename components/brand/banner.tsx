@@ -2,7 +2,7 @@
 
 import { cn } from "@/lib/utils";
 
-export interface BannerProps extends React.HTMLAttributes<HTMLDivElement> {}
+export type BannerProps = React.HTMLAttributes<HTMLDivElement>;
 
 export function Banner({ className, children, ...rest }: BannerProps) {
   return (

@@ -42,6 +42,7 @@ describe("upsertMessage", () => {
     const m2 = mkUser("m-1", "v2");
     const merged = upsertMessage([m1], m2);
     expect(merged.length).toBe(1);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- discriminated union narrowing in test
     expect((merged[0]!.parsed as any).text).toBe("v2");
   });
 

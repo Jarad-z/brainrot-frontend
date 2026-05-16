@@ -2,7 +2,7 @@
 
 import { cn } from "@/lib/utils";
 
-export interface HeroEyebrowProps extends React.HTMLAttributes<HTMLDivElement> {}
+export type HeroEyebrowProps = React.HTMLAttributes<HTMLDivElement>;
 
 export function HeroEyebrow({ className, children, ...rest }: HeroEyebrowProps) {
   return (
@@ -21,7 +21,7 @@ export function HeroEyebrow({ className, children, ...rest }: HeroEyebrowProps) 
   );
 }
 
-export interface HeroTitleProps extends React.HTMLAttributes<HTMLHeadingElement> {}
+export type HeroTitleProps = React.HTMLAttributes<HTMLHeadingElement>;
 
 export function HeroTitle({ className, children, ...rest }: HeroTitleProps) {
   return (
@@ -38,7 +38,7 @@ export function HeroTitle({ className, children, ...rest }: HeroTitleProps) {
   );
 }
 
-export interface HeroPopProps extends React.HTMLAttributes<HTMLSpanElement> {}
+export type HeroPopProps = React.HTMLAttributes<HTMLSpanElement>;
 
 export function HeroPop({ className, children, ...rest }: HeroPopProps) {
   return (
@@ -51,7 +51,7 @@ export function HeroPop({ className, children, ...rest }: HeroPopProps) {
   );
 }
 
-export interface HeroSubProps extends React.HTMLAttributes<HTMLParagraphElement> {}
+export type HeroSubProps = React.HTMLAttributes<HTMLParagraphElement>;
 
 export function HeroSub({ className, children, ...rest }: HeroSubProps) {
   return (

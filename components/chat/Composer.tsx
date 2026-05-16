@@ -44,6 +44,7 @@ export function Composer({ wsId, taskId }: ComposerProps) {
             open: true,
             items: props.items as Agent[],
             anchorRect: (props.clientRect?.() ?? null) as DOMRect | null,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Tiptap SuggestionProps.command is deeply parameterized
             onPick: (agent) => (props.command as any)(agent),
           });
         },
@@ -52,6 +53,7 @@ export function Composer({ wsId, taskId }: ComposerProps) {
             ...s,
             items: props.items as Agent[],
             anchorRect: (props.clientRect?.() ?? s.anchorRect) as DOMRect | null,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Tiptap SuggestionProps.command is deeply parameterized
             onPick: (agent) => (props.command as any)(agent),
           }));
         },

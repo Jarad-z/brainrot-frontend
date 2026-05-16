@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any -- test mocks for Tiptap Editor shape */
 import { describe, it, expect } from "vitest";
 import { serializeEditor } from "./serialize-editor";
 

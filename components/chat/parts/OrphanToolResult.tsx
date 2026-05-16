@@ -1,3 +1,4 @@
+/* eslint-disable camelcase -- snake_case identifiers come from backend wire format */
 import type { ClientMessage } from "@/lib/api/types";
 
 interface OrphanToolResultProps {

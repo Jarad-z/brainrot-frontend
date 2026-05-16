@@ -2,7 +2,7 @@
 
 import { cn } from "@/lib/utils";
 
-export interface RailSectionProps extends React.HTMLAttributes<HTMLDivElement> {}
+export type RailSectionProps = React.HTMLAttributes<HTMLDivElement>;
 
 export function RailSection({ className, children, ...rest }: RailSectionProps) {
   return (
@@ -42,7 +42,7 @@ export function RailHead({ dot, className, children, ...rest }: RailHeadProps) {
   );
 }
 
-export interface RailEmptyProps extends React.HTMLAttributes<HTMLDivElement> {}
+export type RailEmptyProps = React.HTMLAttributes<HTMLDivElement>;
 
 export function RailEmpty({ className, children, ...rest }: RailEmptyProps) {
   return (

@@ -3,6 +3,7 @@ import type { Editor } from "@tiptap/core";
 export function serializeEditor(editor: Editor): { text: string; mentions: string[] } {
   const mentions: string[] = [];
   let text = "";
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- ProseMirror Node type is deeply parameterized; we access well-known fields
   editor.state.doc.descendants((node: any) => {
     if (node.type.name === "mention") {
       text += `@${node.attrs.handle}`;

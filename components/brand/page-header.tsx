@@ -2,7 +2,7 @@
 
 import { cn } from "@/lib/utils";
 
-export interface PageHeaderProps extends React.HTMLAttributes<HTMLElement> {}
+export type PageHeaderProps = React.HTMLAttributes<HTMLElement>;
 
 export function PageHeader({ className, children, ...rest }: PageHeaderProps) {
   return (
@@ -15,7 +15,7 @@ export function PageHeader({ className, children, ...rest }: PageHeaderProps) {
   );
 }
 
-export interface PageTitleProps extends React.HTMLAttributes<HTMLHeadingElement> {}
+export type PageTitleProps = React.HTMLAttributes<HTMLHeadingElement>;
 
 export function PageTitle({ className, children, ...rest }: PageTitleProps) {
   return (
@@ -31,7 +31,7 @@ export function PageTitle({ className, children, ...rest }: PageTitleProps) {
   );
 }
 
-export interface PageSubProps extends React.HTMLAttributes<HTMLParagraphElement> {}
+export type PageSubProps = React.HTMLAttributes<HTMLParagraphElement>;
 
 export function PageSub({ className, children, ...rest }: PageSubProps) {
   return (

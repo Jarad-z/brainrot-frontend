@@ -1,3 +1,4 @@
+/* eslint-disable camelcase -- snake_case identifiers come from backend wire format */
 "use client";
 import { useState } from "react";
 import type { ClientMessage } from "@/lib/api/types";
