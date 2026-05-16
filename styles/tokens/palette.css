@@ -1,0 +1,30 @@
+/* ================================================================
+   tokens/palette.css — paper, ink, hairline, accent variants
+   Each variable corresponds 1:1 to a Tailwind v4 @theme entry
+   in S1 migration; see DESIGN.md §9.
+   ================================================================ */
+:root {
+  /* Paper (warm-white background hierarchy) */
+  --paper-0: #fdfaf2;
+  --paper-1: #f4ede1;
+  --paper-2: #ece3d2;
+
+  /* Ink (foreground hierarchy) */
+  --ink-0: #1b1820;
+  --ink-1: #3b3540;
+  --ink-2: #6f6878;
+  --ink-3: #a8a2b0;
+
+  /* Hairline / 1px border */
+  --hairline: #d8cfbe;
+
+  /* Accent candidates (Tweaks panel chooses one → --accent) */
+  --accent-poppy: #cf4040;
+  --accent-moss:  #5d7a3a;
+  --accent-honey: #c79029;
+  --accent-plum:  #6f3b6b;
+  --accent-fg:    #fdfaf2;
+
+  /* Default accent (overridden at runtime by applyAccent()) */
+  --accent: var(--accent-poppy);
+}
