@@ -2,10 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card } from "@/components/ui/card";
+import { Button } from "@/components/brand/button";
+import { Input } from "@/components/brand/input";
+import { Card } from "@/components/brand/card";
 import { ErrorBanner } from "@/components/common/ErrorBanner";
 import { projectsApi } from "@/lib/api/projects";
 import { ApiError } from "@/lib/api/client";
@@ -53,11 +52,13 @@ export default function OnboardingPage() {
 
   return (
     <div className="p-8 max-w-xl mx-auto">
-      <Card className="p-8 bg-paper-0 border-hairline shadow-1">
-        <h1 className="text-xl font-display font-bold mb-2 text-ink-0">
+      <Card chunky className="p-8">
+        <h1 className="text-xl font-extrabold mb-2 text-ink-0 page-title">
           {messages.workspace.onboardingTitle}
         </h1>
-        <p className="text-sm text-ink-2 mb-6">{messages.workspace.onboardingHelp}</p>
+        <p className="text-sm text-ink-2 mb-6">
+          {messages.workspace.onboardingHelp}
+        </p>
         <form onSubmit={onSubmit} className="space-y-4">
           {formError && (
             <ErrorBanner kind="inline" variant="error">
@@ -65,7 +66,9 @@ export default function OnboardingPage() {
             </ErrorBanner>
           )}
           <div className="space-y-1">
-            <Label htmlFor="wsId">工作区 ID</Label>
+            <label htmlFor="wsId" className="text-xs font-bold text-ink-1">
+              工作区 ID
+            </label>
             <Input
               id="wsId"
               value={wsId}
@@ -77,7 +80,9 @@ export default function OnboardingPage() {
               autoFocus
               aria-invalid={!!fieldError}
             />
-            {fieldError && <p className="text-xs text-state-failed">{fieldError}</p>}
+            {fieldError && (
+              <p className="text-xs text-state-failed">{fieldError}</p>
+            )}
           </div>
           <label className="flex items-center gap-2 text-sm text-ink-1">
             <input
