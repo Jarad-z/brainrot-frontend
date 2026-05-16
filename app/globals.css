@@ -101,6 +101,54 @@
   letter-spacing: -0.02em;
 }
 
+@utility stat-hot-stripe {
+  position: relative;
+}
+@utility stat-hot-stripe-after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 14px;
+  background: repeating-linear-gradient(
+    -45deg,
+    rgb(255 255 255 / 0.22) 0 4px,
+    transparent 4px 9px
+  );
+  pointer-events: none;
+}
+
+@utility topstrip-green {
+  background-image: repeating-linear-gradient(45deg, var(--ink-0) 0 1.5px, transparent 1.5px 10px);
+}
+@utility topstrip-blue {
+  background-image: repeating-linear-gradient(0deg, var(--ink-0) 0 1.5px, transparent 1.5px 9px);
+}
+@utility topstrip-pink {
+  background-image: radial-gradient(var(--ink-0) 1.2px, transparent 1.6px);
+  background-size: 12px 12px;
+}
+@utility topstrip-amber {
+  background-image: repeating-linear-gradient(90deg, var(--ink-0) 0 1.5px, transparent 1.5px 14px);
+}
+@utility topstrip-violet {
+  background-image: repeating-linear-gradient(-45deg, var(--ink-0) 0 1.5px, transparent 1.5px 12px);
+}
+@utility topstrip-teal {
+  background-image: linear-gradient(var(--ink-0) 1.5px, transparent 1.5px),
+    linear-gradient(90deg, var(--ink-0) 1.5px, transparent 1.5px);
+  background-size: 18px 18px;
+}
+
+@keyframes status-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+@utility animate-status-pulse {
+  animation: status-pulse 1.4s ease-in-out infinite;
+}
+
 html,
 body {
   background: var(--paper-1);
