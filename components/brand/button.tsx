@@ -7,7 +7,9 @@ const base =
   "inline-flex items-center gap-2 rounded-md text-sm font-bold whitespace-nowrap " +
   "border-[1.5px] transition-transform " +
   "active:translate-y-[var(--depth)] active:shadow-none " +
-  "disabled:opacity-50 disabled:pointer-events-none";
+  "disabled:opacity-50 disabled:pointer-events-none disabled:shadow-none " +
+  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink-0 focus-visible:ring-offset-2 focus-visible:ring-offset-paper-1 " +
+  "[&_svg]:size-4 [&_svg]:shrink-0";
 
 const variants = {
   primary:
