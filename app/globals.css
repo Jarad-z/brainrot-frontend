@@ -120,24 +120,30 @@
 }
 
 @utility topstrip-green {
-  background-image: repeating-linear-gradient(45deg, var(--ink-0) 0 1.5px, transparent 1.5px 10px);
+  background-color: oklch(40% 0.08 145);
+  background-image: repeating-linear-gradient(45deg, oklch(58% 0.10 145) 0 6px, transparent 6px 16px);
 }
 @utility topstrip-blue {
-  background-image: repeating-linear-gradient(0deg, var(--ink-0) 0 1.5px, transparent 1.5px 9px);
+  background-color: oklch(34% 0.06 245);
+  background-image: repeating-linear-gradient(0deg, oklch(50% 0.07 245) 0 4px, transparent 4px 13px);
 }
 @utility topstrip-pink {
-  background-image: radial-gradient(var(--ink-0) 1.2px, transparent 1.6px);
+  background-color: oklch(48% 0.12 25);
+  background-image: radial-gradient(rgba(255, 255, 255, 0.32) 1.4px, transparent 1.8px);
   background-size: 12px 12px;
 }
 @utility topstrip-amber {
-  background-image: repeating-linear-gradient(90deg, var(--ink-0) 0 1.5px, transparent 1.5px 14px);
+  background-color: var(--accent-honey);
+  background-image: repeating-linear-gradient(0deg, rgb(0 0 0 / 0.35) 0 3px, transparent 3px 14px);
 }
 @utility topstrip-violet {
-  background-image: repeating-linear-gradient(-45deg, var(--ink-0) 0 1.5px, transparent 1.5px 12px);
+  background-color: oklch(34% 0.07 320);
+  background-image: repeating-linear-gradient(90deg, oklch(50% 0.08 320) 0 4px, transparent 4px 13px);
 }
 @utility topstrip-teal {
-  background-image: linear-gradient(var(--ink-0) 1.5px, transparent 1.5px),
-    linear-gradient(90deg, var(--ink-0) 1.5px, transparent 1.5px);
+  background-color: oklch(40% 0.06 200);
+  background-image: linear-gradient(rgba(255, 255, 255, 0.3) 1.4px, transparent 1.4px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.3) 1.4px, transparent 1.4px);
   background-size: 18px 18px;
 }
 

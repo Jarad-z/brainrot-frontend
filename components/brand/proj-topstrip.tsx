@@ -24,7 +24,7 @@ export function ProjTopstrip({
   return (
     <div
       className={cn(
-        "h-[72px] relative bg-paper-0 border-b-[1.5px] border-ink-0",
+        "h-[72px] relative border-b-[1.5px] border-ink-0",
         swatchClass[swatch],
         className,
       )}

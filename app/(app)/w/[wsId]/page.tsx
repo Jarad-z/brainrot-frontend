@@ -40,8 +40,8 @@ export default function WorkspaceHomePage({ params }: PageProps) {
   const session = useSession();
   const user = session.data;
   const firstName =
-    user?.Name?.split(/\s+/)[0] ??
-    user?.Email?.split("@")[0] ??
+    (user?.Name?.split(/\s+/)[0] || "") ||
+    (user?.Email?.split("@")[0] || "") ||
     "";
 
   return (
@@ -53,8 +53,11 @@ export default function WorkspaceHomePage({ params }: PageProps) {
               <span className="dot" /> · 概览
             </HeroEyebrow>
             <HeroTitle>
-              {firstName && `${firstName}, `}今天 <HeroPop>开干</HeroPop>
-              <HeroArrow />
+              {firstName && `${firstName}, `}今天{" "}
+              <HeroPop>
+                开干
+                <HeroArrow />
+              </HeroPop>
             </HeroTitle>
             <HeroSub>该开始干了。先把今天最重要的一件事拎出来。</HeroSub>
             <div className="flex gap-2.5 flex-wrap items-center">
