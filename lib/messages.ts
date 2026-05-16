@@ -18,6 +18,11 @@ export const messages = {
     notFound: "工作区不存在",
     backToOnboarding: "返回引导",
   },
+  project: {
+    notMember: "你不是该项目的成员",
+    notFound: "项目不存在",
+    backToWorkspace: "返回工作区",
+  },
   shell: {
     pendingApprovals: "待审批",
     pendingDisabled: "S3 上线后启用",
