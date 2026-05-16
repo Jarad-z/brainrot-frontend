@@ -8,7 +8,7 @@ import type { TaskCard } from "@/lib/api/types";
 interface ChatPaneProps {
   wsId: string;
   taskId: string;
-  task: TaskCard | undefined;
+  task: TaskCard | null | undefined;
 }
 
 export function ChatPane({ wsId, taskId, task }: ChatPaneProps) {

@@ -3,6 +3,7 @@ import { useEditor, EditorContent } from "@tiptap/react";
 import Document from "@tiptap/extension-document";
 import Paragraph from "@tiptap/extension-paragraph";
 import Text from "@tiptap/extension-text";
+import Placeholder from "@tiptap/extension-placeholder";
 import { useMemo, useRef, useState } from "react";
 import type { Agent } from "@/lib/api/types";
 import { useWorkspaceAgents } from "@/hooks/useWorkspaceAgents";
@@ -37,6 +38,10 @@ export function Composer({ wsId, taskId }: ComposerProps) {
       Document,
       Paragraph,
       Text,
+      Placeholder.configure({
+        placeholder: "输入消息，@ 一个 agent；Ctrl+Enter 发送",
+        emptyEditorClass: "is-editor-empty",
+      }),
       createMentionExtension({
         agentsRef,
         onRender: (props) => {

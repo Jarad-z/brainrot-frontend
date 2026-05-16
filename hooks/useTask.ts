@@ -7,7 +7,7 @@ import type { TaskCard } from "@/lib/api/types";
 
 export function useTask(taskId: string) {
   const queryClient = useQueryClient();
-  return useQuery<TaskCard | undefined>({
+  return useQuery<TaskCard | null>({
     queryKey: queryKeys.tasks.detail(taskId),
     queryFn: async () => {
       const direct = await fetchTask(taskId);
@@ -21,7 +21,9 @@ export function useTask(taskId: string) {
           if (hit) return hit;
         }
       }
-      return undefined;
+      // React Query disallows `undefined` as cached data — use `null` to mean
+      // "no task found (404/405 + cache miss)". Callers handle `null` same as undefined.
+      return null;
     },
     enabled: !!taskId,
   });

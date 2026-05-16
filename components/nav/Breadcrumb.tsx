@@ -24,9 +24,12 @@ export function Breadcrumb() {
   const { data: task } = useTask(taskId ?? "");
 
   if (!wsId) return null;
+  // BACKEND_GAPS #5: no `GET /workspaces/{wsId}` endpoint, so the workspace
+  // name is hardcoded to match `Sidebar.tsx` until the endpoint lands.
+  const wsName = "Lumen Labs";
   return (
     <Crumb>
-      <CrumbSeg active={!projectId}>工作区</CrumbSeg>
+      <CrumbSeg active={!projectId}>{wsName}</CrumbSeg>
       {projectId && (
         <>
           <CrumbSep />

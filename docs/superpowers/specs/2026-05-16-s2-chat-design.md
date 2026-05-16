@@ -969,7 +969,7 @@ Intentionally deferred:
 - Workspace switcher UI + project creation UI — S4.
 - agent CRUD / runtimes / settings pages — S4.
 - Real LLM execution integration — backend mock sufficient for S2 acceptance.
-- TaskCard agent avatars in TaskRow — schema undefined.
+- TaskCard agent avatars in TaskRow — schema undefined; backend will mock realistic data later (BACKEND_GAPS #13). Once `TaskCard.agents` lands, add a ~5-line render block to `components/task-detail/TaskRow.tsx` mapping agent ids → `<Avatar size={18}>` group.
 - Mobile responsive (<768px) — v1 desktop-only per FRONTEND.md §16.
 - Global keyboard shortcuts (Cmd+K command palette, etc.) — out of S2 scope.
 - Task list keyboard navigation (ArrowUp/Down) — deferred polish.

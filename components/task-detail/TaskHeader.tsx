@@ -5,7 +5,7 @@ import { IconButton } from "@/components/brand/icon-button";
 import type { TaskCard } from "@/lib/api/types";
 
 interface TaskHeaderProps {
-  task: TaskCard | undefined;
+  task: TaskCard | null | undefined;
   taskId: string;
 }
 

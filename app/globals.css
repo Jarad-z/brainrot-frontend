@@ -165,3 +165,14 @@ body {
   font-size: var(--text-base);
   line-height: 1.5;
 }
+
+/* Tiptap Placeholder extension — render placeholder text in empty editor.
+ * S2 Composer uses this to show "输入消息，@ 一个 agent；Ctrl+Enter 发送"
+ * when the editor is empty. */
+.ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: var(--ink-3, oklch(60% 0.02 300));
+  pointer-events: none;
+  height: 0;
+}

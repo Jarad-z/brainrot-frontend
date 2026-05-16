@@ -45,7 +45,8 @@ export function ThreeColumnShell({ user, children }: ThreeColumnShellProps) {
               <Tooltip>
                 <TooltipTrigger asChild>
                   <span>
-                    <IconButton disabled aria-label="通知">
+                    {/* Badge is decorative mock to match prototype 13 — S3 will wire real count from approvals API */}
+                    <IconButton disabled aria-label="通知" badge={3}>
                       <svg
                         viewBox="0 0 24 24"
                         fill="none"

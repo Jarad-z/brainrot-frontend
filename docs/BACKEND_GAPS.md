@@ -100,3 +100,23 @@
 - **影响**：前端渲染 ApprovalCard 需要 `approval_id`、`tool_input`、`expires_at` 才能完整工作（按钮决策路由、倒计时、命令摘要）。
 - **Workaround（S2）**：`lib/parse-message.ts` 把这三个字段标 optional；前端按 `approval_id ?? tool_use_id` 兜底 key。`tool_input` 缺失时显示 "(无参数)"，`expires_at` 缺失时不显示倒计时。
 - **Need**：后端确认消息 payload 是否含这三个字段；API.md 更新 `permission_request` 行的 "关键字段" 列。
+
+## #13 `TaskCard` schema 缺 `agents` 字段（任务关联的 agent 列表）
+
+- **状态**：缺失 / 待 mock
+- **发现**：2026-05-17，S2 visual acceptance 阶段
+- **影响**：任务详情页左栏 TaskRow + 项目板 TaskCard 都无法显示"这个 task 关联了哪些 agent"。Prototype `screenshots/13` 的每个 task row 底部都有一组 agent 头像（mock 数据），S2 实际渲染没有 → 视觉差异。
+- **Workaround（S2）**：完全不渲染 agent 头像组。spec §10 + visual acceptance 报告 §6.2 都明确说明此差异由 schema 缺失引起，不是前端疏漏。
+- **Need**：`TaskCard` schema 加 `agents: string[]`（agent uuid 数组）或 `agent_ids: string[]`。后端 mock 阶段：每个 task 至少关联 1-3 个 agent，让前端能渲染出 2-3 个头像的视觉密度（匹配 prototype）。
+- **前端 unlock 路径（≤5 行）**：拿到字段后，`components/task-detail/TaskRow.tsx` 加一段：
+  ```tsx
+  {task.agents && task.agents.length > 0 && (
+    <div className="flex -space-x-1.5">
+      {task.agents.slice(0, 3).map((id) => {
+        const a = agentsMap.get(id);
+        return a ? <Avatar key={id} name={a.name} size={18} /> : null;
+      })}
+    </div>
+  )}
+  ```
+  其中 `agentsMap` 来自 `useWorkspaceAgents(wsId)` —— hook 已在 T20 实现。
