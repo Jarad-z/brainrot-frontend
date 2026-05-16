@@ -79,7 +79,7 @@ export default function WorkspaceHomePage({ params }: PageProps) {
                     </Button>
                   </span>
                 </TooltipTrigger>
-                <TooltipContent>S2 上线后启用</TooltipContent>
+                <TooltipContent>S4 上线后启用</TooltipContent>
               </Tooltip>
             </div>
           </section>

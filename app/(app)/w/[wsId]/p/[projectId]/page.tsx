@@ -17,11 +17,11 @@ import { useTasks } from "@/hooks/useTasks";
 import { messages } from "@/lib/messages";
 
 interface PageProps {
-  params: Promise<{ projectId: string }>;
+  params: Promise<{ wsId: string; projectId: string }>;
 }
 
 export default function ProjectHomePage({ params }: PageProps) {
-  const { projectId } = use(params);
+  const { wsId, projectId } = use(params);
   const { data: project } = useProject(projectId);
   const { data: tasks, isPending } = useTasks(projectId);
 
@@ -55,7 +55,9 @@ export default function ProjectHomePage({ params }: PageProps) {
           <EmptyState title={messages.empty.noTasks.title} />
         )}
 
-        {!isPending && tasks && tasks.length > 0 && <TaskGrid tasks={tasks} />}
+        {!isPending && tasks && tasks.length > 0 && (
+          <TaskGrid tasks={tasks} wsId={wsId} projectId={projectId} />
+        )}
       </div>
     </TooltipProvider>
   );

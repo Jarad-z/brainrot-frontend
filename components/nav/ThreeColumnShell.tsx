@@ -40,7 +40,7 @@ export function ThreeColumnShell({ user, children }: ThreeColumnShellProps) {
                     />
                   </span>
                 </TooltipTrigger>
-                <TooltipContent>S2 上线后启用</TooltipContent>
+                <TooltipContent>S3 上线后启用</TooltipContent>
               </Tooltip>
               <Tooltip>
                 <TooltipTrigger asChild>
