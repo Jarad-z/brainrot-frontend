@@ -6,7 +6,13 @@ export type ParsedMessage =
   | { type: "assistant_text"; payload: { text: string } }
   | { type: "tool_use"; payload: { tool_name: string; tool_use_id: string; input: unknown } }
   | { type: "tool_result"; payload: { tool_use_id: string; is_error: boolean; content: unknown } }
-  | { type: "permission_request"; payload: { tool_use_id: string; tool_name: string } }
+  | { type: "permission_request"; payload: {
+      tool_use_id: string;
+      tool_name: string;
+      approval_id?: string;
+      tool_input?: unknown;
+      expires_at?: string;
+    } }
   | { type: "thinking"; payload: { text: string } }
   | { type: "result"; payload: { duration_ms: number; result: string } }
   | { type: "rate_limit_event"; payload: { retry_in_seconds: number } };
