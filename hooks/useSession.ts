@@ -1,14 +1,13 @@
 "use client";
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { auth } from "@/lib/api/auth";
 import { ApiError } from "@/lib/api/client";
 import { queryKeys } from "@/lib/api/keys";
 
 export function useSession() {
-  const router = useRouter();
+  const redirected = useRef(false);
   const result = useQuery({
     queryKey: queryKeys.me(),
     queryFn: auth.me,
@@ -17,11 +16,13 @@ export function useSession() {
   });
 
   useEffect(() => {
+    if (redirected.current) return;
     if (result.error instanceof ApiError && result.error.status === 401) {
+      redirected.current = true;
       const next = encodeURIComponent(location.pathname + location.search);
-      router.replace(`/login?next=${next}`);
+      location.replace(`/login?next=${next}`);
     }
-  }, [result.error, router]);
+  }, [result.error]);
 
   return result;
 }
