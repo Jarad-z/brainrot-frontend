@@ -60,3 +60,43 @@
   - **安全顾虑**：明文 token 出现在响应体里，违背 HttpOnly cookie-only 的设计意图。任何能读 `/login` 响应的中间层（浏览器扩展、devtools、proxy log）都能拿到这个 token。如果后端也把它作为 cookie 设置了（应当如此），那 token 是双发，体内那份是冗余的；如果没设 cookie 而是希望前端自己存，那 HttpOnly 的承诺没兑现。
 - **Workaround（S1）**：当前能跑通（cookie 看起来是设上了，因为后续 `/me` 用 cookie 验证通过）。前端忽略响应体 token。
 - **Need**：后端确认 token 是否同时通过 `Set-Cookie` 落地。如果是 → 删除响应体的 token（与 API.md 对齐）；如果不是 → 改设 HttpOnly cookie 并删响应体 token。无论哪个分支，API.md 都要更新成实际行为。
+
+## #8 缺 `GET /api/v1/tasks/{taskId}/messages?before=<created_at>&limit=N` 分页
+
+- **状态**：缺失（API.md 标 TODO）
+- **发现**：2026-05-16，S2 设计阶段
+- **影响**：长任务（>1000 条消息）首次进入会全量拉一次。S2 实测 200 条量级跑得动。
+- **Workaround（S2）**：全量拉，react-virtual 惰性渲染。
+- **Need**：cursor-based 分页，response 加 `next_cursor` 字段。
+
+## #9 缺 `GET /api/v1/tasks/{taskId}/artifacts`
+
+- **状态**：缺失
+- **发现**：2026-05-16，S2 设计阶段
+- **影响**：任务详情页右栏"产出"tab 无数据可拉。
+- **Workaround（S2）**：右栏 artifacts tab 显示 placeholder（EmptyState "S3 上线后启用"）。
+- **Need**：`GET /api/v1/tasks/{taskId}/artifacts` → `Artifact[]`。
+
+## #10 缺 `GET /api/v1/projects/{projectId}/assets`
+
+- **状态**：缺失
+- **发现**：2026-05-16，S2 设计阶段
+- **影响**：任务详情页右栏"素材"tab 无数据可拉。
+- **Workaround（S2）**：右栏 assets tab 显示 placeholder（EmptyState "S3 上线后启用"）。
+- **Need**：`GET /api/v1/projects/{projectId}/assets` → `Asset[]`。
+
+## #11 缺 `GET /api/v1/tasks/{taskId}/approvals`
+
+- **状态**：缺失（S2 实际**未阻塞**，审批历史从 messages filter 派生）
+- **发现**：2026-05-16，S2 设计阶段
+- **影响**：S3 做跨 task/跨工作区审批 hub 时需要此 endpoint。S2 仅作记录。
+- **Workaround（S2）**：`useApprovalsHistory(taskId)` 从 `useTaskMessages(taskId)` 过滤 `permission_request` 类消息。
+- **Need**：`GET /api/v1/tasks/{taskId}/approvals` → `ApprovalRequest[]`。
+
+## #12 `permission_request` 消息 payload schema 未明确
+
+- **状态**：schema 不完整（API.md 仅列 `tool_use_id` + `tool_name`）
+- **发现**：2026-05-16，S2 设计阶段
+- **影响**：前端渲染 ApprovalCard 需要 `approval_id`、`tool_input`、`expires_at` 才能完整工作（按钮决策路由、倒计时、命令摘要）。
+- **Workaround（S2）**：`lib/parse-message.ts` 把这三个字段标 optional；前端按 `approval_id ?? tool_use_id` 兜底 key。`tool_input` 缺失时显示 "(无参数)"，`expires_at` 缺失时不显示倒计时。
+- **Need**：后端确认消息 payload 是否含这三个字段；API.md 更新 `permission_request` 行的 "关键字段" 列。
