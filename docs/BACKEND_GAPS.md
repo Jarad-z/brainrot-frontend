@@ -42,3 +42,21 @@
 - **影响**：`/w/[wsId]` 首页无法显示工作区名称。
 - **Workaround（S1）**：hero 只显示项目数 "{N} 个项目"，不显示工作区名。
 - **Need**：`GET /api/v1/workspaces/{wsId}` → `Workspace`。
+
+## #6 `TaskCard` 响应包含未文档化的 `busy: boolean` 字段
+
+- **状态**：schema 不一致（API.md 未列出）
+- **发现**：2026-05-16，S1 manual QA 阶段
+- **影响**：前端 `lib/api/types.ts` 没声明 `busy`，TS 允许（响应是 superset）但读 `busy` 字段时无类型支持。
+- **Workaround（S1）**：不读 `busy`；S2 聊天阶段引入时再加入类型。
+- **Need**：API.md 在 TaskCard schema 加 `busy: boolean` 字段说明（是否有 active run）。
+
+## #7 `POST /api/v1/auth/login` 返回 200 + 明文 token 而不是 204 + 仅 cookie
+
+- **状态**：schema 不一致 + 潜在安全问题（API.md 写 204，HttpOnly cookie-only；实际 200 + `{"token":"..."}` 响应体）
+- **发现**：2026-05-16，S1 manual QA 阶段
+- **影响**：
+  - 前端 `apiFetch<void>` 应当对 204 返回 undefined；现在 200 + JSON 走 `resp.json()` 路径，返回的 token 值被丢弃 —— 工作但语义错。
+  - **安全顾虑**：明文 token 出现在响应体里，违背 HttpOnly cookie-only 的设计意图。任何能读 `/login` 响应的中间层（浏览器扩展、devtools、proxy log）都能拿到这个 token。如果后端也把它作为 cookie 设置了（应当如此），那 token 是双发，体内那份是冗余的；如果没设 cookie 而是希望前端自己存，那 HttpOnly 的承诺没兑现。
+- **Workaround（S1）**：当前能跑通（cookie 看起来是设上了，因为后续 `/me` 用 cookie 验证通过）。前端忽略响应体 token。
+- **Need**：后端确认 token 是否同时通过 `Set-Cookie` 落地。如果是 → 删除响应体的 token（与 API.md 对齐）；如果不是 → 改设 HttpOnly cookie 并删响应体 token。无论哪个分支，API.md 都要更新成实际行为。
