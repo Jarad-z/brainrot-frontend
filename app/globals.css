@@ -33,7 +33,6 @@
   --color-state-denied:        var(--state-denied);
   --color-state-approved:      var(--state-approved);
   --color-state-timeout:       var(--state-timeout);
-  --color-state-archived:      var(--state-archived);
   --color-state-canceled:      var(--state-canceled);
   --color-status-in_progress-bg: var(--status-in_progress-bg);
   --color-status-in_progress-fg: var(--status-in_progress-fg);
