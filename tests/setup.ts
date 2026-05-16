@@ -1,4 +1,12 @@
 import "@testing-library/jest-dom/vitest";
+import { afterEach } from "vitest";
+import { cleanup } from "@testing-library/react";
+
+// React Testing Library's auto-cleanup only runs when vitest globals=true.
+// This repo uses explicit imports, so register cleanup manually.
+afterEach(() => {
+  cleanup();
+});
 
 // Tiptap calls Range.getBoundingClientRect; jsdom lacks it.
 const rangeProto = Range.prototype as unknown as Record<string, unknown>;
