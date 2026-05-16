@@ -28,7 +28,7 @@ Date executed: 2026-05-16  Tester: claude (headless Chromium)
 - [x] 12. Switch ws via /onboarding → sidebar projects + breadcrumb update (implicitly verified via items 8+9)
 - [x] 13. Click project card → navigates to `/w/[wsId]/p/[projectId]` (Link href verified; direct goto also works)
 - [x] 14. Project page → hero "Demo Project" + task grid (2 tasks) + breadcrumb "Workspace › Demo Project"
-- [x] 15. TaskCards rendered as plain `<div>` with `opacity-60 cursor-not-allowed` + tooltip "S2 上线后启用"; no `<Link>`/`<button>` wrapper
+- [x] 15. TaskCards are now clickable `<Link>` wrappers navigating to `/w/[wsId]/p/[projectId]/t/[taskId]` (S2 chat workspace); no longer disabled (previously a plain `<div>` with disabled tooltip during S1)
 - [x] 16. AccountMenu (Avatar "Q") → dropdown opens → 登出 click → `/login` redirect
 - [x] 17. Stop backend `server.exe` → wait ~8s → honey-colored banner "实时连接已断开，正在重连…" appears at top. Restart backend → banner disappears after WS reconnect (exp backoff, observed ~30s on the high side because last delay was already 30s). ✅
 - [x] 18. Console on each page → 0 errors. One dev-mode warning (`WebSocket connection closed before connection established`) on HMR remount — acceptable in dev.
