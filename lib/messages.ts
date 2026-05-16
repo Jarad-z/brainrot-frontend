@@ -1,0 +1,42 @@
+export const messages = {
+  auth: {
+    invalidEmail: "请输入有效的邮箱地址",
+    shortPassword: "密码至少 8 位",
+    loginFailed: "邮箱或密码错误",
+    registerConflict: "邮箱已被占用或参数非法",
+    serverError: "服务器错误，请稍后重试",
+    registerCta: "注册",
+    loginCta: "登录",
+  },
+  workspace: {
+    onboardingTitle: "进入工作区",
+    onboardingHelp: "工作区列表接口尚未开放，请粘贴工作区 ID（管理员处获取）。",
+    onboardingRemember: "记住此选择",
+    onboardingCta: "进入",
+    onboardingInvalidUuid: "格式不正确",
+    notMember: "你不是该工作区成员",
+    notFound: "工作区不存在",
+    backToOnboarding: "返回引导",
+  },
+  shell: {
+    pendingApprovals: "待审批",
+    pendingDisabled: "S3 上线后启用",
+    listsDisabled: "S4 上线后启用",
+    writesDisabled: "S4 上线后启用",
+    taskDisabled: "S2 上线后启用",
+    wsListDisabled: "工作区列表接口尚未开放（S? 上线后启用）",
+    logout: "登出",
+    projects: "项目",
+    agents: "Agents",
+    runtimes: "Runtimes",
+    settings: "设置",
+  },
+  errors: {
+    genericRetry: "出错了，请重试",
+  },
+  empty: {
+    noProjects: { title: "还没有项目", description: "请联系管理员创建" },
+    noTasks: { title: "还没有任务", description: "" },
+  },
+  offline: "实时连接已断开，正在重连…",
+} as const;
