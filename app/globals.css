@@ -73,6 +73,88 @@
   --font-mono: var(--font-mono);
 }
 
+@utility font-tight {
+  font-variation-settings: "wdth" 88;
+  letter-spacing: -0.015em;
+}
+@utility font-wide {
+  font-variation-settings: "wdth" 96;
+  letter-spacing: -0.005em;
+}
+@utility font-normal-wdth {
+  font-variation-settings: "wdth" 100;
+  letter-spacing: 0;
+}
+@utility hero-title {
+  font-variation-settings: "wdth" 84;
+  letter-spacing: -0.035em;
+  line-height: 0.92;
+  text-wrap: balance;
+}
+@utility stat-num {
+  font-variation-settings: "wdth" 78;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+@utility page-title {
+  font-variation-settings: "wdth" 88;
+  letter-spacing: -0.02em;
+}
+
+@utility stat-hot-stripe {
+  position: relative;
+}
+@utility stat-hot-stripe-after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 14px;
+  background: repeating-linear-gradient(
+    -45deg,
+    rgb(255 255 255 / 0.22) 0 4px,
+    transparent 4px 9px
+  );
+  pointer-events: none;
+}
+
+@utility topstrip-green {
+  background-color: oklch(40% 0.08 145);
+  background-image: repeating-linear-gradient(45deg, oklch(58% 0.10 145) 0 6px, transparent 6px 16px);
+}
+@utility topstrip-blue {
+  background-color: oklch(34% 0.06 245);
+  background-image: repeating-linear-gradient(0deg, oklch(50% 0.07 245) 0 4px, transparent 4px 13px);
+}
+@utility topstrip-pink {
+  background-color: oklch(48% 0.12 25);
+  background-image: radial-gradient(rgba(255, 255, 255, 0.32) 1.4px, transparent 1.8px);
+  background-size: 12px 12px;
+}
+@utility topstrip-amber {
+  background-color: var(--accent-honey);
+  background-image: repeating-linear-gradient(0deg, rgb(0 0 0 / 0.35) 0 3px, transparent 3px 14px);
+}
+@utility topstrip-violet {
+  background-color: oklch(34% 0.07 320);
+  background-image: repeating-linear-gradient(90deg, oklch(50% 0.08 320) 0 4px, transparent 4px 13px);
+}
+@utility topstrip-teal {
+  background-color: oklch(40% 0.06 200);
+  background-image: linear-gradient(rgba(255, 255, 255, 0.3) 1.4px, transparent 1.4px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.3) 1.4px, transparent 1.4px);
+  background-size: 18px 18px;
+}
+
+@keyframes status-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+@utility animate-status-pulse {
+  animation: status-pulse 1.4s ease-in-out infinite;
+}
+
 html,
 body {
   background: var(--paper-1);

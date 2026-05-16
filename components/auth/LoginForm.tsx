@@ -1,12 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Button } from "@/components/brand/button";
+import { Input } from "@/components/brand/input";
 import { ErrorBanner } from "@/components/common/ErrorBanner";
 import { auth } from "@/lib/api/auth";
 import { ApiError } from "@/lib/api/client";
@@ -19,6 +18,7 @@ export function LoginForm() {
   const searchParams = useSearchParams();
   const queryClient = useQueryClient();
 
+  const emailRef = useRef<HTMLInputElement>(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [emailError, setEmailError] = useState<string | null>(null);
@@ -51,8 +51,12 @@ export function LoginForm() {
       router.replace(searchParams.get("next") ?? "/");
     } catch (err) {
       if (err instanceof ApiError) {
-        if (err.status === 401) setFormError(messages.auth.loginFailed);
-        else if (err.status >= 500) setFormError(messages.auth.serverError);
+        if (err.status === 401) {
+          setFormError(messages.auth.loginFailed);
+          setPassword("");
+          emailRef.current?.focus();
+          emailRef.current?.select();
+        } else if (err.status >= 500) setFormError(messages.auth.serverError);
         else setFormError(err.body || messages.errors.genericRetry);
       } else {
         setFormError(messages.errors.genericRetry);
@@ -70,9 +74,12 @@ export function LoginForm() {
         </ErrorBanner>
       )}
       <div className="space-y-1">
-        <Label htmlFor="email">邮箱</Label>
+        <label htmlFor="email" className="text-xs font-bold text-ink-1">
+          邮箱
+        </label>
         <Input
           id="email"
+          ref={emailRef}
           type="email"
           value={email}
           onChange={(e) => {
@@ -80,7 +87,8 @@ export function LoginForm() {
             setEmailError(null);
           }}
           onBlur={() => {
-            if (email && !isValidEmail(email)) setEmailError(messages.auth.invalidEmail);
+            if (email && !isValidEmail(email))
+              setEmailError(messages.auth.invalidEmail);
           }}
           aria-invalid={!!emailError}
           autoFocus
@@ -88,7 +96,9 @@ export function LoginForm() {
         {emailError && <p className="text-xs text-state-failed">{emailError}</p>}
       </div>
       <div className="space-y-1">
-        <Label htmlFor="password">密码</Label>
+        <label htmlFor="password" className="text-xs font-bold text-ink-1">
+          密码
+        </label>
         <Input
           id="password"
           type="password"
@@ -103,14 +113,16 @@ export function LoginForm() {
           }}
           aria-invalid={!!passwordError}
         />
-        {passwordError && <p className="text-xs text-state-failed">{passwordError}</p>}
+        {passwordError && (
+          <p className="text-xs text-state-failed">{passwordError}</p>
+        )}
       </div>
       <Button type="submit" disabled={pending} className="w-full">
         {pending ? "登录中…" : messages.auth.loginCta}
       </Button>
       <p className="text-xs text-ink-2 text-center">
         还没有账号？
-        <Link href="/register" className="underline">
+        <Link href="/register" className="underline ml-1">
           注册 →
         </Link>
       </p>

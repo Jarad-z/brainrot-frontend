@@ -5,23 +5,39 @@ import { useParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { projectsApi } from "@/lib/api/projects";
 import { queryKeys } from "@/lib/api/keys";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Separator } from "@/components/ui/separator";
-import { WorkspaceSwitcher } from "./WorkspaceSwitcher";
+import { BrandMark } from "@/components/brand/brand-mark";
+import { WsSwitcher } from "@/components/brand/ws-switcher";
+import { NavItem } from "@/components/brand/nav-item";
+import { ProjItem } from "@/components/brand/proj-item";
+import {
+  TooltipProvider,
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+} from "@/components/brand/tooltip";
+import { swatchFromId } from "@/lib/swatch";
 import { messages } from "@/lib/messages";
 
-function DisabledLink({ label, tooltip }: { label: string; tooltip: string }) {
+function DisabledNavItem({
+  label,
+  tooltip,
+  icon,
+}: {
+  label: string;
+  tooltip: string;
+  icon?: React.ReactNode;
+}) {
   return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <span className="block px-3 py-1.5 text-sm text-ink-3 opacity-60 cursor-not-allowed select-none">
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <span>
+          <NavItem disabled icon={icon}>
             {label}
-          </span>
-        </TooltipTrigger>
-        <TooltipContent side="right">{tooltip}</TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+          </NavItem>
+        </span>
+      </TooltipTrigger>
+      <TooltipContent side="right">{tooltip}</TooltipContent>
+    </Tooltip>
   );
 }
 
@@ -37,43 +53,74 @@ export function Sidebar() {
   });
 
   return (
-    <aside className="w-60 shrink-0 border-r border-hairline bg-paper-1 flex flex-col">
-      <div className="p-4">
-        <Link href="/" className="text-xl font-display font-extrabold text-ink-0">
-          Brainrot
-        </Link>
-      </div>
-      <Separator />
-      <div className="p-3">
-        <WorkspaceSwitcher />
-      </div>
-      <Separator />
-      <nav className="flex-1 overflow-y-auto py-2">
-        <p className="px-3 py-1 text-xs text-ink-2 uppercase">{messages.shell.projects}</p>
-        {wsId &&
-          projects.map((p) => (
-            <Link
-              key={p.id}
-              href={`/w/${wsId}/p/${p.id}`}
-              className={`block px-3 py-1.5 text-sm rounded-md mx-1 truncate ${
-                activeProjectId === p.id
-                  ? "bg-paper-2 text-ink-0 font-medium"
-                  : "text-ink-1 hover:bg-paper-2"
-              }`}
-              title={p.name}
-            >
-              • {p.name}
+    <TooltipProvider>
+      <aside className="w-60 shrink-0 bg-paper-0 border-r-[1.5px] border-hairline flex flex-col overflow-hidden">
+        {/* head */}
+        <div className="flex items-center gap-2.5 px-4 py-4 border-b-[1.5px] border-hairline">
+          <BrandMark logo="B" />
+          <div className="min-w-0 overflow-hidden">
+            <div className="font-extrabold text-[17px] text-ink-0 tracking-tight truncate font-tight">
+              Brainrot
+            </div>
+            <div className="text-[11px] font-medium text-ink-2 truncate">
+              v0.1 · 工作台
+            </div>
+          </div>
+        </div>
+
+        {/* ws switcher */}
+        <div className="px-3 pt-3 pb-1.5">
+          <WsSwitcher name="Lumen Labs" meta="lumen" avatar="LL" />
+        </div>
+
+        {/* nav */}
+        <nav className="flex-1 overflow-y-auto py-2">
+          <p className="px-4 pt-3 pb-1.5 text-[10.5px] font-extrabold tracking-[0.08em] text-ink-3 uppercase">
+            导航
+          </p>
+          {wsId ? (
+            <Link href={`/w/${wsId}`}>
+              <NavItem active>概览</NavItem>
             </Link>
-          ))}
-        <Separator className="my-2" />
-        <DisabledLink
-          label={`${messages.shell.pendingApprovals} (0)`}
-          tooltip={messages.shell.pendingDisabled}
-        />
-        <DisabledLink label={messages.shell.agents} tooltip={messages.shell.listsDisabled} />
-        <DisabledLink label={messages.shell.runtimes} tooltip={messages.shell.listsDisabled} />
-        <DisabledLink label={messages.shell.settings} tooltip={messages.shell.listsDisabled} />
-      </nav>
-    </aside>
+          ) : (
+            <NavItem>概览</NavItem>
+          )}
+          <DisabledNavItem label="审批" tooltip={messages.shell.pendingDisabled} />
+          <DisabledNavItem label="Agents" tooltip={messages.shell.listsDisabled} />
+          <DisabledNavItem
+            label="Runtimes"
+            tooltip={messages.shell.listsDisabled}
+          />
+          <DisabledNavItem label="设置" tooltip={messages.shell.listsDisabled} />
+
+          {/* projects */}
+          <p className="px-4 pt-4 pb-1.5 text-[10.5px] font-extrabold tracking-[0.08em] text-ink-3 uppercase">
+            {messages.shell.projects}
+          </p>
+          {wsId &&
+            projects.map((p) => (
+              <Link key={p.id} href={`/w/${wsId}/p/${p.id}`}>
+                <ProjItem
+                  swatch={swatchFromId(p.id)}
+                  active={p.id === activeProjectId}
+                  title={p.name}
+                >
+                  {p.name}
+                </ProjItem>
+              </Link>
+            ))}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span>
+                <ProjItem disabled>+ 新建项目</ProjItem>
+              </span>
+            </TooltipTrigger>
+            <TooltipContent side="right">
+              {messages.shell.writesDisabled}
+            </TooltipContent>
+          </Tooltip>
+        </nav>
+      </aside>
+    </TooltipProvider>
   );
 }

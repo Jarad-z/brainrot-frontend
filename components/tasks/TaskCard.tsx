@@ -1,5 +1,12 @@
-import { Card } from "@/components/ui/card";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+"use client";
+
+import { Card } from "@/components/brand/card";
+import {
+  TooltipProvider,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/brand/tooltip";
 import { TaskStatusBadge } from "./TaskStatusBadge";
 import { relativeTime } from "@/lib/format";
 import { messages } from "@/lib/messages";
@@ -15,8 +22,8 @@ export function TaskCard({ task }: TaskCardProps) {
       <Tooltip>
         <TooltipTrigger asChild>
           <div className="select-none">
-            <Card className="p-4 bg-paper-0 border-hairline shadow-1 opacity-60 cursor-not-allowed h-full">
-              <h4 className="text-sm font-display font-semibold text-ink-0 mb-1 line-clamp-2">
+            <Card className="p-4 opacity-60 cursor-not-allowed h-full">
+              <h4 className="text-sm font-extrabold text-ink-0 mb-1 line-clamp-2 font-tight">
                 {task.title}
               </h4>
               {task.summary && (

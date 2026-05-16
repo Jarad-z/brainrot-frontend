@@ -1,10 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { projectsApi } from "@/lib/api/projects";
 import { queryKeys } from "@/lib/api/keys";
+import { Crumb, CrumbSeg, CrumbSep } from "@/components/brand/crumb";
 
 export function Breadcrumb() {
   const params = useParams<{ wsId?: string; projectId?: string }>();
@@ -12,25 +12,23 @@ export function Breadcrumb() {
   const projectId = params.projectId;
 
   const { data: project } = useQuery({
-    queryKey: projectId ? queryKeys.projects.detail(projectId) : ["project-disabled"],
+    queryKey: projectId
+      ? queryKeys.projects.detail(projectId)
+      : ["project-disabled"],
     queryFn: () => projectsApi.get(projectId!),
     enabled: !!projectId,
   });
 
   if (!wsId) return null;
   return (
-    <nav className="text-sm text-ink-2 flex items-center gap-2">
-      <Link href={`/w/${wsId}`} className="hover:text-ink-0">
-        Workspace
-      </Link>
+    <Crumb>
+      <CrumbSeg active={!projectId}>工作区</CrumbSeg>
       {projectId && (
         <>
-          <span>›</span>
-          <Link href={`/w/${wsId}/p/${projectId}`} className="hover:text-ink-0">
-            {project?.name ?? "…"}
-          </Link>
+          <CrumbSep />
+          <CrumbSeg active>{project?.name ?? "…"}</CrumbSeg>
         </>
       )}
-    </nav>
+    </Crumb>
   );
 }
