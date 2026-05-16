@@ -37,9 +37,7 @@ describe("isKey", () => {
     expect(isKey(fakeEvent({ key: "Tab", altKey: true }), "Tab", { alt: true })).toBe(true);
   });
   it("rejects when meta present but not required", () => {
-    expect(isKey(fakeEvent({ key: "Enter", metaKey: true }), "Enter", { meta: false })).toBe(
-      false,
-    );
+    expect(isKey(fakeEvent({ key: "Enter", metaKey: true }), "Enter", { meta: false })).toBe(false);
   });
 });
 

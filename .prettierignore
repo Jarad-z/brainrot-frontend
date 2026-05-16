@@ -1,0 +1,18 @@
+node_modules
+.next
+out
+build
+dist
+coverage
+pnpm-lock.yaml
+
+# S0 archive — preserved as-is, do not reformat
+ui_design
+_design_pkg
+
+# Project docs (markdown) — manual formatting decisions
+docs
+README.md
+
+# Stub artifacts — manual formatting decisions
+tests/manual-checklist.md
