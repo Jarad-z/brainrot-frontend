@@ -1,5 +1,6 @@
-import { describe, it, expect } from "vitest";
-import { computeCountdown, URGENT_MS } from "@/lib/countdown";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { renderHook, act } from "@testing-library/react";
+import { computeCountdown, useCountdown, URGENT_MS } from "@/lib/countdown";
 
 const now = Date.parse("2026-05-16T12:00:00Z");
 
@@ -36,5 +37,45 @@ describe("computeCountdown", () => {
 
   it("URGENT_MS is 10 minutes", () => {
     expect(URGENT_MS).toBe(10 * 60 * 1000);
+  });
+});
+
+describe("useCountdown", () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+    // Mock requestAnimationFrame to call callback immediately
+    vi.stubGlobal(
+      "requestAnimationFrame",
+      (cb: FrameRequestCallback) => setTimeout(() => cb(Date.now()), 16) as unknown as number,
+    );
+    vi.stubGlobal("cancelAnimationFrame", (id: number) => clearTimeout(id));
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.unstubAllGlobals();
+  });
+
+  it("returns initial countdown state on mount", () => {
+    const expires = new Date(Date.now() + 5 * 60 * 1000).toISOString();
+    const { result } = renderHook(() => useCountdown(expires));
+    expect(result.current.expired).toBe(false);
+    expect(result.current.urgent).toBe(true);
+  });
+
+  it("returns expired state for past timestamp", () => {
+    const expires = new Date(Date.now() - 1000).toISOString();
+    const { result } = renderHook(() => useCountdown(expires));
+    expect(result.current.expired).toBe(true);
+    expect(result.current.label).toBe("已超时");
+  });
+
+  it("cleans up animation frame on unmount", () => {
+    const expires = new Date(Date.now() + 60_000).toISOString();
+    const { unmount } = renderHook(() => useCountdown(expires));
+    // Should not throw
+    act(() => {
+      unmount();
+    });
   });
 });
