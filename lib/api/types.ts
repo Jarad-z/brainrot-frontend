@@ -40,6 +40,10 @@ export interface TaskCard {
   created_at: string;
   updated_at: string;
   done_at: string | null;
+  // BACKEND_GAPS #6 (resolved 2026-05-17): true when an active run exists for this task
+  busy?: boolean;
+  // BACKEND_GAPS #13 (resolved 2026-05-17): agent uuids associated with this task
+  agents?: string[];
 }
 
 export type AgentBackendType = "claude";
