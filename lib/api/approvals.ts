@@ -1,4 +1,4 @@
-import { apiFetch } from "./client";
+import { apiFetch, ApiError } from "./client";
 import type { ApprovalDecision, ApprovalRequest } from "./types";
 
 export interface DecideInput {
@@ -14,4 +14,19 @@ export async function decideApproval(
     method: "POST",
     body: JSON.stringify(input),
   });
+}
+
+/**
+ * Fetch approvals for a task. Returns null on 404 so callers can fall back to
+ * a derive-from-messages path while BACKEND_GAPS #11 is still open.
+ */
+export async function fetchTaskApprovals(
+  taskId: string,
+): Promise<ApprovalRequest[] | null> {
+  try {
+    return await apiFetch<ApprovalRequest[]>(`/api/v1/tasks/${taskId}/approvals`);
+  } catch (e) {
+    if (e instanceof ApiError && e.status === 404) return null;
+    throw e;
+  }
 }
