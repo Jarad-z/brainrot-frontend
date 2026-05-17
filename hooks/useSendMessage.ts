@@ -22,7 +22,7 @@ export function useSendMessage(taskId: string) {
         tempId,
         task_card_id: taskId,
         role: "user",
-        author_user_id: me?.ID ?? null,
+        author_user_id: me?.id ?? null,
         author_agent_id: null,
         content: encodeJSON({ text: input.text, mentions: input.mentions }),
         task_run_id: null,

@@ -27,7 +27,7 @@ export function MessageList({ taskId, wsId }: MessageListProps) {
 
   const authors = useMemo(() => {
     const users: Record<string, { name: string; handle?: string }> = {};
-    if (me) users[me.ID] = { name: me.Name };
+    if (me) users[me.id] = { name: me.name };
     const ag: Record<string, { name: string; handle: string }> = {};
     for (const a of agents) ag[a.id] = { name: a.name, handle: a.handle };
     return { users, agents: ag };

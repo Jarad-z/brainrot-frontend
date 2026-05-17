@@ -40,8 +40,8 @@ export default function WorkspaceHomePage({ params }: PageProps) {
   const session = useSession();
   const user = session.data;
   const firstName =
-    (user?.Name?.split(/\s+/)[0] || "") ||
-    (user?.Email?.split("@")[0] || "") ||
+    (user?.name?.split(/\s+/)[0] || "") ||
+    (user?.email?.split("@")[0] || "") ||
     "";
 
   return (

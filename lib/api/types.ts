@@ -1,10 +1,11 @@
 import type { ParsedMessage } from "@/lib/parse-message";
 
-// User uses PascalCase to match the /me endpoint response (see BACKEND_GAPS.md #3).
+// BACKEND_GAPS #3 resolved (2026-05-17): backend now returns snake_case
+// {id, email, name} from /me.
 export interface User {
-  ID: string;
-  Email: string;
-  Name: string;
+  id: string;
+  email: string;
+  name: string;
 }
 
 export interface Workspace {
