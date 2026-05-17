@@ -53,7 +53,7 @@ function userMsg(id = "u1"): ClientMessage {
     metadata: "",
     created_at: "2026-05-17T09:00:00Z",
     meta: {},
-    parsed: { type: "user", payload: { text: "hi", mentions: [] } } as ClientMessage["parsed"],
+    parsed: { type: "user", text: "hi", mentions: [] },
   };
 }
 
