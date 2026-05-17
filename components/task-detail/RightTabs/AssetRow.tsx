@@ -1,4 +1,3 @@
-/* eslint-disable camelcase -- snake_case identifiers come from backend wire format */
 "use client";
 import type { Asset } from "@/lib/api/types";
 import { relativeTime } from "@/lib/format";
