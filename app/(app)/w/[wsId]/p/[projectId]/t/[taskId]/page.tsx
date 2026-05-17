@@ -36,7 +36,7 @@ export default function TaskDetailPage({ params }: PageProps) {
     <div className="h-full grid grid-cols-[260px_1fr_320px] min-h-0 overflow-hidden">
       <TaskListPane projectId={projectId} wsId={wsId} activeTaskId={taskId} />
       <ChatPane wsId={wsId} taskId={taskId} task={task ?? found} />
-      <RightPanel taskId={taskId} />
+      <RightPanel taskId={taskId} projectId={projectId} />
     </div>
   );
 }
