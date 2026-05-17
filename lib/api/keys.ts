@@ -8,10 +8,12 @@ export const queryKeys = {
   projects: {
     detail: (projectId: string) => ["projects", projectId] as const,
     tasks: (projectId: string) => ["projects", projectId, "tasks"] as const,
+    assets: (projectId: string) => ["projects", projectId, "assets"] as const,
   },
   tasks: {
     detail: (taskId: string) => ["tasks", taskId] as const,
     messages: (taskId: string) => ["tasks", taskId, "messages"] as const,
+    artifacts: (taskId: string) => ["tasks", taskId, "artifacts"] as const,
   },
   approvals: {
     task: (taskId: string) => ["approvals", "task", taskId] as const,
