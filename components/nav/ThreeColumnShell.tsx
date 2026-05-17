@@ -40,12 +40,13 @@ export function ThreeColumnShell({ user, children }: ThreeColumnShellProps) {
                     />
                   </span>
                 </TooltipTrigger>
-                <TooltipContent>S2 上线后启用</TooltipContent>
+                <TooltipContent>S3 上线后启用</TooltipContent>
               </Tooltip>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <span>
-                    <IconButton disabled aria-label="通知">
+                    {/* Badge is decorative mock to match prototype 13 — S3 will wire real count from approvals API */}
+                    <IconButton disabled aria-label="通知" badge={3}>
                       <svg
                         viewBox="0 0 24 24"
                         fill="none"
@@ -65,7 +66,7 @@ export function ThreeColumnShell({ user, children }: ThreeColumnShellProps) {
               </Tooltip>
               <AccountMenu user={user} />
             </header>
-            <main className="flex-1 overflow-y-auto">{children}</main>
+            <main className="flex-1 min-h-0 overflow-hidden">{children}</main>
           </div>
         </div>
       </div>

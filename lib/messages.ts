@@ -28,7 +28,6 @@ export const messages = {
     pendingDisabled: "S3 上线后启用",
     listsDisabled: "S4 上线后启用",
     writesDisabled: "S4 上线后启用",
-    taskDisabled: "S2 上线后启用",
     wsListDisabled: "工作区列表接口尚未开放（S? 上线后启用）",
     logout: "登出",
     projects: "项目",

@@ -51,7 +51,7 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div className="p-8 max-w-xl mx-auto">
+    <div className="p-8 max-w-xl mx-auto h-full overflow-y-auto">
       <Card chunky className="p-8">
         <h1 className="text-xl font-extrabold mb-2 text-ink-0 page-title">
           {messages.workspace.onboardingTitle}

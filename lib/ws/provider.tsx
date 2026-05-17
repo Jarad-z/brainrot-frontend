@@ -1,8 +1,12 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useAppStore } from "@/lib/store";
+import { useChatUIStore } from "@/lib/store/chat-ui";
 import { WSClient } from "./client";
+import { WSClientContext } from "./context";
+import { registerHandlers } from "./handlers";
 
 interface WSProviderProps {
   children: React.ReactNode;
@@ -10,15 +14,29 @@ interface WSProviderProps {
 
 export function WSProvider({ children }: WSProviderProps) {
   const setWsStatus = useAppStore((s) => s.setWsStatus);
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
+  const client = useMemo(() => {
     const url =
       process.env.NEXT_PUBLIC_WS_URL ??
-      `${location.protocol === "https:" ? "wss" : "ws"}://${location.host}/ws`;
-    const client = new WSClient(url, setWsStatus);
-    client.connect();
-    return () => client.disconnect();
+      (typeof window !== "undefined"
+        ? `${location.protocol === "https:" ? "wss" : "ws"}://${location.host}/ws`
+        : "");
+    return new WSClient(url, setWsStatus);
   }, [setWsStatus]);
 
-  return <>{children}</>;
+  useEffect(() => {
+    client.connect();
+    const unsubscribeHandlers = registerHandlers(
+      client,
+      queryClient,
+      () => useChatUIStore.getState(),
+    );
+    return () => {
+      unsubscribeHandlers();
+      client.disconnect();
+    };
+  }, [client, queryClient]);
+
+  return <WSClientContext.Provider value={client}>{children}</WSClientContext.Provider>;
 }

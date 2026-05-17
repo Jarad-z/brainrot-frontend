@@ -1,3 +1,5 @@
+import type { ParsedMessage } from "@/lib/parse-message";
+
 // User uses PascalCase to match the /me endpoint response (see BACKEND_GAPS.md #3).
 export interface User {
   ID: string;
@@ -38,4 +40,67 @@ export interface TaskCard {
   created_at: string;
   updated_at: string;
   done_at: string | null;
+}
+
+export type AgentBackendType = "claude";
+
+export interface Agent {
+  id: string;
+  workspace_id: string;
+  runtime_id: string;
+  handle: string;
+  name: string;
+  avatar_url: string | null;
+  description: string;
+  instructions: string;
+  backend_type: AgentBackendType;
+  model: string | null;
+  custom_env: string;
+  custom_args: string;
+  mcp_config: string;
+  archived: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Message {
+  id: string;
+  task_card_id: string;
+  role: "user" | "agent" | "system";
+  author_user_id: string | null;
+  author_agent_id: string | null;
+  content: string;
+  task_run_id: string | null;
+  seq: number | null;
+  metadata: string;
+  created_at: string;
+}
+
+export interface ClientMessage extends Message {
+  parsed: ParsedMessage;
+  meta: { queued?: boolean };
+  tempId?: string;
+}
+
+export type ApprovalDecision = "approved" | "denied" | "approved_with_edits";
+export type ApprovalStatus = ApprovalDecision | "pending" | "timeout";
+
+export interface ApprovalRequest {
+  id: string;
+  run_id: string;
+  task_card_id: string;
+  tool_name: string;
+  tool_input: string;
+  status: ApprovalStatus;
+  decided_by: string | null;
+  decided_at: string | null;
+  decision_note: string | null;
+  created_at: string;
+  expires_at: string;
+}
+
+export interface EnqueuedRun {
+  RunID: string;
+  AgentID: string;
+  RuntimeID: string;
 }

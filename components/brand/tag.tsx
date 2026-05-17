@@ -2,7 +2,7 @@
 
 import { cn } from "@/lib/utils";
 
-export interface TagProps extends React.HTMLAttributes<HTMLSpanElement> {}
+export type TagProps = React.HTMLAttributes<HTMLSpanElement>;
 
 export function Tag({ className, ...rest }: TagProps) {
   return (
@@ -17,7 +17,7 @@ export function Tag({ className, ...rest }: TagProps) {
   );
 }
 
-export interface PillsProps extends React.HTMLAttributes<HTMLDivElement> {}
+export type PillsProps = React.HTMLAttributes<HTMLDivElement>;
 
 export function Pills({ className, ...rest }: PillsProps) {
   return (

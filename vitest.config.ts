@@ -14,8 +14,6 @@ export default defineConfig({
       include: ["lib/**/*.{ts,tsx}"],
       exclude: [
         "lib/**/*.d.ts",
-        // api/messages.ts is a stub (original plan exclusion)
-        "lib/api/messages.ts",
         // pure type-only files — no runtime statements to cover
         "lib/api/types.ts",
         // thin apiFetch wrappers — covered indirectly via client.test.ts; unit-testing
@@ -23,8 +21,7 @@ export default defineConfig({
         "lib/api/auth.ts",
         "lib/api/projects.ts",
         "lib/api/tasks.ts",
-        // WebSocket infrastructure — requires a real WebSocket environment; deferred to S2
-        "lib/ws/client.ts",
+        // WebSocket provider — React-Context-only; exercised via component renders in S2
         "lib/ws/provider.tsx",
         // constant object — no branches or functions to exercise
         "lib/messages.ts",

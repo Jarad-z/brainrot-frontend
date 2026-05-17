@@ -2,7 +2,7 @@
 
 import { cn } from "@/lib/utils";
 
-export interface CrumbProps extends React.HTMLAttributes<HTMLDivElement> {}
+export type CrumbProps = React.HTMLAttributes<HTMLDivElement>;
 
 export function Crumb({ className, children, ...rest }: CrumbProps) {
   return (
