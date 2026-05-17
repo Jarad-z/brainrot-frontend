@@ -63,6 +63,35 @@ POST /api/v1/auth/logout
 
 ## 工作区
 
+### 列出我能进的工作区
+
+```
+GET /api/v1/workspaces
+```
+
+- `200` → `Workspace[]`，按 `created_at DESC`，无分页。新用户返回 `[]`。
+- `401` 未登录。
+- 用途：前端登录后用它决定默认 `wsId`；空数组就跳新建工作区流程。
+
+### 单个工作区详情
+
+```
+GET /api/v1/workspaces/{ws_id}
+```
+
+- `200` → `Workspace`（不含 role）。
+- `403` 调用者不是该工作区成员。
+
+### 列出工作区的 daemon runtime
+
+```
+GET /api/v1/workspaces/{ws_id}/runtimes
+```
+
+- `200` → `AgentRuntime[]`，按 `created_at DESC`；已 `revoked` 的不返回。
+- `403` 不是工作区成员。
+- 用途：sidebar 显示"哪些 daemon 在线"；与 WS `runtime.online`/`runtime.offline` 事件互补，REST 给首屏初始集合。
+
 ### 创建工作区
 
 ```
@@ -156,8 +185,17 @@ PATCH /api/v1/tasks/{task_id}
 → 204
 
 POST /api/v1/tasks/{task_id}/cancel-run
-→ 204             // 取消当前活跃的 run（若有）
+→ 204             // 取消该任务卡当前活跃的 run（若有）
 ```
+
+**`cancel-run` 语义（重要）**：
+
+- **取消范围**：只取消该任务卡当前唯一的活跃 run（`status IN ('pending','claimed','running','awaiting_approval')`）。受 partial unique index `idx_task_queue_card_active` 保证，每张任务卡同一时刻**至多**一条活跃 run，因此不存在"批量取消"语义。
+- **排队消息处理**：被取消的 run 状态记为 `canceled`，**不会**触发自动晋升排队 (`metadata.queued=true`) 的用户消息。换言之：取消之后，排队消息会原地停留，必须等用户**重新 @mention**（或后续显式机制）才会再次入队。⚠️ 这与"自动晋升"直觉不同，前端文案不要承诺"队列会接着跑"。
+- **审批联动**：若取消时 run 处于 `awaiting_approval`，对应的 `ApprovalRequest` 行状态**不会**被自动改写（仍是 `pending`），但 daemon 已被通知该 run 终止；sweeper 最终会按 TTL 把它打 `timeout`。
+- **并发幂等性**：多次调用幂等——后续调用 SQL UPDATE 命中 0 行，service 当前会因 `pgx.ErrNoRows` 返回 400。前端遇到这种 400 视作"已被人取消过"处理即可。
+- **WS 通知**：取消完成后通过 daemon 通道触发 `run.completed` (`status="canceled"`)；前端用它来 toast "X 的运行已取消"，**不需要**响应体里带 `run_id`。
+- **返回值**：当前为 `204 No Content`；不返回 `run_id`。改成 `200 + {"canceled_run_id":"..."}` 的提案 still pending（参见 BACKEND_GAPS #16）。
 
 ---
 
@@ -165,15 +203,19 @@ POST /api/v1/tasks/{task_id}/cancel-run
 
 任务卡内一条对话线。`@handle` 会在 body 解析为 `mentions[]`（agent ID 数组），由后端入队为 run。
 
-### 列出消息（历史）
+### 列出消息（历史 / 分页）
 
 ```
 GET /api/v1/tasks/{task_id}/messages
+GET /api/v1/tasks/{task_id}/messages?before=<RFC3339Nano>&limit=N    // cursor 分页
 ```
 
-- `200` → `Message[]`，按 `created_at` **升序**。
-- **当前没有分页**：响应即任务卡里全部消息。聊天流活跃时这条会越长越大，前端在长流场景下要把它配合虚拟列表渲染；后续会加 `before`/`limit` 分页（TODO）。
-- `400` 不是任务所属工作区成员。
+- **不带任何参数**：返回 `Message[]`，按 `created_at` **升序**，全量无分页（旧行为，前端兼容）。
+- **带 `limit`（推荐，长流场景）**：返回 `{ "messages": Message[], "next_cursor": "<RFC3339Nano>" | "" }`。
+  - `messages` 仍按 `created_at` **升序**（直接 append 到聊天流末端）。
+  - `next_cursor` 是本批最早一条的 `created_at`；再次请求时作 `before=` 传入；为空 (`""`) 表示已到头。
+  - `limit` 上限 `500`，缺省 `50`。
+- `400` 不是任务所属工作区成员，或 `before` 不是合法 RFC3339Nano。
 
 ### 追加消息
 
@@ -219,7 +261,7 @@ const parsed = JSON.parse(raw);
 | `"assistant_text"` | claude stream | `payload` 是 stringified `{"text":"..."}` |
 | `"tool_use"` | claude stream | `payload` 含 `tool_name`, `tool_use_id`, `input` |
 | `"tool_result"` | claude stream | `payload` 含 `tool_use_id`, `is_error`, `content` |
-| `"permission_request"` | claude stream | 同时会创建 `ApprovalRequest`，前端应优先看 approval 列表 |
+| `"permission_request"` | server（创建审批时同步写入） | payload: `approval_id`, `tool_name`, `tool_input`, `expires_at`, `agent_id`, `agent_handle`。前端可用此消息在聊天流就地渲染审批卡。同时会发 WS `approval.requested` 事件。 |
 | `"thinking"` | claude stream | `payload.text` 是思考内容 |
 | `"result"` | claude stream | 标记 run 结束，`payload.duration_ms`, `payload.result` |
 | `"rate_limit_event"` | claude stream | 速率限制提示 |
@@ -244,6 +286,36 @@ POST /api/v1/approvals/{approval_id}/decide
 - 决策窗口默认 1 小时；超时会被 sweeper 标 `timeout` 并让 run 失败。
 - 审批的 `tool_input` 字段同样是 base64 编码的 jsonb，解码后是 `{"command":"ls", ...}` 之类。
 
+### 列出任务的审批历史
+
+```
+GET /api/v1/tasks/{task_id}/approvals
+```
+
+- `200` → `TaskApprovalItem[]`，按 `created_at DESC`。`TaskApprovalItem` = `ApprovalRequest` 所有字段 + `agent_id` + `agent_handle`（避免前端 N+1 反查 agent）。
+- `403` 不是任务所属工作区成员。
+
+### 工作区审批 hub（跨任务）
+
+```
+GET /api/v1/workspaces/{ws_id}/approvals?status=pending|approved|denied|timeout|approved_with_edits
+```
+
+- `200` → `ApprovalHubItem[]`：每条是 `ApprovalRequest` 的所有字段 + `project_id` + `project_name` + `task_id` + `task_title` + `agent_id` + `agent_handle`，按 `created_at DESC`。
+- 不带 `status` 参数 → 返回工作区内所有审批（不过滤）。
+- `403` 不是工作区成员。
+
+### 当前用户跨工作区 pending 审批
+
+```
+GET /api/v1/me/pending-approvals                  // 全量
+GET /api/v1/me/pending-approvals?count_only=1     // 只算数
+```
+
+- 默认 `200` → `{ "count": N, "items": PendingItem[] }`。`PendingItem` 是 `ApprovalHubItem` + `workspace_id`。
+- `count_only=1` → `{ "count": N }`，省去 join；用于 navbar bell badge。
+- 语义：扫调用者所有 workspace membership 下 `status='pending'` 且 `expires_at > now()` 的审批。
+
 ---
 
 ## 资产（项目级文件上传）
@@ -257,6 +329,24 @@ Content-Type: multipart/form-data
 
 - 限制 100 MB；MIME 由 form 决定。
 - agent 触发期间生成的产物走另一条线（artifacts），由 daemon 直接上传，前端只读。
+
+### 列出项目资产
+
+```
+GET /api/v1/projects/{project_id}/assets
+```
+
+- `200` → `Asset[]`，按 `created_at DESC`。
+- `403` 不是项目所属工作区成员。
+
+### 列出任务产出 (artifacts)
+
+```
+GET /api/v1/tasks/{task_id}/artifacts
+```
+
+- `200` → `Artifact[]`，按 `created_at DESC`；`excluded=true` 的不返回。
+- `403` 不是任务所属工作区成员。
 
 ---
 
@@ -296,7 +386,7 @@ Cookie: brainrot_session=...
 | `task.updated` | `project` | 状态/字段变更 | `task`: TaskCard |
 | `message.appended` | `task` | 用户/agent 消息新增 | `message`: Message, `runs`: EnqueuedRun[]（user）或 `message_id`+`seq`+`content`（agent） |
 | `run.completed` | `task` | run 终止 | `run_id`, `status` (`done`/`failed`/`canceled`), `error` |
-| `approval.requested` | `task` | 新审批请求 | `approval_id`, `run_id`, `tool_name`, `tool_input` |
+| `approval.requested` | `task` | 新审批请求 | `approval_id`, `run_id`, `tool_name`, `tool_input`, `expires_at`, `agent_id`, `agent_handle` |
 | `approval.decided` | `task` | 审批决策 | `approval_id`, `decision`, `note` |
 | `asset.added` | `project` | 项目资产上传完成 | `asset`: Asset |
 | `artifact.added` | `project` | agent 产物上传完成 | `artifact`: Artifact |
@@ -358,7 +448,9 @@ Cookie: brainrot_session=...
   sort_order: number,
   created_by: string,
   created_at: string, updated_at: string,
-  done_at: string | null
+  done_at: string | null,
+  busy: boolean,             // 只在 list 接口返回；true = 该卡有 pending/claimed/running/awaiting_approval 的 run
+  agents: string[]           // 只在 list 接口返回；该卡历史上派过工的所有 agent uuid（DISTINCT，来自 agent_task_queue）。空数组 = 尚未触发过任何 agent。前端用这个字段渲染任务卡底部的 agent 头像组。
 }
 ```
 
@@ -428,6 +520,37 @@ Cookie: brainrot_session=...
 
 ---
 
+## 鉴权矩阵
+
+下面这张表是从 service 层 `requireRole(...)` 调用反推出来的，描述每个**写接口**实际要求的 workspace role。角色等级：`owner > editor > viewer`（`viewer` 只读）。
+
+| Endpoint | 需要的 role | 失败码 | 备注 |
+|---|---|---|---|
+| `POST /auth/register`, `POST /auth/login`, `POST /auth/logout` | — | — | 无需 session |
+| `GET /me`, `GET /me/pending-approvals` | 任意已登录 | `401` | |
+| `POST /workspaces` | 任意已登录 | `401` | 创建者自动成为 `owner` |
+| `GET /workspaces`, `GET /workspaces/{id}` | 调用者必须是该 ws 成员 | `403` | |
+| `POST /workspaces/{id}/members` | `owner` | `403` | |
+| `POST /workspaces/{id}/install-tokens` | `owner` | `403` | |
+| `GET /workspaces/{id}/runtimes` | 任意成员（owner/editor/viewer） | `403` | |
+| `GET /workspaces/{id}/agents` | 任意成员 | `403` | |
+| `POST /workspaces/{id}/agents` | `owner` / `editor` | `403` | |
+| `POST /workspaces/{id}/projects` | `owner` / `editor` | `403` | |
+| `GET /workspaces/{id}/projects` | 任意成员 | `403` | |
+| `GET /workspaces/{id}/approvals` | 任意成员 | `403` | |
+| `GET /projects/{id}` | 任意 ws 成员 | `403` | |
+| `POST /projects/{id}/tasks` | `owner` / `editor` | `403` | |
+| `GET /projects/{id}/tasks` | 任意 ws 成员 | `403` | |
+| `POST /projects/{id}/assets` | `owner` / `editor` | `403` | upload |
+| `GET /projects/{id}/assets` | 任意 ws 成员 | `403` | |
+| `PATCH /tasks/{id}` (status) | `owner` / `editor` | `403` | |
+| `POST /tasks/{id}/cancel-run` | `owner` / `editor` | `403` | |
+| `GET /tasks/{id}/messages` | 任意 ws 成员 | `403` | |
+| `POST /tasks/{id}/messages` | `owner` / `editor` | `403` | 触发 agent |
+| `GET /tasks/{id}/artifacts` | 任意 ws 成员 | `403` | |
+| `GET /tasks/{id}/approvals` | 任意 ws 成员 | `403` | |
+| `POST /approvals/{id}/decide` | `owner` / `editor` | `403` | |
+
 ## 错误模型
 
 所有错误用纯文本响应体（`text/plain`）+ HTTP 状态码，**不是** JSON envelope。常见码：
@@ -483,24 +606,32 @@ POST   /api/v1/auth/register
 POST   /api/v1/auth/login
 POST   /api/v1/auth/logout
 GET    /api/v1/me
+GET    /api/v1/me/pending-approvals
 
+GET    /api/v1/workspaces
 POST   /api/v1/workspaces
+GET    /api/v1/workspaces/{ws_id}
 POST   /api/v1/workspaces/{ws_id}/members
 POST   /api/v1/workspaces/{ws_id}/install-tokens
+GET    /api/v1/workspaces/{ws_id}/runtimes
 GET    /api/v1/workspaces/{ws_id}/agents
 POST   /api/v1/workspaces/{ws_id}/agents
 POST   /api/v1/workspaces/{ws_id}/projects
 GET    /api/v1/workspaces/{ws_id}/projects
+GET    /api/v1/workspaces/{ws_id}/approvals
 
 GET    /api/v1/projects/{project_id}
 POST   /api/v1/projects/{project_id}/tasks
 GET    /api/v1/projects/{project_id}/tasks
 POST   /api/v1/projects/{project_id}/assets
+GET    /api/v1/projects/{project_id}/assets
 
 PATCH  /api/v1/tasks/{task_id}
 POST   /api/v1/tasks/{task_id}/cancel-run
 GET    /api/v1/tasks/{task_id}/messages
 POST   /api/v1/tasks/{task_id}/messages
+GET    /api/v1/tasks/{task_id}/artifacts
+GET    /api/v1/tasks/{task_id}/approvals
 
 POST   /api/v1/approvals/{approval_id}/decide
 
