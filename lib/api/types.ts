@@ -49,7 +49,7 @@ export interface TaskCard {
 
 export type AgentBackendType = "claude";
 
-/** Decoded form used everywhere except inside lib/api/agents.ts. */
+/** Agent as returned by the backend (jsonb columns are decoded server-side). */
 export interface Agent {
   id: string;
   workspace_id: string;
@@ -64,26 +64,6 @@ export interface Agent {
   custom_env: Record<string, string>;
   custom_args: string[];
   mcp_config: Record<string, unknown>;
-  archived: boolean;
-  created_at: string;
-  updated_at: string;
-}
-
-/** Wire form returned by the backend — three jsonb fields arrive base64-encoded. */
-export interface AgentWire {
-  id: string;
-  workspace_id: string;
-  runtime_id: string;
-  handle: string;
-  name: string;
-  avatar_url: string | null;
-  description: string;
-  instructions: string;
-  backend_type: AgentBackendType;
-  model: string | null;
-  custom_env: string;
-  custom_args: string;
-  mcp_config: string;
   archived: boolean;
   created_at: string;
   updated_at: string;
