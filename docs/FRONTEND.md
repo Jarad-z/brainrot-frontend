@@ -517,8 +517,15 @@ class WSClient {
 - 排队提示因 BACKEND_GAPS #18 暂未做 — cancel-run dialog 文案承认了"取消后排队消息会卡住"。
 - 跨 ws 全局 count 推 S4（虽然 backend 已实现 `GET /me/pending-approvals?count_only=1` 在 #11/#14 一并，但 ws-switcher UI 还在 S4 范围内）。
 
-**M5 · 素材 / 产物 / agent 管理（1 周）**
-- 上传、产物 tab、agent CRUD、runtime 列表（依赖后端补接口）。
+**M5 · 素材 / 产物 / agent 管理（1 周）** — ⚙️ S4 已完成（2026-05-18，branch `s4-workspace-mgmt`）
+
+- ✅ workspace switcher dropdown + 创建工作区（modal）— sidebar 切换器解锁，登录后按 `localStorage.lastWsId` 智能落地
+- ✅ 跨 ws bell badge + 顶层 `/approvals` hub — bell 按当前路由 scope 智能跳转单 ws 或全局 hub
+- ✅ agent CRUD（new / edit / archive，按钮文案"归档"+ 默认隐藏 + "显示已归档" toggle）— 三个 jsonb 字段的 base64 wire 非对称由 `lib/api/agents-encoding.ts` 统一边界处理（见 BACKEND_GAPS #21）
+- ✅ `/w/[wsId]/runtimes` 列表 + 一次性 install-token modal（token 不入 React Query 缓存）
+- ✅ `/w/[wsId]/settings`：基本信息 + 我的 user ID + 添加成员（按 UUID）+ 危险操作占位
+- 文件上传 UX（asset 上传 / artifact 排除标记）→ S5
+- 改 ws 元信息 / 列成员 / 移除成员 / 改 role / 归档 ws / 按 email 邀请 → S5 阻塞于 BACKEND_GAPS #19/#20
 
 **M6 · 打磨**
 - 深色主题、键盘快捷键、虚拟列表、E2E、可访问性扫描。

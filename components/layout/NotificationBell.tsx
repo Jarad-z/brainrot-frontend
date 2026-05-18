@@ -1,11 +1,7 @@
 "use client";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { IconButton } from "@/components/brand/icon-button";
-import { usePendingApprovalsCount } from "@/hooks/usePendingApprovalsCount";
-
-interface NotificationBellProps {
-  wsId: string;
-}
+import { useGlobalPendingApprovalsCount } from "@/hooks/useGlobalPendingApprovalsCount";
 
 function badgeFromCount(n: number): number | string | undefined {
   if (n <= 0) return undefined;
@@ -13,15 +9,24 @@ function badgeFromCount(n: number): number | string | undefined {
   return n;
 }
 
-export function NotificationBell({ wsId }: NotificationBellProps) {
+const WS_ROUTE = /^\/w\/([^/]+)/;
+
+export function NotificationBell() {
   const router = useRouter();
-  const count = usePendingApprovalsCount(wsId);
+  const pathname = usePathname() ?? "";
+  const { data: count = 0 } = useGlobalPendingApprovalsCount();
   const badge = badgeFromCount(count);
+
+  const onClick = () => {
+    const m = pathname.match(WS_ROUTE);
+    if (m) router.push(`/w/${m[1]}/approvals`);
+    else router.push("/approvals");
+  };
 
   return (
     <IconButton
       aria-label="通知"
-      onClick={() => router.push(`/w/${wsId}/approvals`)}
+      onClick={onClick}
       badge={badge}
       title={count > 0 ? `${count} 件待审批` : "暂无待审批"}
     >

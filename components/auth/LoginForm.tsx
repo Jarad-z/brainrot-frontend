@@ -47,7 +47,7 @@ export function LoginForm() {
     setFormError(null);
     try {
       await auth.login(email, password);
-      await queryClient.invalidateQueries({ queryKey: queryKeys.me() });
+      await queryClient.invalidateQueries({ queryKey: queryKeys.me.self() });
       router.replace(searchParams.get("next") ?? "/");
     } catch (err) {
       if (err instanceof ApiError) {

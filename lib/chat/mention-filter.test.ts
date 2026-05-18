@@ -7,7 +7,7 @@ function mk(handle: string, archived = false): Agent {
     id: handle, workspace_id: "w1", runtime_id: "r1",
     handle, name: handle.toUpperCase(), avatar_url: null,
     description: "", instructions: "", backend_type: "claude",
-    model: null, custom_env: "", custom_args: "", mcp_config: "",
+    model: null, custom_env: {}, custom_args: [], mcp_config: {},
     archived, created_at: "", updated_at: "",
   };
 }

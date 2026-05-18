@@ -9,7 +9,7 @@ import { queryKeys } from "@/lib/api/keys";
 export function useSession() {
   const redirected = useRef(false);
   const result = useQuery({
-    queryKey: queryKeys.me(),
+    queryKey: queryKeys.me.self(),
     queryFn: auth.me,
     retry: false,
     staleTime: 5 * 60 * 1000,

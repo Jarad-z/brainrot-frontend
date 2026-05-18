@@ -6,7 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import { projectsApi } from "@/lib/api/projects";
 import { queryKeys } from "@/lib/api/keys";
 import { BrandMark } from "@/components/brand/brand-mark";
-import { WsSwitcher } from "@/components/brand/ws-switcher";
+import { WorkspaceSwitcherDropdown } from "@/components/workspace/WorkspaceSwitcherDropdown";
 import { NavItem } from "@/components/brand/nav-item";
 import { ProjItem } from "@/components/brand/proj-item";
 import {
@@ -17,29 +17,6 @@ import {
 } from "@/components/brand/tooltip";
 import { swatchFromId } from "@/lib/swatch";
 import { messages } from "@/lib/messages";
-
-function DisabledNavItem({
-  label,
-  tooltip,
-  icon,
-}: {
-  label: string;
-  tooltip: string;
-  icon?: React.ReactNode;
-}) {
-  return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <span>
-          <NavItem disabled icon={icon}>
-            {label}
-          </NavItem>
-        </span>
-      </TooltipTrigger>
-      <TooltipContent side="right">{tooltip}</TooltipContent>
-    </Tooltip>
-  );
-}
 
 export function Sidebar() {
   const params = useParams<{ wsId?: string; projectId?: string }>();
@@ -70,7 +47,7 @@ export function Sidebar() {
 
         {/* ws switcher */}
         <div className="px-3 pt-3 pb-1.5">
-          <WsSwitcher name="Lumen Labs" meta="lumen" avatar="LL" />
+          <WorkspaceSwitcherDropdown />
         </div>
 
         {/* nav */}
@@ -85,13 +62,30 @@ export function Sidebar() {
           ) : (
             <NavItem>概览</NavItem>
           )}
-          <DisabledNavItem label="审批" tooltip={messages.shell.pendingDisabled} />
-          <DisabledNavItem label="Agents" tooltip={messages.shell.listsDisabled} />
-          <DisabledNavItem
-            label="Runtimes"
-            tooltip={messages.shell.listsDisabled}
-          />
-          <DisabledNavItem label="设置" tooltip={messages.shell.listsDisabled} />
+          <Link href="/approvals">
+            <NavItem>{messages.shell.pendingApprovals}</NavItem>
+          </Link>
+          {wsId ? (
+            <Link href={`/w/${wsId}/agents`}>
+              <NavItem>{messages.shell.agents}</NavItem>
+            </Link>
+          ) : (
+            <NavItem>{messages.shell.agents}</NavItem>
+          )}
+          {wsId ? (
+            <Link href={`/w/${wsId}/runtimes`}>
+              <NavItem>{messages.shell.runtimes}</NavItem>
+            </Link>
+          ) : (
+            <NavItem>{messages.shell.runtimes}</NavItem>
+          )}
+          {wsId ? (
+            <Link href={`/w/${wsId}/settings`}>
+              <NavItem>{messages.shell.settings}</NavItem>
+            </Link>
+          ) : (
+            <NavItem>{messages.shell.settings}</NavItem>
+          )}
 
           {/* projects */}
           <p className="px-4 pt-4 pb-1.5 text-[10.5px] font-extrabold tracking-[0.08em] text-ink-3 uppercase">

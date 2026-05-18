@@ -1,9 +1,19 @@
 export const queryKeys = {
-  me: () => ["me"] as const,
+  me: {
+    self: () => ["me"] as const,
+    pendingApprovals: () => ["me", "pending-approvals"] as const,
+    pendingApprovalsCount: () => ["me", "pending-approvals", "count"] as const,
+  },
   workspaces: {
+    list: () => ["workspaces"] as const,
     detail: (wsId: string) => ["workspaces", wsId] as const,
     projects: (wsId: string) => ["workspaces", wsId, "projects"] as const,
     agents: (wsId: string) => ["workspaces", wsId, "agents"] as const,
+    runtimes: (wsId: string) => ["workspaces", wsId, "runtimes"] as const,
+    approvals: (wsId: string) => ["workspaces", wsId, "approvals"] as const,
+  },
+  agents: {
+    detail: (agentId: string) => ["agents", agentId] as const,
   },
   projects: {
     detail: (projectId: string) => ["projects", projectId] as const,

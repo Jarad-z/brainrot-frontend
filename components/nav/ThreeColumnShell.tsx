@@ -1,6 +1,5 @@
 "use client";
 
-import { useParams } from "next/navigation";
 import { OfflineBanner } from "@/components/common/OfflineBanner";
 import { Sidebar } from "./Sidebar";
 import { Breadcrumb } from "./Breadcrumb";
@@ -21,8 +20,6 @@ interface ThreeColumnShellProps {
 }
 
 export function ThreeColumnShell({ user, children }: ThreeColumnShellProps) {
-  const params = useParams<{ wsId?: string }>();
-  const currentWsId = params?.wsId ?? "";
   return (
     <TooltipProvider>
       <div className="min-h-screen bg-paper-1 flex flex-col">
@@ -45,7 +42,7 @@ export function ThreeColumnShell({ user, children }: ThreeColumnShellProps) {
                 </TooltipTrigger>
                 <TooltipContent>S3 上线后启用</TooltipContent>
               </Tooltip>
-              {currentWsId ? <NotificationBell wsId={currentWsId} /> : null}
+              <NotificationBell />
               <AccountMenu user={user} />
             </header>
             <main className="flex-1 min-h-0 overflow-hidden">{children}</main>

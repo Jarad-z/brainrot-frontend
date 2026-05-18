@@ -217,3 +217,57 @@
   - case C：msg-2 mention 多个 agent（@editor @reviewer）→ editor 先跑，reviewer 仍 queued ✅
   - case D：run-1 failed → msg-2 永远不晋升（current behavior，需另立 gap 讨论是否要在 failed 时也促发晋升）
 - **优先级**：高。这是正确性 bug 而非视觉问题；用户会看到 "@editor 帮我写" 但回复是 writer 风格的尴尬场面，且很难 debug（前端日志显示 mention 是 editor，后端 run 显示 agent 是 writer）。
+
+## #19 缺按 email 邀请成员接口
+
+- **状态**：S5 阻塞
+- **发现**：2026-05-18，S4 设计阶段
+- **影响**：用户无法用 email 把他人加入工作区。必须手贴 UUID。
+- **Workaround（S4）**：`/w/[wsId]/settings` "添加成员" 表单接收 user_id UUID；`AddMemberModal` 文案"邀请流即将上线，请粘贴对方的 user ID"；同页面提供"你的 user ID + 复制"让被邀请人取自己的 ID。
+- **Need**：`POST /api/v1/workspaces/{ws}/invitations { email, role }` 创建邀请；被邀请人 inbox 接受后入会。
+
+## #20 工作区成员管理 + 元信息 RESTful 完善
+
+- **状态**：S5 阻塞
+- **发现**：2026-05-18，S4 设计阶段
+- **影响**：用户无法看到当前工作区有谁、改 ws 名称/slug、改成员 role、移除成员、归档工作区。
+- **Workaround（S4）**：`/w/[wsId]/settings` 成员区不渲染列表，只显示"成员列表即将上线"+ "添加成员"按钮；危险操作区显示 disabled 占位。
+- **Need**：
+  - `GET /api/v1/workspaces/{wsId}/members` → `WorkspaceMember[]`
+  - `PATCH /api/v1/workspaces/{wsId} { name?, slug? }`
+  - `PATCH /api/v1/workspaces/{wsId}/members/{user_id}/role { role }`
+  - `DELETE /api/v1/workspaces/{wsId}/members/{user_id}` → 204
+  - `POST /api/v1/workspaces/{wsId}/archive` → 204（软归档；硬删永远不做）
+
+## #21 Agent 字段读写不对称（GET 返 base64 []byte，POST 收 raw JSON）
+
+- **状态**：非阻塞（已 workaround）
+- **发现**：2026-05-18，S4 设计阶段（实测 `pkg/db/generated/agents.sql.go:45` `CustomEnv []byte`）
+- **影响**：GET `/api/v1/agents/...` 返回的 `custom_env` / `custom_args` / `mcp_config` 三个字段是 base64 string；POST 收 raw JSON object/array。前端必须分别 encode/decode。
+- **根因**：sqlc 把 jsonb 列生成 `[]byte`，Go 默认 `json.Marshal([]byte)` 编码成 base64。handler `writeJSON(w, ag)` 直接吐 `ag` → 客户端拿 base64 string。
+- **Workaround（S4）**：`lib/api/agents-encoding.ts` 提供 `decodeAgentResponse` / `encodeAgentInput`；类型分层 `AgentWire`（wire）vs `Agent`（decoded）；`lib/api/agents.ts` 是唯一边界。上层组件/hook 永远拿 `Agent`。
+- **Need**：handler 把 `CustomEnv []byte` 在序列化前 `json.Unmarshal` 成 `map[string]string` / `[]string` / `map[string]any` 再 `writeJSON`。修后前端可删除 `agents-encoding.ts` + `AgentWire` 类型。
+
+## #22 缺 `GET /api/v1/agents/{id}` 和 `PATCH /api/v1/agents/{id}`
+
+- **状态**：发现于 S4 manual QA 2026-05-18
+- **影响**：S4 agent 详情/编辑页 (`/w/[wsId]/agents/[agentId]`) 进不去 — 后端返回 405 Method Not Allowed。
+- **当前后端实际只有**：
+  - `GET /api/v1/workspaces/{ws_id}/agents` — 列表
+  - `POST /api/v1/workspaces/{ws_id}/agents` — 创建
+  - `DELETE /api/v1/agents/{agent_id}` — 归档
+  - 缺：`GET /api/v1/agents/{id}` 和 `PATCH /api/v1/agents/{id}`
+- **Workaround（S4）**：`hooks/useAgent.ts` 改为从 `useWorkspaceAgents(wsId)` 列表里 `.find()` 派生；详情页变成只读视图，显式提示"编辑暂未开放"。
+- **Need**：
+  - `GET /api/v1/agents/{id}` → `Agent`（response 同 list item）— 用于刷新单条
+  - `PATCH /api/v1/agents/{id}` `{handle?, name?, model?, instructions?, custom_env?, custom_args?, mcp_config?}` → `Agent`
+- **修后前端动作**：恢复 `lib/api/agents.ts` 里的 `fetchAgent` / `updateAgent` 调用；`hooks/useAgent.ts` 改回 `useQuery`；详情页改回 `useUpdateAgent` mutation。
+
+## #23 `GET /me/pending-approvals` response 包了 `{count, items}` 而不是裸数组
+
+- **状态**：发现于 S4 manual QA 2026-05-18
+- **影响**：S4 顶层 `/approvals` 页首次实现时按裸数组解析 → 客户端崩溃（`Application error`）。
+- **当前后端**：`internal/handler/frontend_gaps.go:245` 返回 `{count: N, items: PendingItem[]}`，count_only=1 时返回 `{count: N}`。
+- **Workaround（S4）**：`lib/api/me.ts` 加 `ListResponse` 类型解开 `{items}` 字段返回 `PendingApproval[]`；`PendingApproval` 类型同步对齐后端字段（`project_name` 而非不存在的 `workspace_name`）。
+- **Need**：要么 API.md 写清楚 response shape；要么把 list endpoint 改成裸 array（与 ws-scope `/workspaces/{ws}/approvals` 风格对齐）。
+- **次要**：`PendingItem` 缺 `workspace_name` — 前端要 `useWorkspaces()` 二次查询补 ws 名。建议后端加上这个字段。
