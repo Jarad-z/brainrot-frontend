@@ -271,3 +271,57 @@
 - **Workaround（S4）**：`lib/api/me.ts` 加 `ListResponse` 类型解开 `{items}` 字段返回 `PendingApproval[]`；`PendingApproval` 类型同步对齐后端字段（`project_name` 而非不存在的 `workspace_name`）。
 - **Need**：要么 API.md 写清楚 response shape；要么把 list endpoint 改成裸 array（与 ws-scope `/workspaces/{ws}/approvals` 风格对齐）。
 - **次要**：`PendingItem` 缺 `workspace_name` — 前端要 `useWorkspaces()` 二次查询补 ws 名。建议后端加上这个字段。
+
+## #24 `message.content` 和 `message.metadata` 也是 base64 string（同 #21 根因）
+
+- **状态**：发现于 2026-05-18 backend smoke test（`fix/cancel-clears-queued-messages` 分支验证）
+- **影响**：
+  - 前端从 `GET /api/v1/tasks/{taskId}/messages` 拿到的 `content` 字段是 base64 string，不是 `{text, mentions}` 嵌套对象 —— 直接 `msg.content.text` 永远是 `undefined`。
+  - `metadata` 同样问题：要判断 `metadata.queued === true` 必须先 base64 解码 + JSON.parse。
+- **根因**：跟 #21 一样 —— sqlc 把 `message.content`/`metadata` 两个 jsonb 列生成 `[]byte`，Go 默认 `json.Marshal([]byte)` 编码成 base64。`pkg/db/generated/messages.sql.go:104` `Metadata []byte`，content 同样。
+- **复现**：smoke test 里 PowerShell 必须这么解：
+  ```powershell
+  $bytes = [Convert]::FromBase64String($m.metadata)
+  $meta  = [System.Text.Encoding]::UTF8.GetString($bytes)  # "{"queued":true}"
+  ```
+- **Workaround（任何调用 `/messages` 的前端代码）**：跟 agents-encoding.ts 类似的处理 —— 拿到 wire 后立刻解码 content/metadata 两个字段。建议加 `lib/api/messages-encoding.ts` 复用。
+- **Need**：跟 #21 一起修。Handler 在 `writeJSON(w, msgs)` 之前把 `content` 和 `metadata` 两个字段从 `[]byte` 反序列化成结构化对象再吐出。修后影响所有读 message 的接口：`GET /tasks/{id}/messages`、`GET /tasks/{id}/messages?before=...&limit=...`（#8 那个 paged 版本）、`POST /tasks/{id}/messages` 响应里的 `message` 字段。
+- **优先级**：高 —— 这是任何聊天 UI 都必须正确读 `text` 字段才能渲染。S2 阶段如果靠 `String.fromCharCode(...atob(b64))` 这种临时拼凑 hacky 解决了，请加 follow-up 用统一 encoding 层。
+
+## #25 `runtime.online` 标志滞后到第一次 heartbeat（~15s），而不是 WS 连上的瞬间
+
+- **状态**：发现于 2026-05-18 backend smoke test
+- **影响**：用户启动 daemon 后立刻看 `/workspaces/{ws}/runtimes`，会看到 `online: false`、`last_heartbeat: null`，要等到 ~15 秒后第一次 heartbeat 到达才翻成 `online: true`。Sidebar runtime 灯 / agent 可用性指示会有 15 秒"假离线"窗口。
+- **复现**：
+  ```
+  daemon 启动 → WS 立刻连上（server 日志 daemon ws: connected）
+                    ↓
+  curl /workspaces/{ws}/runtimes → online: false, last_heartbeat: null
+                    ↓ (~15s 后第一次 heartbeat)
+  curl /workspaces/{ws}/runtimes → online: true
+  ```
+- **根因**：`online` 字段由 server 根据 `last_heartbeat` 派生（`heartbeat_interval=15s` 是 daemon.yaml 默认值）。WS connect 这条信号没用于翻转 `online`。
+- **Workaround（前端）**：UI 上对新建 daemon 显示 "等待 daemon 上线..." 的过渡态，至少 20s；不要拿首次响应的 `online: false` 直接标红离线。或者前端订阅 WS `runtime.online`/`runtime.offline` 事件（这两个事件应该是 daemon WS 真连上时发的，而不是看 heartbeat）。
+- **Need**：server 在 `daemonws.Hub` 接收到 WS connect 时，立刻把对应 runtime 的 `online=true` 写库（或者至少派生时检查 hub 在线状态而非只看 heartbeat）。WS disconnect 时翻 `online=false`。这样 list API 反映的就是即时状态，前端无需 polling 等 heartbeat。
+- **优先级**：中 —— 是 UX 顺滑问题，不阻塞功能；但用户每次起 daemon 都会经历这个不必要的"假离线"窗口，体感差。
+
+## #26 缺 `GET /api/v1/tasks/{taskId}/runs` 端点
+
+- **状态**：发现于 2026-05-18 backend smoke test
+- **影响**：
+  - 前端无法直接列出某张 card 的 run 历史（pending / running / canceled / done / failed 各几条）。
+  - 取消 run 后，前端要知道"被取消的那个 run"的 ID + status 翻转，只能从 message 列表里数 `agent`-role 消息推断 —— 而 agent 消息和 run 不是 1:1（real backend 一个 run 会发 5 条不同类型的事件消息）。
+  - Cancel 后 UI 想展示"这个 run 已取消"的灰条目，没接口可调。
+- **当前后端**：service 层有 `Run.ListByCard`（`internal/service/run.go`），SQL `ListRunsByCard` 也在 `pkg/db/queries/queue.sql:46`，但**没有 HTTP 路由暴露**。`cmd/server/router.go` 里没注册。
+- **复现**：smoke test 里我只能从 daemon 日志的 `handleTask: workdir=... run=<uuid>` 行数推断 "daemon 实际 claim 了几个 run"。这对前端不可行。
+- **Workaround（前端）**：从 `/messages` 响应里收集 `task_run_id` 字段去重，间接得到 run id 列表 + 推断 run 状态。复杂且脆弱（不同事件类型的消息字段不一致）。或者订阅 WS `run.completed` / `run_canceled` 事件维护本地 run 状态机。
+- **Need**：暴露 `GET /api/v1/tasks/{taskId}/runs` → `Run[]`，按 `created_at desc`。每条带 `id` / `agent_id` / `runtime_id` / `status` / `created_at` / `finished_at` / `error`。Handler 直接调已有的 service 方法即可，5 行代码。
+- **优先级**：中。S2 如果只用消息流也能凑合；S3+ 有"取消/重跑"等 run 维度操作时刚需。
+
+## #27 `message.text` 字段同时存在裸字段和嵌入 content 两种位置（推测）
+
+- **状态**：2026-05-18 backend smoke test 顺手发现的疑似不一致，未完整核实
+- **症状**：smoke test 中 POST `/messages` body 是 `{ content: { text: "@smoker one", mentions: [agentId] } }`，server 端 handler `appendMsgReq.Content.Text` 正确读到。Service 把 `text` 存进 `message.content` 列（`json.Marshal(map[string]any{"text": text})`）。但 list 返回的 `Message` struct 暴露的字段是 `content` (jsonb 编码后)，没有顶层 `text` 字段。如果 S2 前端期待 `msg.text` 直接拿到字符串，会拿到 undefined。
+- **影响**：跟 #24 部分重叠 —— 前端要拿 message 文本必须 `JSON.parse(atob(msg.content)).text`，没法 `msg.text`。
+- **建议**：后端在 message 序列化时把 `text` 从 content jsonb 里提到顶层（同时保留 content 给以后可能的富格式字段），这样最常见的"读消息文本"操作不用解码 jsonb。或者**至少**把 content 反序列化成对象（即修 #24）。
+- **优先级**：低 —— 修 #24 顺带就解决了。这一条主要是提醒前端**不要写 `msg.text`**，统一走 content 字段。
