@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { ReactNode } from "react";
 import { useCreateWorkspace } from "./useCreateWorkspace";
 import { ApiError } from "@/lib/api/client";
+import { queryKeys } from "@/lib/api/keys";
 import * as wsApi from "@/lib/api/workspaces";
 import type { Workspace } from "@/lib/api/types";
 
@@ -37,7 +38,7 @@ describe("useCreateWorkspace", () => {
     });
 
     await waitFor(() => expect(result.current.data?.id).toBe("ws-new"));
-    expect(spy).toHaveBeenCalledWith({ queryKey: ["workspaces"] });
+    expect(spy).toHaveBeenCalledWith({ queryKey: queryKeys.workspaces.list() });
   });
 
   it("surfaces ApiError on 409 conflict", async () => {
