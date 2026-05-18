@@ -145,6 +145,16 @@
     loading: "加载中…",
     loadError: "加载失败",
   },
+  bulkApprovals: {
+    selected: (n: number) => `已选 ${n} 条`,
+    approve: "批准选中",
+    deny: "拒绝选中",
+    clear: "取消选择",
+    selectAll: "全选",
+    processing: (done: number, total: number) => `处理中 ${done}/${total}...`,
+    summarySimple: (ok: number, fail: number) =>
+      fail === 0 ? `已处理 ${ok} 条` : `已处理 ${ok} 条，${fail} 条失败`,
+  },
   assets: {
     uploadCta: "+ 上传",
     selectFiles: "选择文件",

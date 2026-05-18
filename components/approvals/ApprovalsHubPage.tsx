@@ -6,7 +6,9 @@ import { useProjects } from "@/hooks/useProjects";
 import { queryKeys } from "@/lib/api/keys";
 import { useWorkspacePendingApprovals } from "@/hooks/useWorkspacePendingApprovals";
 import { ApprovalHubCard } from "./ApprovalHubCard";
+import { BulkApprovalsList } from "./BulkApprovalsList";
 import { ToolFilterInput } from "./ToolFilterInput";
+import { messages } from "@/lib/messages";
 import type { TaskCard } from "@/lib/api/types";
 
 interface ApprovalsHubPageProps {
@@ -18,6 +20,7 @@ export function ApprovalsHubPage({ wsId }: ApprovalsHubPageProps) {
   const client = useWSClient();
   const { data: projects = [] } = useProjects(wsId);
   const [filter, setFilter] = useState("");
+  const [toast, setToast] = useState<string | null>(null);
 
   // Collect all task IDs in the current workspace from cache.
   const taskIds = useMemo(() => {
@@ -73,10 +76,20 @@ export function ApprovalsHubPage({ wsId }: ApprovalsHubPageProps) {
           <div>全部处理完了</div>
         </div>
       ) : (
-        <div className="flex flex-col gap-3 max-w-3xl">
-          {visible.map((a) => (
-            <ApprovalHubCard key={a.id} approval={a} />
-          ))}
+        <div className="max-w-3xl">
+          <BulkApprovalsList
+            items={visible}
+            renderRow={(a) => <ApprovalHubCard approval={a} />}
+            onResult={(r) => {
+              setToast(messages.bulkApprovals.summarySimple(r.ok.length, r.fail.length));
+              setTimeout(() => setToast(null), 3000);
+            }}
+          />
+          {toast && (
+            <div className="fixed bottom-4 right-4 px-3 py-2 bg-ink-0 text-paper-0 rounded-sm text-sm shadow-[var(--shadow-current)]">
+              {toast}
+            </div>
+          )}
         </div>
       )}
     </div>
