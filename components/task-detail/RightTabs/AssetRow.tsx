@@ -1,15 +1,9 @@
 "use client";
 import type { Asset } from "@/lib/api/types";
-import { relativeTime } from "@/lib/format";
+import { relativeTime, formatBytes } from "@/lib/format";
 
 interface AssetRowProps {
   asset: Asset;
-}
-
-function formatBytes(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
 }
 
 export function AssetRow({ asset }: AssetRowProps) {

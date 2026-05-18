@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { xhrUpload } from "@/lib/api/upload";
 import { queryKeys } from "@/lib/api/keys";
@@ -28,6 +28,14 @@ export function useUploadAssets(projectId: string) {
   const qc = useQueryClient();
   const m = messages.assets;
   const [items, setItems] = useState<UploadItem[]>([]);
+  const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+
+  useEffect(() => {
+    return () => {
+      timersRef.current.forEach(clearTimeout);
+      timersRef.current = [];
+    };
+  }, []);
 
   function updateItem(id: string, patch: Partial<UploadItem>) {
     setItems((prev) => prev.map((it) => (it.id === id ? { ...it, ...patch } : it)));
@@ -44,7 +52,7 @@ export function useUploadAssets(projectId: string) {
         filename: f.name,
         size: f.size,
         loaded: 0,
-        status: "pending" as UploadStatus,
+        status: "pending",
       }));
       setItems((prev) => [...newItems, ...prev]);
 
@@ -68,7 +76,8 @@ export function useUploadAssets(projectId: string) {
           );
           updateItem(item.id, { status: "done", loaded: file.size });
           qc.invalidateQueries({ queryKey: queryKeys.projects.assets(projectId) });
-          setTimeout(() => dismiss(item.id), 3000);
+          const t = setTimeout(() => dismiss(item.id), 3000);
+          timersRef.current.push(t);
         } catch (err) {
           let msg: string = m.networkError;
           if (err instanceof ApiError) {

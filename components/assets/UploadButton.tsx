@@ -2,16 +2,11 @@
 
 import { useRef } from "react";
 import { useUploadAssets } from "@/hooks/useUploadAssets";
+import { formatBytes } from "@/lib/format";
 import { messages } from "@/lib/messages";
 
 interface Props {
   projectId: string;
-}
-
-function formatBytes(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
 }
 
 export function UploadButton({ projectId }: Props) {
@@ -43,6 +38,7 @@ export function UploadButton({ projectId }: Props) {
           multiple
           onChange={onPick}
           className="hidden"
+          aria-label={m.selectFiles}
         />
       </div>
       {items.length > 0 && (
@@ -76,7 +72,7 @@ export function UploadButton({ projectId }: Props) {
                     className="ml-1 text-ink-2"
                     aria-label={m.dismiss}
                   >
-                    x
+                    ×
                   </button>
                 </>
               )}

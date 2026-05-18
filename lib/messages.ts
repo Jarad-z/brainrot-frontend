@@ -157,6 +157,8 @@
     serverRejectedSize: "文件过大，后端拒绝",
     networkError: "上传失败，请重试",
     forbiddenViewer: "需要 editor 或 owner 权限",
+    loading: "加载中...",
+    loadError: "加载失败",
   },
   addMember: {
     title: "邀请成员",
