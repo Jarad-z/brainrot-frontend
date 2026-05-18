@@ -186,14 +186,16 @@ export interface InstallToken {
   expires_at: string;
 }
 
-/** From GET /me/pending-approvals — ApprovalRequest plus enough ws/agent context for the top-level hub. */
+/** From GET /me/pending-approvals — ApprovalRequest plus enough ws/project/agent context for the top-level hub.
+ *  Note: backend does NOT include workspace_name; UI must look it up via useWorkspaces() or display the project_name. */
 export interface PendingApproval extends ApprovalRequest {
   workspace_id: string;
-  workspace_name: string;
+  project_id: string;
+  project_name: string;
+  task_id: string;
+  task_title: string;
   agent_id: string;
   agent_handle: string;
-  task_card_id: string;
-  task_title: string;
 }
 
 export type WorkspaceRole = "owner" | "editor" | "member" | "viewer";

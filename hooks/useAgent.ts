@@ -1,14 +1,20 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
-import { fetchAgent } from "@/lib/api/agents";
-import { queryKeys } from "@/lib/api/keys";
+import { useWorkspaceAgents } from "@/hooks/useWorkspaceAgents";
 
-export function useAgent(agentId: string) {
-  return useQuery({
-    queryKey: queryKeys.agents.detail(agentId),
-    queryFn: () => fetchAgent(agentId),
-    enabled: !!agentId,
-    staleTime: 0,
-  });
+/**
+ * Resolves a single agent by id from the workspace agents list.
+ *
+ * Backend GAP: `GET /api/v1/agents/{id}` does not exist (BACKEND_GAPS #22) — only
+ * list + create + delete are implemented. Until that endpoint lands we derive
+ * the detail view from the list, which is fine since wsId is in the URL.
+ */
+export function useAgent(wsId: string, agentId: string) {
+  const q = useWorkspaceAgents(wsId);
+  const agent = q.data?.find((a) => a.id === agentId);
+  return {
+    data: agent,
+    isLoading: q.isLoading,
+    isError: q.isError,
+  };
 }

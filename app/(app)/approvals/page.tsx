@@ -2,20 +2,28 @@
 
 import Link from "next/link";
 import { useGlobalPendingApprovals } from "@/hooks/useGlobalPendingApprovals";
+import { useWorkspaces } from "@/hooks/useWorkspaces";
 import type { PendingApproval } from "@/lib/api/types";
 
-function groupByWorkspace(items: PendingApproval[]): Map<string, { name: string; items: PendingApproval[] }> {
+function groupByWorkspace(
+  items: PendingApproval[],
+  wsNameById: Map<string, string>,
+): Map<string, { name: string; items: PendingApproval[] }> {
   const out = new Map<string, { name: string; items: PendingApproval[] }>();
   for (const it of items) {
     const cur = out.get(it.workspace_id);
     if (cur) cur.items.push(it);
-    else out.set(it.workspace_id, { name: it.workspace_name, items: [it] });
+    else {
+      const name = wsNameById.get(it.workspace_id) ?? it.project_name;
+      out.set(it.workspace_id, { name, items: [it] });
+    }
   }
   return out;
 }
 
 export default function TopLevelApprovalsPage() {
   const { data = [], isLoading, isError } = useGlobalPendingApprovals();
+  const { data: wsList = [] } = useWorkspaces();
 
   if (isLoading) {
     return <main className="p-6 text-sm text-ink-2">加载中…</main>;
@@ -31,7 +39,8 @@ export default function TopLevelApprovalsPage() {
     );
   }
 
-  const groups = groupByWorkspace(data);
+  const wsNameById = new Map(wsList.map((w) => [w.id, w.name]));
+  const groups = groupByWorkspace(data, wsNameById);
 
   return (
     <main className="p-6 flex flex-col gap-6 overflow-y-auto h-full">
