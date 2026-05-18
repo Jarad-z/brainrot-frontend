@@ -1,19 +1,49 @@
 "use client";
 
 import { useParams } from "next/navigation";
+import { useState } from "react";
 import { useAgent } from "@/hooks/useAgent";
+import { useUpdateAgent } from "@/hooks/useUpdateAgent";
 import { useWorkspaceRuntimes } from "@/hooks/useWorkspaceRuntimes";
 import { AgentForm } from "@/components/agents/AgentForm";
 import { ArchiveAgentButton } from "@/components/agents/ArchiveAgentButton";
+import { ApiError } from "@/lib/api/client";
 import { messages } from "@/lib/messages";
+import type { AgentInput } from "@/lib/api/types";
 
 export default function AgentDetailPage() {
   const { wsId, agentId } = useParams<{ wsId: string; agentId: string }>();
-  const { data: agent, isLoading } = useAgent(wsId, agentId);
+  const { data: agent, isLoading } = useAgent(agentId);
   const { data: runtimes = [] } = useWorkspaceRuntimes(wsId);
+  const mutation = useUpdateAgent(wsId, agentId);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   if (isLoading) return <main className="p-6 text-sm text-ink-2">加载中…</main>;
   if (!agent) return <main className="p-6 text-sm text-state-failed">Agent 不存在</main>;
+
+  async function onSubmit(input: AgentInput) {
+    setSubmitError(null);
+    // PATCH accepts partial; handle is read-only. We send the editable fields.
+    const patch: Partial<AgentInput> = {
+      name: input.name,
+      avatar_url: input.avatar_url,
+      description: input.description,
+      instructions: input.instructions,
+      model: input.model,
+      custom_env: input.custom_env,
+      custom_args: input.custom_args,
+      mcp_config: input.mcp_config,
+    };
+    try {
+      await mutation.mutateAsync(patch);
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 409) {
+        setSubmitError(messages.agents.form.handleConflict);
+      } else {
+        setSubmitError((err as Error).message);
+      }
+    }
+  }
 
   return (
     <main className="p-6 overflow-y-auto h-full">
@@ -25,20 +55,14 @@ export default function AgentDetailPage() {
         <p className="text-xs text-ink-2 mb-3 italic">
           {messages.agents.archivedBadge} — 仅可查看，不可编辑
         </p>
-      ) : (
-        <p className="text-xs text-ink-2 mb-3 italic">
-          编辑暂未开放（后端 PATCH /agents/{"{id}"} 未就绪，BACKEND_GAPS #22）。当前页面为只读。
-        </p>
-      )}
+      ) : null}
       <AgentForm
         mode="edit"
         initial={agent}
         runtimes={runtimes}
-        isSubmitting={false}
-        submitError="编辑暂不可用"
-        onSubmit={() => {
-          /* PATCH endpoint missing; intentionally a no-op */
-        }}
+        isSubmitting={mutation.isPending}
+        submitError={submitError}
+        onSubmit={onSubmit}
       />
     </main>
   );
