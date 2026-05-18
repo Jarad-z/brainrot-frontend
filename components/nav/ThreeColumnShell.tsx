@@ -1,11 +1,12 @@
 "use client";
 
+import { useParams } from "next/navigation";
 import { OfflineBanner } from "@/components/common/OfflineBanner";
 import { Sidebar } from "./Sidebar";
 import { Breadcrumb } from "./Breadcrumb";
 import { AccountMenu } from "./AccountMenu";
 import { Input } from "@/components/brand/input";
-import { IconButton } from "@/components/brand/icon-button";
+import { NotificationBell } from "@/components/layout/NotificationBell";
 import {
   TooltipProvider,
   Tooltip,
@@ -20,6 +21,8 @@ interface ThreeColumnShellProps {
 }
 
 export function ThreeColumnShell({ user, children }: ThreeColumnShellProps) {
+  const params = useParams<{ wsId?: string }>();
+  const currentWsId = params?.wsId ?? "";
   return (
     <TooltipProvider>
       <div className="min-h-screen bg-paper-1 flex flex-col">
@@ -42,28 +45,7 @@ export function ThreeColumnShell({ user, children }: ThreeColumnShellProps) {
                 </TooltipTrigger>
                 <TooltipContent>S3 上线后启用</TooltipContent>
               </Tooltip>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <span>
-                    {/* Badge is decorative mock to match prototype 13 — S3 will wire real count from approvals API */}
-                    <IconButton disabled aria-label="通知" badge={3}>
-                      <svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="1.75"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="w-4 h-4"
-                      >
-                        <path d="M6 8a6 6 0 0 1 12 0c0 7 3 7 3 9H3c0-2 3-2 3-9" />
-                        <path d="M10 21a2 2 0 0 0 4 0" />
-                      </svg>
-                    </IconButton>
-                  </span>
-                </TooltipTrigger>
-                <TooltipContent>S3 上线后启用</TooltipContent>
-              </Tooltip>
+              {currentWsId ? <NotificationBell wsId={currentWsId} /> : null}
               <AccountMenu user={user} />
             </header>
             <main className="flex-1 min-h-0 overflow-hidden">{children}</main>

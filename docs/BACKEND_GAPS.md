@@ -134,6 +134,14 @@
   ```
   其中 `agentsMap` 来自 `useWorkspaceAgents(wsId)` —— hook 已在 T20 实现。
 
+## #14 跨工作区 pending approvals 聚合（hub + bell badge 全局模式）
+
+- **状态**：✅ 后端已就绪（与 #11 同时落地，2026-05-17）— 后端实现了 `GET /api/v1/me/pending-approvals` 和 `GET /api/v1/me/pending-approvals?count_only=1`，以及 `GET /api/v1/workspaces/{ws_id}/approvals?status=`。S3 前端**未接入**，仍走"当前 ws 内 messages cache 派生"的本地聚合路径，因为 S3 设计阶段决策 Q1=c（仅当前 ws）。S4 接入 workspace switcher 时切到 `/me/pending-approvals?count_only=1` 即可。
+- **发现**：2026-05-17，S3 设计阶段（spec 决策 Q1）
+- **影响**：S3 阶段 bell badge / hub 仅展示"当前工作区"内的 pending。多 ws 全局视图（S4 workspace switcher）需要这些 endpoint 才能给跨 ws 总数。
+- **前端 unlock 路径（S4）**：把 `usePendingApprovalsCount(wsId)` 内部从派生改为 `useQuery(["pending-approvals", "count"], () => apiFetch("/api/v1/me/pending-approvals?count_only=1"))`。hub 页同样接 `GET /me/pending-approvals` 拿到跨 ws 的完整列表，无需逐 task prefetch。
+- **Need**：✅ 已满足，无后端工作。S4 实现。
+
 ## #18 `promoteQueued` 用错 agent — 排队消息被前一个 agent 接管（正确性 bug）
 
 - **状态**：后端 bug（不是接口缺失，是行为错误）

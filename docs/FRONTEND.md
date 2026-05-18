@@ -512,8 +512,10 @@ class WSClient {
 **M3 · 聊天流 + 发消息（2 周，核心）**
 - Composer + @mention、消息分类渲染（含 thinking/tool/result）、WS 接入与增量、流式滚动。
 
-**M4 · 审批 + run 控制（1 周）**
-- 审批卡片、`/approvals` 总览、取消 run、排队提示、超时倒计时。
+**M4 · 审批 + run 控制（1 周）** — ✅ S3 已完成（2026-05-17，branch `s3-approvals`）
+- 审批卡片、`/approvals` 总览（hub 模式）、取消 run（5s cooldown + 二次确认）、超时倒计时（disabled + "已超时" 占位）。
+- 排队提示因 BACKEND_GAPS #18 暂未做 — cancel-run dialog 文案承认了"取消后排队消息会卡住"。
+- 跨 ws 全局 count 推 S4（虽然 backend 已实现 `GET /me/pending-approvals?count_only=1` 在 #11/#14 一并，但 ws-switcher UI 还在 S4 范围内）。
 
 **M5 · 素材 / 产物 / agent 管理（1 周）**
 - 上传、产物 tab、agent CRUD、runtime 列表（依赖后端补接口）。
