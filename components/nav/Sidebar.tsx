@@ -18,29 +18,6 @@ import {
 import { swatchFromId } from "@/lib/swatch";
 import { messages } from "@/lib/messages";
 
-function DisabledNavItem({
-  label,
-  tooltip,
-  icon,
-}: {
-  label: string;
-  tooltip: string;
-  icon?: React.ReactNode;
-}) {
-  return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <span>
-          <NavItem disabled icon={icon}>
-            {label}
-          </NavItem>
-        </span>
-      </TooltipTrigger>
-      <TooltipContent side="right">{tooltip}</TooltipContent>
-    </Tooltip>
-  );
-}
-
 export function Sidebar() {
   const params = useParams<{ wsId?: string; projectId?: string }>();
   const wsId = params.wsId ?? null;
@@ -102,7 +79,13 @@ export function Sidebar() {
           ) : (
             <NavItem>{messages.shell.runtimes}</NavItem>
           )}
-          <DisabledNavItem label="设置" tooltip={messages.shell.listsDisabled} />
+          {wsId ? (
+            <Link href={`/w/${wsId}/settings`}>
+              <NavItem>{messages.shell.settings}</NavItem>
+            </Link>
+          ) : (
+            <NavItem>{messages.shell.settings}</NavItem>
+          )}
 
           {/* projects */}
           <p className="px-4 pt-4 pb-1.5 text-[10.5px] font-extrabold tracking-[0.08em] text-ink-3 uppercase">
