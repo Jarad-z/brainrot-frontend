@@ -88,7 +88,13 @@ export function Sidebar() {
           <Link href="/approvals">
             <NavItem>{messages.shell.pendingApprovals}</NavItem>
           </Link>
-          <DisabledNavItem label="Agents" tooltip={messages.shell.listsDisabled} />
+          {wsId ? (
+            <Link href={`/w/${wsId}/agents`}>
+              <NavItem>{messages.shell.agents}</NavItem>
+            </Link>
+          ) : (
+            <NavItem>{messages.shell.agents}</NavItem>
+          )}
           <DisabledNavItem
             label="Runtimes"
             tooltip={messages.shell.listsDisabled}
