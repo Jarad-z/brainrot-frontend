@@ -335,3 +335,23 @@
 - **影响**：跟 #24 部分重叠 —— 前端要拿 message 文本必须 `JSON.parse(atob(msg.content)).text`，没法 `msg.text`。
 - **建议**：后端在 message 序列化时把 `text` 从 content jsonb 里提到顶层（同时保留 content 给以后可能的富格式字段），这样最常见的"读消息文本"操作不用解码 jsonb。或者**至少**把 content 反序列化成对象（即修 #24）。
 - **优先级**：低 —— 修 #24 顺带就解决了。这一条主要是提醒前端**不要写 `msg.text`**，统一走 content 字段。
+
+## #28 缺 `PATCH /api/v1/artifacts/{id} { excluded }`（artifact 排除写端点）
+
+- **状态**：未实现（S5 设计阶段 2026-05-19 记录）
+- **发现**：S5 brainstorm 阶段，对比 spec §6 vs API.md 资产章节时
+- **影响**：前端没有把 artifact 标记为 `excluded=true` 的路径。`GET /api/v1/tasks/{taskId}/artifacts` 已经做服务端过滤（不返回 excluded=true 的行），但**没有写端点让前端切换状态**。这意味着 spec §6.2 假设的"排除按钮 + 显示已排除 toggle"现在没法实现。
+- **Workaround（S5）**：整块"排除"UI 完全不在 S5 范围。Artifact tab 只读列表保持现状。
+- **Need**：`PATCH /api/v1/artifacts/{artifact_id} { excluded: bool }` → 200 或 204。鉴权矩阵建议 owner / editor 可改，viewer 403。可选的扩展：让 `GET /tasks/{taskId}/artifacts?include_excluded=1` 接受参数返回全部行（含 excluded=true），方便前端做"显示已排除" toggle 而不必双查询。
+- **前端 unlock 路径**：实现后即可在 `components/task-detail/RightTabs/ArtifactsTab.tsx` 加"排除"按钮（PATCH excluded=true）+ "显示已排除" toggle（依赖第二个接口）。复用 S5 已经引入的 ConfirmDialog 或 inline 处理。
+
+## #29 缺非 owner 自离工作区接口
+
+- **状态**：未实现（S5 设计阶段 2026-05-19 记录）
+- **发现**：S5 brainstorm 阶段，确认 #20 实现状态时发现
+- **影响**：editor / viewer 没有自己"离开工作区"的路径。当前 `DELETE /api/v1/workspaces/{ws_id}/members/{user_id}` 仅 owner 可调（鉴权矩阵第 659 行），所以非 owner 完全没有自助离开方式 —— 必须求 owner 帮忙 kick。
+- **Workaround（S5）**：Settings 页不出"离开工作区"按钮。S5 设计 §2.1 explicitly 排除。
+- **Need**：两种实现都可以：
+  - 方案 A（推荐，最小改动）：把 `DELETE /api/v1/workspaces/{ws}/members/{user_id}` 的鉴权放宽为"owner 可删任意成员；任意成员可删自己（user_id == 调用者 id）"。返回 204。Owner 删自己额外考虑：不能让工作区零 owner，所以拒绝（403 + body 解释）；除非有第二个 owner 存在。
+  - 方案 B：单独 `DELETE /api/v1/workspaces/{ws}/membership` 表达"删除调用者自己的成员关系"，鉴权简单（必须是成员），同样守护"不能让工作区零 owner"。
+- **前端 unlock 路径**：Settings 页"危险区"加"离开工作区"按钮（ConfirmDialog 确认），调用对应端点。viewer/editor 默认显示，owner 仅在 owner 数 > 1 时显示。
