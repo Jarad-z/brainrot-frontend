@@ -32,7 +32,7 @@ export function useBulkDecide() {
             await decideApproval(id, { decision });
             ok.push(id);
           } catch (e) {
-            fail.push({ id, error: (e as Error).message });
+            fail.push({ id, error: e instanceof Error ? e.message : String(e) });
           } finally {
             setProgress((p) => (p ? { ...p, done: p.done + 1 } : p));
           }

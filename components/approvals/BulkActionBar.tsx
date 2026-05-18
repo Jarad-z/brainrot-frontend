@@ -3,7 +3,7 @@
 import { messages } from "@/lib/messages";
 import type { BulkProgress } from "@/hooks/useBulkDecide";
 
-interface Props {
+interface BulkActionBarProps {
   count: number;
   progress: BulkProgress | null;
   onApprove: () => void;
@@ -11,7 +11,7 @@ interface Props {
   onClear: () => void;
 }
 
-export function BulkActionBar({ count, progress, onApprove, onDeny, onClear }: Props) {
+export function BulkActionBar({ count, progress, onApprove, onDeny, onClear }: BulkActionBarProps) {
   const m = messages.bulkApprovals;
   const busy = progress !== null;
   if (count === 0 && !busy) return null;

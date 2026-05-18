@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useGlobalPendingApprovals } from "@/hooks/useGlobalPendingApprovals";
 import { useWorkspaces } from "@/hooks/useWorkspaces";
@@ -28,6 +28,13 @@ export default function TopLevelApprovalsPage() {
   const { data = [], isLoading, isError } = useGlobalPendingApprovals();
   const { data: wsList = [] } = useWorkspaces();
   const [toast, setToast] = useState<string | null>(null);
+  const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    };
+  }, []);
 
   if (isLoading) {
     return <main className="p-6 text-sm text-ink-2">加载中…</main>;
@@ -75,8 +82,9 @@ export default function TopLevelApprovalsPage() {
               </div>
             )}
             onResult={(r) => {
+              if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
               setToast(messages.bulkApprovals.summarySimple(r.ok.length, r.fail.length));
-              setTimeout(() => setToast(null), 3000);
+              toastTimerRef.current = setTimeout(() => setToast(null), 3000);
             }}
           />
         </section>

@@ -46,6 +46,7 @@ export function BulkApprovalsList<T extends { id: string }>({
   }
 
   async function submit(decision: ApprovalDecision) {
+    if (progress !== null) return;
     const ids = Array.from(selected);
     if (ids.length === 0) return;
     const result = await run(ids, decision);

@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useWSClient } from "@/lib/ws/context";
 import { useProjects } from "@/hooks/useProjects";
@@ -21,6 +21,13 @@ export function ApprovalsHubPage({ wsId }: ApprovalsHubPageProps) {
   const { data: projects = [] } = useProjects(wsId);
   const [filter, setFilter] = useState("");
   const [toast, setToast] = useState<string | null>(null);
+  const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    };
+  }, []);
 
   // Collect all task IDs in the current workspace from cache.
   const taskIds = useMemo(() => {
@@ -81,8 +88,9 @@ export function ApprovalsHubPage({ wsId }: ApprovalsHubPageProps) {
             items={visible}
             renderRow={(a) => <ApprovalHubCard approval={a} />}
             onResult={(r) => {
+              if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
               setToast(messages.bulkApprovals.summarySimple(r.ok.length, r.fail.length));
-              setTimeout(() => setToast(null), 3000);
+              toastTimerRef.current = setTimeout(() => setToast(null), 3000);
             }}
           />
           {toast && (
