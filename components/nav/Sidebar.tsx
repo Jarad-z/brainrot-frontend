@@ -95,10 +95,13 @@ export function Sidebar() {
           ) : (
             <NavItem>{messages.shell.agents}</NavItem>
           )}
-          <DisabledNavItem
-            label="Runtimes"
-            tooltip={messages.shell.listsDisabled}
-          />
+          {wsId ? (
+            <Link href={`/w/${wsId}/runtimes`}>
+              <NavItem>{messages.shell.runtimes}</NavItem>
+            </Link>
+          ) : (
+            <NavItem>{messages.shell.runtimes}</NavItem>
+          )}
           <DisabledNavItem label="设置" tooltip={messages.shell.listsDisabled} />
 
           {/* projects */}
