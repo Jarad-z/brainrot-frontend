@@ -85,7 +85,9 @@ export function Sidebar() {
           ) : (
             <NavItem>概览</NavItem>
           )}
-          <DisabledNavItem label="审批" tooltip={messages.shell.pendingDisabled} />
+          <Link href="/approvals">
+            <NavItem>{messages.shell.pendingApprovals}</NavItem>
+          </Link>
           <DisabledNavItem label="Agents" tooltip={messages.shell.listsDisabled} />
           <DisabledNavItem
             label="Runtimes"
