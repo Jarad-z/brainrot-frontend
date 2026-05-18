@@ -220,61 +220,68 @@
 
 ## #19 缺按 email 邀请成员接口
 
-- **状态**：S5 阻塞
+- **状态**：✅ 已完成（2026-05-19，PR https://github.com/Jarad-z/brainrot/pull/2 squash 合并 `58d37cf`）— 实现 `POST /api/v1/workspaces/{ws_id}/invitations { email, role }`（`internal/handler/invitation.go`、`internal/service/workspace.go` `InviteByEmail`）。v1 不引入独立的 pending invite 表，直接按 email 查 `app_user` 加为成员：未注册用户 → 404 `ErrUserNotFound`；重复邀请 → 409 `ErrAlreadyMember`；非 owner → 403。后续若要 pending/accept 流程再单独立项。
+- **原状态**：S5 阻塞
 - **发现**：2026-05-18，S4 设计阶段
 - **影响**：用户无法用 email 把他人加入工作区。必须手贴 UUID。
 - **Workaround（S4）**：`/w/[wsId]/settings` "添加成员" 表单接收 user_id UUID；`AddMemberModal` 文案"邀请流即将上线，请粘贴对方的 user ID"；同页面提供"你的 user ID + 复制"让被邀请人取自己的 ID。
 - **Need**：`POST /api/v1/workspaces/{ws}/invitations { email, role }` 创建邀请；被邀请人 inbox 接受后入会。
+- **前端 unlock 路径**：把 `AddMemberModal` 表单从 user_id 改成 email，提交 `POST /workspaces/{ws}/invitations { email, role }`；处理 404（"对方还没注册，让 ta 先注册"）和 409（"已经是成员了"）。pending/accept 流暂时不存在，邀请即生效。
 
 ## #20 工作区成员管理 + 元信息 RESTful 完善
 
-- **状态**：S5 阻塞
+- **状态**：✅ 大部分已完成（2026-05-19，PR #2 `58d37cf`）— 实现 `GET /workspaces/{ws_id}/members`（返回 `[]ListMembersRow` 含 email/name/avatar/role/joined_at）、`PATCH /workspaces/{ws_id}/members/{user_id} { role }`、`DELETE /workspaces/{ws_id}/members/{user_id}` → 204、`PATCH /workspaces/{ws_id} { name?, slug? }`。归档 `POST /workspaces/{ws_id}/archive` **延后**：涉及多处下游过滤（project/runtime list 等），单独立项。
+- **原状态**：S5 阻塞
 - **发现**：2026-05-18，S4 设计阶段
 - **影响**：用户无法看到当前工作区有谁、改 ws 名称/slug、改成员 role、移除成员、归档工作区。
 - **Workaround（S4）**：`/w/[wsId]/settings` 成员区不渲染列表，只显示"成员列表即将上线"+ "添加成员"按钮；危险操作区显示 disabled 占位。
 - **Need**：
-  - `GET /api/v1/workspaces/{wsId}/members` → `WorkspaceMember[]`
-  - `PATCH /api/v1/workspaces/{wsId} { name?, slug? }`
-  - `PATCH /api/v1/workspaces/{wsId}/members/{user_id}/role { role }`
-  - `DELETE /api/v1/workspaces/{wsId}/members/{user_id}` → 204
-  - `POST /api/v1/workspaces/{wsId}/archive` → 204（软归档；硬删永远不做）
+  - ✅ `GET /api/v1/workspaces/{wsId}/members` → `WorkspaceMember[]`
+  - ✅ `PATCH /api/v1/workspaces/{wsId} { name?, slug? }`
+  - ✅ `PATCH /api/v1/workspaces/{wsId}/members/{user_id} { role }`
+  - ✅ `DELETE /api/v1/workspaces/{wsId}/members/{user_id}` → 204
+  - ⏸ `POST /api/v1/workspaces/{wsId}/archive` → 软归档延后
+- **前端 unlock 路径**：`/w/[wsId]/settings` 成员区改为 list + 行内 role 切换 + 移除按钮；workspace 元信息表单接 PATCH。归档按钮继续 disabled 直到后端补上。
 
 ## #21 Agent 字段读写不对称（GET 返 base64 []byte，POST 收 raw JSON）
 
-- **状态**：非阻塞（已 workaround）
+- **状态**：✅ 已完成（2026-05-19，PR #2 `58d37cf`）— 引入 `AgentView`（`internal/handler/jsonb.go`），handler `List` / `Create` / `Get` / `Patch` 在 `writeJSON` 之前把 `custom_env` / `custom_args` / `mcp_config` 三个 jsonb 列解码成 `map[string]string` / `[]string` / `map[string]any`。前端可以删除 `agents-encoding.ts` + `AgentWire`，统一用 `Agent` 类型。
+- **原状态**：非阻塞（已 workaround）
 - **发现**：2026-05-18，S4 设计阶段（实测 `pkg/db/generated/agents.sql.go:45` `CustomEnv []byte`）
 - **影响**：GET `/api/v1/agents/...` 返回的 `custom_env` / `custom_args` / `mcp_config` 三个字段是 base64 string；POST 收 raw JSON object/array。前端必须分别 encode/decode。
 - **根因**：sqlc 把 jsonb 列生成 `[]byte`，Go 默认 `json.Marshal([]byte)` 编码成 base64。handler `writeJSON(w, ag)` 直接吐 `ag` → 客户端拿 base64 string。
 - **Workaround（S4）**：`lib/api/agents-encoding.ts` 提供 `decodeAgentResponse` / `encodeAgentInput`；类型分层 `AgentWire`（wire）vs `Agent`（decoded）；`lib/api/agents.ts` 是唯一边界。上层组件/hook 永远拿 `Agent`。
 - **Need**：handler 把 `CustomEnv []byte` 在序列化前 `json.Unmarshal` 成 `map[string]string` / `[]string` / `map[string]any` 再 `writeJSON`。修后前端可删除 `agents-encoding.ts` + `AgentWire` 类型。
+- **前端 unlock 路径**：删除 `lib/api/agents-encoding.ts`、`AgentWire` 类型分层；`lib/api/agents.ts` 直接 `apiFetch<Agent>` 即可。注意 `pgtype.Text` 字段（`avatar_url`、`model`）仍以 `{String, Valid}` 形态返回，与现有处理一致。
 
 ## #22 缺 `GET /api/v1/agents/{id}` 和 `PATCH /api/v1/agents/{id}`
 
-- **状态**：发现于 S4 manual QA 2026-05-18
+- **状态**：✅ 已完成（2026-05-19，PR #2 `58d37cf`）— 实现 `GET /api/v1/agents/{agent_id}` 和 `PATCH /api/v1/agents/{agent_id}`（`internal/handler/agent.go`，service `Agent.Update`）。PATCH 接受 `{name?, avatar_url?, description?, instructions?, model?, custom_env?, custom_args?, mcp_config?}`，**nil 指针 = 保留原值**，`{}` 或 `[]` = 显式清空，符合 partial-update 语义。响应同 list item，jsonb 字段已解码（见 #21）。注意：`handle` 不能改（保持唯一性约束）。
+- **原状态**：发现于 S4 manual QA 2026-05-18
 - **影响**：S4 agent 详情/编辑页 (`/w/[wsId]/agents/[agentId]`) 进不去 — 后端返回 405 Method Not Allowed。
 - **当前后端实际只有**：
   - `GET /api/v1/workspaces/{ws_id}/agents` — 列表
   - `POST /api/v1/workspaces/{ws_id}/agents` — 创建
+  - ✅ `GET /api/v1/agents/{agent_id}` — 单条
+  - ✅ `PATCH /api/v1/agents/{agent_id}` — 更新
   - `DELETE /api/v1/agents/{agent_id}` — 归档
-  - 缺：`GET /api/v1/agents/{id}` 和 `PATCH /api/v1/agents/{id}`
 - **Workaround（S4）**：`hooks/useAgent.ts` 改为从 `useWorkspaceAgents(wsId)` 列表里 `.find()` 派生；详情页变成只读视图，显式提示"编辑暂未开放"。
-- **Need**：
-  - `GET /api/v1/agents/{id}` → `Agent`（response 同 list item）— 用于刷新单条
-  - `PATCH /api/v1/agents/{id}` `{handle?, name?, model?, instructions?, custom_env?, custom_args?, mcp_config?}` → `Agent`
-- **修后前端动作**：恢复 `lib/api/agents.ts` 里的 `fetchAgent` / `updateAgent` 调用；`hooks/useAgent.ts` 改回 `useQuery`；详情页改回 `useUpdateAgent` mutation。
+- **修后前端动作**：恢复 `lib/api/agents.ts` 里的 `fetchAgent` / `updateAgent` 调用；`hooks/useAgent.ts` 改回 `useQuery`；详情页改回 `useUpdateAgent` mutation。注意 PATCH body 用 `null`/省略来表达"不改"，用 `{}` 来表达"清空"。
 
 ## #23 `GET /me/pending-approvals` response 包了 `{count, items}` 而不是裸数组
 
-- **状态**：发现于 S4 manual QA 2026-05-18
+- **状态**：✅ 已完成（2026-05-19，后端 PR #2 `58d37cf` + 前端 PR https://github.com/Jarad-z/brainrot-frontend/pull/7 `1a7c37c` 已合并）— 后端默认改返回裸 `PendingItem[]`；`?count_only=1` 分支保留 `{count}`（语义不同，故意保持）。前端 `lib/api/me.ts` 同步删除 `ListResponse` 类型 + `r.items` 解包，直接 `apiFetch<PendingApproval[]>`。**部署须协同**：两个 PR 任何一个先单独上线都会让 `/approvals` 页崩。
+- **原状态**：发现于 S4 manual QA 2026-05-18
 - **影响**：S4 顶层 `/approvals` 页首次实现时按裸数组解析 → 客户端崩溃（`Application error`）。
 - **当前后端**：`internal/handler/frontend_gaps.go:245` 返回 `{count: N, items: PendingItem[]}`，count_only=1 时返回 `{count: N}`。
 - **Workaround（S4）**：`lib/api/me.ts` 加 `ListResponse` 类型解开 `{items}` 字段返回 `PendingApproval[]`；`PendingApproval` 类型同步对齐后端字段（`project_name` 而非不存在的 `workspace_name`）。
 - **Need**：要么 API.md 写清楚 response shape；要么把 list endpoint 改成裸 array（与 ws-scope `/workspaces/{ws}/approvals` 风格对齐）。
-- **次要**：`PendingItem` 缺 `workspace_name` — 前端要 `useWorkspaces()` 二次查询补 ws 名。建议后端加上这个字段。
+- **次要 follow-up（仍待办）**：`PendingItem` 缺 `workspace_name` — 前端要 `useWorkspaces()` 二次查询补 ws 名。本次未一并修，建议下次后端 PR 加上这个字段，前端可以省一次查询。
 
 ## #24 `message.content` 和 `message.metadata` 也是 base64 string（同 #21 根因）
 
-- **状态**：发现于 2026-05-18 backend smoke test（`fix/cancel-clears-queued-messages` 分支验证）
+- **状态**：✅ 已完成（2026-05-19，PR #2 `58d37cf`）— 引入 `MessageView`（`internal/handler/jsonb.go`），所有读 message 的接口（`MessageHandler.List` / `Append`、`GapHandler.ListTaskMessagesPaged` 的全量与分页两条路径）都在 `writeJSON` 前把 `content` 与 `metadata` 反序列化成 `map[string]any`。前端可以删除任何 base64 解码兜底，直接 `msg.content.text` / `msg.metadata.queued`。
+- **原状态**：发现于 2026-05-18 backend smoke test（`fix/cancel-clears-queued-messages` 分支验证）
 - **影响**：
   - 前端从 `GET /api/v1/tasks/{taskId}/messages` 拿到的 `content` 字段是 base64 string，不是 `{text, mentions}` 嵌套对象 —— 直接 `msg.content.text` 永远是 `undefined`。
   - `metadata` 同样问题：要判断 `metadata.queued === true` 必须先 base64 解码 + JSON.parse。
@@ -290,7 +297,8 @@
 
 ## #25 `runtime.online` 标志滞后到第一次 heartbeat（~15s），而不是 WS 连上的瞬间
 
-- **状态**：发现于 2026-05-18 backend smoke test
+- **状态**：✅ 已完成（2026-05-19，PR #2 `58d37cf`）— daemon WS 连上后服务端立刻 `SetRuntimeOnline(true)`；断开后延迟 1.5s 防抖（短时重连不翻 offline，避免 sweeper 误判 active run 为 `runtime_offline`），用 `Hub.IsConnected` 判断是否被新连接顶替。同时收紧 `MarkRuntimesStale`：`last_heartbeat IS NOT NULL` 守卫避免 WS 刚连上、首次 heartbeat 还没到时被立刻扫成 offline。daemon 端也在 `ctx.Done()` 时主动关 WS（之前要等服务端 30s ping/read deadline）。e2e 新增 `TestDaemon_WSDisconnect_FlipsOfflineImmediately` 覆盖。
+- **原状态**：发现于 2026-05-18 backend smoke test
 - **影响**：用户启动 daemon 后立刻看 `/workspaces/{ws}/runtimes`，会看到 `online: false`、`last_heartbeat: null`，要等到 ~15 秒后第一次 heartbeat 到达才翻成 `online: true`。Sidebar runtime 灯 / agent 可用性指示会有 15 秒"假离线"窗口。
 - **复现**：
   ```
@@ -307,7 +315,8 @@
 
 ## #26 缺 `GET /api/v1/tasks/{taskId}/runs` 端点
 
-- **状态**：发现于 2026-05-18 backend smoke test
+- **状态**：✅ 已完成（2026-05-19，PR #2 `58d37cf`）— 实现 `GET /api/v1/tasks/{task_id}/runs`（`internal/handler/runs.go`），返回 `RunView[]` 按 `created_at DESC`。⚠️ **不返回 `agent_snapshot` 和 `metadata`**：code review 发现 `agent_snapshot` 内嵌 `CustomEnv`（API key），裸返回会让 workspace viewer 拿到密钥；`RunView` 主动裁掉这两个字段，只暴露 `id` / `workspace_id` / `task_card_id` / `agent_id` / `runtime_id` / `trigger_message_id` / `session_id` / `status` / `error` / `created_at` / `claimed_at` / `started_at` / `finished_at`。
+- **原状态**：发现于 2026-05-18 backend smoke test
 - **影响**：
   - 前端无法直接列出某张 card 的 run 历史（pending / running / canceled / done / failed 各几条）。
   - 取消 run 后，前端要知道"被取消的那个 run"的 ID + status 翻转，只能从 message 列表里数 `agent`-role 消息推断 —— 而 agent 消息和 run 不是 1:1（real backend 一个 run 会发 5 条不同类型的事件消息）。
@@ -320,7 +329,8 @@
 
 ## #27 `message.text` 字段同时存在裸字段和嵌入 content 两种位置（推测）
 
-- **状态**：2026-05-18 backend smoke test 顺手发现的疑似不一致，未完整核实
+- **状态**：✅ 已完成（2026-05-19，随 #24 一起修，PR #2 `58d37cf`）— 选择"修 #24 即可"的最小方案：没有把 `text` 提到顶层裸字段（避免双源），但 `content` 现在是真正的对象，前端可以直接 `msg.content.text`，不需要再 base64 解码。
+- **原状态**：2026-05-18 backend smoke test 顺手发现的疑似不一致，未完整核实
 - **症状**：smoke test 中 POST `/messages` body 是 `{ content: { text: "@smoker one", mentions: [agentId] } }`，server 端 handler `appendMsgReq.Content.Text` 正确读到。Service 把 `text` 存进 `message.content` 列（`json.Marshal(map[string]any{"text": text})`）。但 list 返回的 `Message` struct 暴露的字段是 `content` (jsonb 编码后)，没有顶层 `text` 字段。如果 S2 前端期待 `msg.text` 直接拿到字符串，会拿到 undefined。
 - **影响**：跟 #24 部分重叠 —— 前端要拿 message 文本必须 `JSON.parse(atob(msg.content)).text`，没法 `msg.text`。
 - **建议**：后端在 message 序列化时把 `text` 从 content jsonb 里提到顶层（同时保留 content 给以后可能的富格式字段），这样最常见的"读消息文本"操作不用解码 jsonb。或者**至少**把 content 反序列化成对象（即修 #24）。

@@ -104,14 +104,64 @@ POST /api/v1/workspaces
 
 - `201` → `Workspace`（见下方对象表）。
 
-### 添加成员
+### 添加成员（已知 user_id）
 
 ```
 POST /api/v1/workspaces/{ws_id}/members
-{ "user_id": "<uuid>", "role": "member" }   // role: "owner" | "member"
+{ "user_id": "<uuid>", "role": "editor" }   // role: "owner" | "editor" | "viewer"
+```
+
+- `204`，`403` 不是 owner，`409` 已经是成员（`ErrAlreadyMember`）。
+
+### 按 email 邀请成员
+
+```
+POST /api/v1/workspaces/{ws_id}/invitations
+{ "email": "alice@example.com", "role": "editor" }
+```
+
+- `204` 直接入会（v1 无 pending/accept 流，邀请即生效）。
+- `403` 不是 owner。
+- `404` 该 email 在系统里没有对应用户 — 让对方先 `/auth/register`。
+- `409` 已经是成员。
+
+### 列出成员
+
+```
+GET /api/v1/workspaces/{ws_id}/members
+```
+
+- `200` → `WorkspaceMember[]`，按 `joined_at` 升序。
+- `403` 不是工作区成员。
+
+每条字段：`workspace_id` / `user_id` / `role` / `joined_at` / `email` / `name` / `avatar_url`（`pgtype.Text` 形态 `{String, Valid}`）。
+
+### 改成员角色
+
+```
+PATCH /api/v1/workspaces/{ws_id}/members/{user_id}
+{ "role": "viewer" }
 ```
 
 - `204`，`403` 不是 owner。
+
+### 移除成员
+
+```
+DELETE /api/v1/workspaces/{ws_id}/members/{user_id}
+```
+
+- `204`，`403` 不是 owner。
+
+### 改工作区名称 / slug
+
+```
+PATCH /api/v1/workspaces/{ws_id}
+{ "name"?: "New Name", "slug"?: "new-slug" }   // 字段可选，nil = 不改
+```
+
+- `200` → `Workspace`，`403` 不是 owner，`400` slug 冲突。
+- 软归档（`POST /workspaces/{ws}/archive`）尚未实现，已立项延后。
 
 ### 签发 daemon 安装 token
 
@@ -129,7 +179,7 @@ POST /api/v1/workspaces/{ws_id}/install-tokens
 GET /api/v1/workspaces/{ws_id}/agents
 ```
 
-- `200` → `Agent[]`（无分页，全量返回；不区分 `archived`，前端自行过滤）。
+- `200` → `Agent[]`（无分页，全量返回；服务端已过滤掉 `archived=true` 的行，前端不会看到归档项）。
 - `403` 不是工作区成员。
 
 ### 注册 agent（即"工作区里的一个 @handle"）
@@ -150,7 +200,47 @@ POST /api/v1/workspaces/{ws_id}/agents
 }
 ```
 
-- `201` → `Agent`。
+- `201` → `Agent`。请求体的 `custom_env` / `custom_args` / `mcp_config` 是裸 JSON（对象/数组）。
+
+### 单个 agent 详情
+
+```
+GET /api/v1/agents/{agent_id}
+```
+
+- `200` → `Agent`。响应里 `custom_env` / `custom_args` / `mcp_config` 已解码为对象/数组（与请求体形状对称）。
+- `403` 不是工作区成员。
+- `404` agent 不存在或已归档。
+
+### 修改 agent
+
+```
+PATCH /api/v1/agents/{agent_id}
+{
+  "name"?:         "New",
+  "avatar_url"?:   "",
+  "description"?:  "",
+  "instructions"?: "...",
+  "model"?:        "claude-sonnet-4-6",
+  "custom_env"?:   { "ANTHROPIC_API_KEY": "sk-..." },
+  "custom_args"?:  ["--flag"],
+  "mcp_config"?:   { ... }
+}
+```
+
+- `200` → `Agent`（与 list/get 同形）。
+- `403` 不是 owner / editor。
+- `handle` **不可改**（保持工作区内唯一约束的稳定性）。
+- 语义：字段**省略或 `null`** = 保留原值；**`{}` / `[]`** = 显式清空。注意区分。
+
+### 归档 agent
+
+```
+DELETE /api/v1/agents/{agent_id}
+```
+
+- `204` 软删除（`archived=true`），后续 list 接口不再返回该行。
+- `403` 不是工作区 owner / editor。
 
 ---
 
@@ -191,7 +281,9 @@ POST /api/v1/tasks/{task_id}/cancel-run
 **`cancel-run` 语义（重要）**：
 
 - **取消范围**：只取消该任务卡当前唯一的活跃 run（`status IN ('pending','claimed','running','awaiting_approval')`）。受 partial unique index `idx_task_queue_card_active` 保证，每张任务卡同一时刻**至多**一条活跃 run，因此不存在"批量取消"语义。
-- **排队消息处理**：被取消的 run 状态记为 `canceled`，**不会**触发自动晋升排队 (`metadata.queued=true`) 的用户消息。换言之：取消之后，排队消息会原地停留，必须等用户**重新 @mention**（或后续显式机制）才会再次入队。⚠️ 这与"自动晋升"直觉不同，前端文案不要承诺"队列会接着跑"。
+- **排队消息清除（同一事务）**：取消操作在同一数据库事务内，把该 card 上所有 `message.metadata.queued=true` 的用户消息的 `queued` 键删掉。这样未来某次成功 run 的 `Complete -> promoteQueued` 不会把被取消那一轮背后的旧排队消息"复活"成新 run。
+- **排队消息处理**：被取消的 run 状态记为 `canceled`，**不会**触发自动晋升排队消息。换言之：取消之后，用户需**重新 @mention** agent 才会再次入队。⚠️ 这与"自动晋升"直觉不同，前端文案不要承诺"队列会接着跑"。
+- **daemon 迟报保护**：daemon 若在收到取消通知前已完成处理并随后上报 `Complete(status='done')`，服务端会识别到 run 已处于终态（`canceled`）并**静默丢弃**该报告，不会把 status 翻回 `done`。
 - **审批联动**：若取消时 run 处于 `awaiting_approval`，对应的 `ApprovalRequest` 行状态**不会**被自动改写（仍是 `pending`），但 daemon 已被通知该 run 终止；sweeper 最终会按 TTL 把它打 `timeout`。
 - **并发幂等性**：多次调用幂等——后续调用 SQL UPDATE 命中 0 行，service 当前会因 `pgx.ErrNoRows` 返回 400。前端遇到这种 400 视作"已被人取消过"处理即可。
 - **WS 通知**：取消完成后通过 daemon 通道触发 `run.completed` (`status="canceled"`)；前端用它来 toast "X 的运行已取消"，**不需要**响应体里带 `run_id`。
@@ -210,12 +302,13 @@ GET /api/v1/tasks/{task_id}/messages
 GET /api/v1/tasks/{task_id}/messages?before=<RFC3339Nano>&limit=N    // cursor 分页
 ```
 
-- **不带任何参数**：返回 `Message[]`，按 `created_at` **升序**，全量无分页（旧行为，前端兼容）。
+- **不带任何参数**：返回 `Message[]`，按 `created_at` **升序**，全量无分页（旧行为，前端兼容）。⚠️ 长 task 下一次能拉出数千行 message，**生产前端建议始终带 `limit`**。
 - **带 `limit`（推荐，长流场景）**：返回 `{ "messages": Message[], "next_cursor": "<RFC3339Nano>" | "" }`。
   - `messages` 仍按 `created_at` **升序**（直接 append 到聊天流末端）。
   - `next_cursor` 是本批最早一条的 `created_at`；再次请求时作 `before=` 传入；为空 (`""`) 表示已到头。
   - `limit` 上限 `500`，缺省 `50`。
-- `400` 不是任务所属工作区成员，或 `before` 不是合法 RFC3339Nano。
+- `403` 不是任务所属工作区成员（或任务不存在 — service 层用 `ErrForbidden` 兜底，不区分）。
+- `400` `before` 不是合法 RFC3339Nano。
 
 ### 追加消息
 
@@ -243,18 +336,13 @@ POST /api/v1/tasks/{task_id}/messages
 
 每个被 mention 的 agent 都会产生一个 run；如果该任务卡已有同 agent 的活跃 run，新消息会被打 `metadata.queued=true`，等当前 run 完成后自动晋升。
 
-### 消息内容（重要 — content 是 base64）
+### 消息内容（content / metadata 都是结构化对象）
 
-`Message.content` 字段在 JSON 响应里是 **base64 编码后的 jsonb**（Go `[]byte` 默认 JSON marshal 行为）。前端解析方式：
+`Message.content` 和 `Message.metadata` 在 JSON 响应里都是**已解码的对象**——服务端在 `writeJSON` 之前用 `MessageView` 把 jsonb 列反序列化。前端可以直接 `message.content.text` / `message.metadata.queued`，**不要**再 `atob` + `JSON.parse`。
 
-```js
-const raw = atob(message.content);          // -> '{"text":"@writer hi"}'
-const parsed = JSON.parse(raw);
-```
+`content` 内的字段约定：
 
-`parsed` 内的字段约定：
-
-| `parsed.type` | 来源 | 关键字段 |
+| `content.type` | 来源 | 关键字段 |
 |---|---|---|
 | 缺省（用户消息） | 用户发送 | `text` (string), `mentions` (uuid[]) |
 | `"system"` | claude stream | `payload` 是 stringified JSON，包含 `type`, `subtype` 等 |
@@ -265,6 +353,13 @@ const parsed = JSON.parse(raw);
 | `"thinking"` | claude stream | `payload.text` 是思考内容 |
 | `"result"` | claude stream | 标记 run 结束，`payload.duration_ms`, `payload.result` |
 | `"rate_limit_event"` | claude stream | 速率限制提示 |
+
+`metadata` 关键字段：
+
+| 字段 | 含义 |
+|---|---|
+| `queued` (bool) | 用户消息发出时已有同卡活跃 run，被打成"排队"；当前 run 完成后会被 `promoteQueued` 自动晋升。 |
+| `promoted_agents` (uuid[]) | 已经为该排队消息派工过的 agent ID 列表，幂等去重防止 promote 二次入队。 |
 
 提取助手文本的 SQL 形式作参考：`(content->>'payload')::jsonb->>'text'`。
 
@@ -284,7 +379,7 @@ POST /api/v1/approvals/{approval_id}/decide
 ```
 
 - 决策窗口默认 1 小时；超时会被 sweeper 标 `timeout` 并让 run 失败。
-- 审批的 `tool_input` 字段同样是 base64 编码的 jsonb，解码后是 `{"command":"ls", ...}` 之类。
+- 审批的 `tool_input` 字段仍是 jsonb-as-`[]byte`（base64）—— 与 message 的 `content`/`metadata` 不同，本批未顺手解码。前端读 REST 响应里的 `ApprovalRequest.tool_input` 时仍需 `JSON.parse(atob(...))`；WS `approval.requested` 事件的 payload 里则是已解码的对象（见对应章节）。
 
 ### 列出任务的审批历史
 
@@ -312,9 +407,10 @@ GET /api/v1/me/pending-approvals                  // 全量
 GET /api/v1/me/pending-approvals?count_only=1     // 只算数
 ```
 
-- 默认 `200` → `{ "count": N, "items": PendingItem[] }`。`PendingItem` 是 `ApprovalHubItem` + `workspace_id`。
+- 默认 `200` → 裸 `PendingItem[]`（与 ws-scope `/workspaces/{ws}/approvals` 风格对齐）。`PendingItem` 是 `ApprovalHubItem` + `workspace_id`。
 - `count_only=1` → `{ "count": N }`，省去 join；用于 navbar bell badge。
 - 语义：扫调用者所有 workspace membership 下 `status='pending'` 且 `expires_at > now()` 的审批。
+- ⚠️ 历史变更：本接口默认形态原为 `{count, items}` 包裹，2026-05-19 起改为裸数组。前端如还在解 `r.items`，会拿到 `undefined`。
 
 ---
 
@@ -347,6 +443,29 @@ GET /api/v1/tasks/{task_id}/artifacts
 
 - `200` → `Artifact[]`，按 `created_at DESC`；`excluded=true` 的不返回。
 - `403` 不是任务所属工作区成员。
+
+### 列出任务的 run 历史
+
+```
+GET /api/v1/tasks/{task_id}/runs
+```
+
+- `200` → `RunView[]`，按 `created_at DESC`。
+- `403` 不是任务所属工作区成员。
+
+`RunView` 字段：
+
+| 字段 | 类型 | 说明 |
+|---|---|---|
+| `id` | uuid | run id |
+| `workspace_id` / `task_card_id` / `agent_id` / `runtime_id` | uuid | 关联 |
+| `trigger_message_id` | uuid \| null | 触发本 run 的用户消息 |
+| `session_id` | pgtype.Text | claude session resume token |
+| `status` | string | `pending` / `claimed` / `running` / `awaiting_approval` / `done` / `canceled` / `failed` |
+| `error` | pgtype.Text | 失败原因（`runtime_offline` 表示 sweeper 因 runtime 离线判失败） |
+| `created_at` / `claimed_at` / `started_at` / `finished_at` | time | 生命周期戳 |
+
+⚠️ **不返回 `agent_snapshot` 和 `metadata`**：`agent_snapshot` 内嵌 agent 的 `custom_env`（含 API key），裸返回会让 workspace viewer 拿到密钥；`metadata` 是 server 内部状态（如 promote 进度），不暴露给客户端。
 
 ---
 
@@ -393,6 +512,8 @@ Cookie: brainrot_session=...
 | `runtime.online` | `workspace` | daemon 上线 | `runtime_id` |
 | `runtime.offline` | `workspace` | daemon 心跳过期 | `runtime_id` |
 
+> ⚠️ `approval.requested` 事件里的 `tool_input` 是**解码后的 JSON 对象**（直接在 payload 里），而 REST `ApprovalRequest.tool_input` 是 base64 编码的字符串。前端处理 WS 事件时**不要**再 `atob()`。
+
 ### Ping / 重连建议
 
 - 服务端每 45s 发一次 ping，连接保持。
@@ -421,9 +542,9 @@ Cookie: brainrot_session=...
   description: string, instructions: string,
   backend_type: "claude",
   model: string | null,
-  custom_env:  string,  // base64 编码的 jsonb，解出来是 {"KEY":"v"}
-  custom_args: string,  // base64 编码的 jsonb，解出来是 ["--flag"]
-  mcp_config:  string,  // base64 编码的 jsonb
+  custom_env:  { [k: string]: string },   // 已解码对象
+  custom_args: string[],                   // 已解码数组
+  mcp_config:  Record<string, any>,        // 已解码对象
   archived: boolean,
   created_at: string, updated_at: string
 }
@@ -461,10 +582,10 @@ Cookie: brainrot_session=...
   role: "user" | "agent" | "system",
   author_user_id:  string | null,
   author_agent_id: string | null,
-  content:  string,           // base64 编码的 jsonb (见上面"消息内容"小节)
-  task_run_id: string | null, // agent 消息会带 run_id
-  seq: number | null,         // agent 消息流内序号；user 消息为 null
-  metadata: string,           // base64 编码的 jsonb；user 排队会含 {"queued":true}
+  content:  Record<string, any>,  // 已解码对象（见上面"消息内容"小节）
+  task_run_id: string | null,     // agent 消息会带 run_id
+  seq: number | null,             // agent 消息流内序号；user 消息为 null
+  metadata: Record<string, any>,  // 已解码对象；user 排队会含 {"queued":true,"promoted_agents":[...]}
   created_at: string
 }
 ```
@@ -516,7 +637,7 @@ Cookie: brainrot_session=...
 }
 ```
 
-> 当前没有"列出工作区的 runtime"REST 接口。前端可以从 `runtime.online`/`runtime.offline` WS 事件维护一份本地集合，或后端补一个 `GET /api/v1/workspaces/{ws_id}/runtimes`（待加）。
+> 列出 runtime 的 REST 是 `GET /api/v1/workspaces/{ws_id}/runtimes`（见上文）。WS `runtime.online`/`runtime.offline` 事件用于维护增量。
 
 ---
 
@@ -530,11 +651,19 @@ Cookie: brainrot_session=...
 | `GET /me`, `GET /me/pending-approvals` | 任意已登录 | `401` | |
 | `POST /workspaces` | 任意已登录 | `401` | 创建者自动成为 `owner` |
 | `GET /workspaces`, `GET /workspaces/{id}` | 调用者必须是该 ws 成员 | `403` | |
-| `POST /workspaces/{id}/members` | `owner` | `403` | |
+| `PATCH /workspaces/{id}` (name/slug) | `owner` | `403` | |
+| `POST /workspaces/{id}/members` | `owner` | `403` / `409`(已是成员) | |
+| `POST /workspaces/{id}/invitations` | `owner` | `403` / `404`(用户未注册) / `409`(已是成员) | |
+| `GET /workspaces/{id}/members` | 任意成员 | `403` | |
+| `PATCH /workspaces/{id}/members/{user_id}` | `owner` | `403` | 改 role |
+| `DELETE /workspaces/{id}/members/{user_id}` | `owner` | `403` | |
 | `POST /workspaces/{id}/install-tokens` | `owner` | `403` | |
 | `GET /workspaces/{id}/runtimes` | 任意成员（owner/editor/viewer） | `403` | |
 | `GET /workspaces/{id}/agents` | 任意成员 | `403` | |
 | `POST /workspaces/{id}/agents` | `owner` / `editor` | `403` | |
+| `GET /agents/{id}` | 任意 ws 成员 | `403` / `404` | |
+| `PATCH /agents/{id}` | `owner` / `editor` | `403` | partial update |
+| `DELETE /agents/{id}` | `owner` / `editor` | `403` | 软删 (archive) |
 | `POST /workspaces/{id}/projects` | `owner` / `editor` | `403` | |
 | `GET /workspaces/{id}/projects` | 任意成员 | `403` | |
 | `GET /workspaces/{id}/approvals` | 任意成员 | `403` | |
@@ -549,6 +678,7 @@ Cookie: brainrot_session=...
 | `POST /tasks/{id}/messages` | `owner` / `editor` | `403` | 触发 agent |
 | `GET /tasks/{id}/artifacts` | 任意 ws 成员 | `403` | |
 | `GET /tasks/{id}/approvals` | 任意 ws 成员 | `403` | |
+| `GET /tasks/{id}/runs` | 任意 ws 成员 | `403` | run 历史，不含 agent_snapshot |
 | `POST /approvals/{id}/decide` | `owner` / `editor` | `403` | |
 
 ## 错误模型
@@ -611,11 +741,19 @@ GET    /api/v1/me/pending-approvals
 GET    /api/v1/workspaces
 POST   /api/v1/workspaces
 GET    /api/v1/workspaces/{ws_id}
+PATCH  /api/v1/workspaces/{ws_id}
 POST   /api/v1/workspaces/{ws_id}/members
+GET    /api/v1/workspaces/{ws_id}/members
+PATCH  /api/v1/workspaces/{ws_id}/members/{user_id}
+DELETE /api/v1/workspaces/{ws_id}/members/{user_id}
+POST   /api/v1/workspaces/{ws_id}/invitations
 POST   /api/v1/workspaces/{ws_id}/install-tokens
 GET    /api/v1/workspaces/{ws_id}/runtimes
 GET    /api/v1/workspaces/{ws_id}/agents
 POST   /api/v1/workspaces/{ws_id}/agents
+GET    /api/v1/agents/{agent_id}
+PATCH  /api/v1/agents/{agent_id}
+DELETE /api/v1/agents/{agent_id}
 POST   /api/v1/workspaces/{ws_id}/projects
 GET    /api/v1/workspaces/{ws_id}/projects
 GET    /api/v1/workspaces/{ws_id}/approvals
@@ -632,6 +770,7 @@ GET    /api/v1/tasks/{task_id}/messages
 POST   /api/v1/tasks/{task_id}/messages
 GET    /api/v1/tasks/{task_id}/artifacts
 GET    /api/v1/tasks/{task_id}/approvals
+GET    /api/v1/tasks/{task_id}/runs
 
 POST   /api/v1/approvals/{approval_id}/decide
 
