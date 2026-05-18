@@ -11,6 +11,7 @@ export const queryKeys = {
     agents: (wsId: string) => ["workspaces", wsId, "agents"] as const,
     runtimes: (wsId: string) => ["workspaces", wsId, "runtimes"] as const,
     approvals: (wsId: string) => ["workspaces", wsId, "approvals"] as const,
+    members: (wsId: string) => ["workspaces", wsId, "members"] as const,
   },
   agents: {
     detail: (agentId: string) => ["agents", agentId] as const,

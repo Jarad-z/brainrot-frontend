@@ -189,3 +189,23 @@ export interface CreateWorkspaceInput {
   name: string;
   slug: string;
 }
+
+export interface WorkspaceMember {
+  workspace_id: string;
+  user_id: string;
+  role: WorkspaceRole;
+  joined_at: string;
+  email: string;
+  name: string;
+  avatar_url: string | null;
+}
+
+export interface UpdateWorkspaceInput {
+  name?: string;
+  slug?: string;
+}
+
+export interface InviteInput {
+  email: string;
+  role: WorkspaceRole;
+}
