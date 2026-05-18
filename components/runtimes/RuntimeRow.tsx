@@ -12,7 +12,7 @@ export function RuntimeRow({ runtime }: RuntimeRowProps) {
       <span
         className={
           runtime.online
-            ? "inline-block w-2 h-2 rounded-full bg-state-success"
+            ? "inline-block w-2 h-2 rounded-full bg-state-approved"
             : "inline-block w-2 h-2 rounded-full bg-ink-3"
         }
         aria-label={runtime.online ? m.online : m.offline}
