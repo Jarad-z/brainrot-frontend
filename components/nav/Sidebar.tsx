@@ -6,7 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import { projectsApi } from "@/lib/api/projects";
 import { queryKeys } from "@/lib/api/keys";
 import { BrandMark } from "@/components/brand/brand-mark";
-import { WsSwitcher } from "@/components/brand/ws-switcher";
+import { WorkspaceSwitcherDropdown } from "@/components/workspace/WorkspaceSwitcherDropdown";
 import { NavItem } from "@/components/brand/nav-item";
 import { ProjItem } from "@/components/brand/proj-item";
 import {
@@ -70,7 +70,7 @@ export function Sidebar() {
 
         {/* ws switcher */}
         <div className="px-3 pt-3 pb-1.5">
-          <WsSwitcher name="Lumen Labs" meta="lumen" avatar="LL" />
+          <WorkspaceSwitcherDropdown />
         </div>
 
         {/* nav */}

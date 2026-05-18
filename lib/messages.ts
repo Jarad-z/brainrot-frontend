@@ -28,7 +28,7 @@ export const messages = {
     pendingDisabled: "S3 上线后启用",
     listsDisabled: "S4 上线后启用",
     writesDisabled: "S4 上线后启用",
-    wsListDisabled: "工作区列表接口尚未开放（S? 上线后启用）",
+    wsListEmpty: "还没有工作区",
     logout: "登出",
     projects: "项目",
     agents: "Agents",
@@ -41,6 +41,18 @@ export const messages = {
   empty: {
     noProjects: { title: "还没有项目", description: "请联系管理员创建" },
     noTasks: { title: "还没有任务", description: "" },
+  },
+  createWs: {
+    title: "创建工作区",
+    nameLabel: "工作区名称",
+    namePlaceholder: "例如：Marketing-Q2",
+    slugLabel: "Slug",
+    slugPlaceholder: "marketing-q2",
+    slugHelp: "URL 友好，仅小写字母、数字、连字符",
+    cta: "创建",
+    cancel: "取消",
+    slugConflict: "该 slug 已被占用",
+    creating: "创建中…",
   },
   offline: "实时连接已断开，正在重连…",
 } as const;
