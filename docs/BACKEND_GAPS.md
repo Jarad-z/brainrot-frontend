@@ -79,7 +79,7 @@
 
 ## #9 缺 `GET /api/v1/tasks/{taskId}/artifacts`
 
-- **状态**：✅ 已完成（2026-05-17 验证）— 实现 `internal/handler/frontend_gaps.go:31 ListTaskArtifacts`，路由 `cmd/server/router.go:93`。返回 `Artifact[]`，已过滤 `excluded = false`，按 `created_at DESC`。非成员 403。Live 测试：`GET /api/v1/tasks/{id}/artifacts` → `200 []`。
+- **状态**：✅ 已完成（后端 2026-05-17；前端 S3.1 2026-05-18 已接入：`hooks/useTaskArtifacts.ts`、`components/task-detail/RightTabs/ArtifactsTab.tsx`）— 实现 `internal/handler/frontend_gaps.go:31 ListTaskArtifacts`，路由 `cmd/server/router.go:93`。返回 `Artifact[]`，已过滤 `excluded = false`，按 `created_at DESC`。非成员 403。Live 测试：`GET /api/v1/tasks/{id}/artifacts` → `200 []`。
 - **原状态**：缺失
 - **发现**：2026-05-16，S2 设计阶段
 - **影响**：任务详情页右栏"产出"tab 无数据可拉。
@@ -88,7 +88,7 @@
 
 ## #10 缺 `GET /api/v1/projects/{projectId}/assets`
 
-- **状态**：✅ 已完成（2026-05-17 验证）— 实现 `internal/handler/asset.go:14 List`，路由 `cmd/server/router.go:88`。返回 `Asset[]`，按 project 维度。Live 测试：`GET /api/v1/projects/{pid}/assets` → `200 []`。
+- **状态**：✅ 已完成（后端 2026-05-17；前端 S3.1 2026-05-18 已接入：`hooks/useProjectAssets.ts`、`components/task-detail/RightTabs/AssetsTab.tsx`）— 实现 `internal/handler/asset.go:14 List`，路由 `cmd/server/router.go:88`。返回 `Asset[]`，按 project 维度。Live 测试：`GET /api/v1/projects/{pid}/assets` → `200 []`。
 - **原状态**：缺失
 - **发现**：2026-05-16，S2 设计阶段
 - **影响**：任务详情页右栏"素材"tab 无数据可拉。

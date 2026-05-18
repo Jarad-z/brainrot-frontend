@@ -104,6 +104,32 @@ export interface ApprovalRequest {
   expires_at: string;
 }
 
+// Shared base shape — both Asset and Artifact have these fields.
+interface BlobBase {
+  id: string;
+  project_id: string;
+  filename: string;
+  mime_type: string;
+  size_bytes: number;
+  blob_key: string;
+  sha256: string;
+  created_at: string;
+}
+
+// Project-scoped, uploaded by a human user.
+export interface Asset extends BlobBase {
+  uploaded_by: string;
+}
+
+// Task-scoped, produced by an agent run; excluded=true rows are filtered
+// server-side (see API.md §列出任务产出).
+export interface Artifact extends BlobBase {
+  task_card_id: string;
+  task_run_id: string | null;
+  source: string;
+  excluded: boolean;
+}
+
 export interface EnqueuedRun {
   RunID: string;
   AgentID: string;

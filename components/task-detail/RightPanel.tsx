@@ -8,9 +8,10 @@ import { ApprovalsTab } from "./RightTabs/ApprovalsTab";
 
 interface RightPanelProps {
   taskId: string;
+  projectId: string;
 }
 
-export function RightPanel({ taskId }: RightPanelProps) {
+export function RightPanel({ taskId, projectId }: RightPanelProps) {
   const activeTab = useChatUIStore((s) => s.byTask[taskId]?.activeTab ?? "artifacts");
   const setTab = useChatUIStore((s) => s.setActiveTab);
   const { data: approvalsData } = useTaskApprovalsHistory(taskId);
@@ -23,8 +24,8 @@ export function RightPanel({ taskId }: RightPanelProps) {
         approvalsCount={approvalsData?.length ?? 0}
       />
       <div className="flex-1 overflow-y-auto">
-        {activeTab === "artifacts" && <ArtifactsTab />}
-        {activeTab === "assets" && <AssetsTab />}
+        {activeTab === "artifacts" && <ArtifactsTab taskId={taskId} />}
+        {activeTab === "assets" && <AssetsTab projectId={projectId} />}
         {activeTab === "approvals" && <ApprovalsTab taskId={taskId} />}
       </div>
     </aside>
