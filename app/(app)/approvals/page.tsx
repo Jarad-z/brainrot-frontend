@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useGlobalPendingApprovals } from "@/hooks/useGlobalPendingApprovals";
 import type { PendingApproval } from "@/lib/api/types";
 
@@ -54,12 +55,12 @@ export default function TopLevelApprovalsPage() {
                   <span className="text-xs text-ink-2">@{it.agent_handle}</span>
                 </div>
                 <div className="text-xs text-ink-2 mt-1">{it.task_title}</div>
-                <a
+                <Link
                   href={`/w/${it.workspace_id}/approvals`}
                   className="inline-block mt-2 text-xs font-semibold text-ink-0 underline"
                 >
                   在工作区中处理 →
-                </a>
+                </Link>
               </li>
             ))}
           </ul>
