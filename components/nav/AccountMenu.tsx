@@ -41,12 +41,12 @@ export function AccountMenu({ user }: AccountMenuProps) {
           type="button"
           className="rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         >
-          <Avatar name={user.Name || user.Email} size={36} />
+          <Avatar name={user.name || user.email} size={36} />
         </button>
       </DropdownTrigger>
       <DropdownContent align="end">
         <div className="px-3 py-2 text-xs text-ink-2 font-mono">
-          {user.Email}
+          {user.email}
         </div>
         <DropdownSeparator />
         <DropdownItem onSelect={onLogout}>
