@@ -178,7 +178,7 @@ export interface PendingApproval extends ApprovalRequest {
   agent_handle: string;
 }
 
-export type WorkspaceRole = "owner" | "editor" | "member" | "viewer";
+export type WorkspaceRole = "owner" | "editor" | "viewer";
 
 export interface WorkspaceMemberInput {
   user_id: string;
