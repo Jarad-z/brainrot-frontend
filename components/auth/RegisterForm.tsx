@@ -53,7 +53,7 @@ export function RegisterForm() {
     try {
       await auth.register(email, name, password);
       await auth.login(email, password);
-      await queryClient.invalidateQueries({ queryKey: queryKeys.me() });
+      await queryClient.invalidateQueries({ queryKey: queryKeys.me.self() });
       router.replace("/");
     } catch (err) {
       if (err instanceof ApiError) {

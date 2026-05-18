@@ -2,8 +2,8 @@ import { describe, it, expect } from "vitest";
 import { queryKeys } from "@/lib/api/keys";
 
 describe("queryKeys", () => {
-  it("me", () => {
-    expect(queryKeys.me()).toEqual(["me"]);
+  it("me.self", () => {
+    expect(queryKeys.me.self()).toEqual(["me"]);
   });
   it("workspaces.projects(wsId)", () => {
     expect(queryKeys.workspaces.projects("ws-1")).toEqual(["workspaces", "ws-1", "projects"]);
