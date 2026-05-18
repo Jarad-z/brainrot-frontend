@@ -23,7 +23,10 @@ export function WorkspaceInfoForm({ workspace }: Props) {
   useEffect(() => {
     setName(workspace.name);
     setSlug(workspace.slug);
-  }, [workspace.id, workspace.name, workspace.slug]);
+    // Reset state only on identity change (new workspace). Avoiding deps on
+    // name/slug prevents background refetches (or other-tab saves) from
+    // discarding the user's in-progress edits.
+  }, [workspace.id]);
 
   const dirty = name !== workspace.name || slug !== workspace.slug;
   const slugValid = SLUG_RE.test(slug);

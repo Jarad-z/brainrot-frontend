@@ -95,8 +95,8 @@ export function MemberRow({ wsId, member, isMe, viewerIsOwner }: Props) {
             {m.remove}
           </button>
         )}
+        {toast && <span className="text-xs text-ink-2">{toast}</span>}
       </div>
-      {toast && <span className="text-xs text-ink-2 ml-2">{toast}</span>}
       <ConfirmDialog
         open={confirmOpen}
         onOpenChange={setConfirmOpen}
