@@ -1,4 +1,4 @@
-export const messages = {
+﻿export const messages = {
   auth: {
     invalidEmail: "请输入有效的邮箱地址",
     shortPassword: "密码至少 8 位",
@@ -146,18 +146,21 @@ export const messages = {
     loadError: "加载失败",
   },
   addMember: {
-    title: "添加成员",
-    userIdLabel: "User ID (UUID)",
-    userIdPlaceholder: "550e8400-e29b-41d4-a716-446655440000",
-    userIdHelp: "邀请流即将上线。当前请粘贴对方的 user ID（对方可在“设置”页查看自己的 ID）。",
-    userIdInvalid: "格式不正确，应为 UUID",
+    title: "邀请成员",
+    emailLabel: "Email",
+    emailPlaceholder: "alice@example.com",
+    emailInvalid: "请输入有效的邮箱地址",
     roleLabel: "Role",
-    add: "添加",
+    invite: "邀请",
     cancel: "取消",
-    adding: "添加中…",
+    inviting: "邀请中…",
     success: "已添加成员",
-    notFound: "用户不存在",
-    alreadyMember: "该用户已是成员",
+    notFound:
+      "这个 email 还没注册 brainrot。让 ta 先访问下方注册链接后再试。",
+    copyRegisterLink: "复制注册链接",
+    copied: "已复制",
+    alreadyMember: "ta 已经是工作区成员了。",
+    permissionOwner: "需要 owner 权限",
   },
   offline: "实时连接已断开，正在重连…",
 } as const;
