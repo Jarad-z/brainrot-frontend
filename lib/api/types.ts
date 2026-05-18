@@ -49,7 +49,28 @@ export interface TaskCard {
 
 export type AgentBackendType = "claude";
 
+/** Decoded form used everywhere except inside lib/api/agents.ts. */
 export interface Agent {
+  id: string;
+  workspace_id: string;
+  runtime_id: string;
+  handle: string;
+  name: string;
+  avatar_url: string | null;
+  description: string;
+  instructions: string;
+  backend_type: AgentBackendType;
+  model: string | null;
+  custom_env: Record<string, string>;
+  custom_args: string[];
+  mcp_config: Record<string, unknown>;
+  archived: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+/** Wire form returned by the backend — three jsonb fields arrive base64-encoded. */
+export interface AgentWire {
   id: string;
   workspace_id: string;
   runtime_id: string;
@@ -66,6 +87,20 @@ export interface Agent {
   archived: boolean;
   created_at: string;
   updated_at: string;
+}
+
+/** Input shape for POST /agents and PATCH /agents/{id}. Already in decoded form. */
+export interface AgentInput {
+  runtime_id: string;
+  handle: string;
+  name: string;
+  avatar_url?: string;
+  description?: string;
+  instructions?: string;
+  model?: string;
+  custom_env: Record<string, string>;
+  custom_args: string[];
+  mcp_config: Record<string, unknown>;
 }
 
 export interface Message {
@@ -134,4 +169,41 @@ export interface EnqueuedRun {
   RunID: string;
   AgentID: string;
   RuntimeID: string;
+}
+
+export interface Runtime {
+  id: string;
+  workspace_id: string;
+  host: string;
+  online: boolean;
+  last_heartbeat: string | null;
+  capacity: number;
+  created_at: string;
+}
+
+export interface InstallToken {
+  token: string;
+  expires_at: string;
+}
+
+/** From GET /me/pending-approvals — ApprovalRequest plus enough ws/agent context for the top-level hub. */
+export interface PendingApproval extends ApprovalRequest {
+  workspace_id: string;
+  workspace_name: string;
+  agent_id: string;
+  agent_handle: string;
+  task_card_id: string;
+  task_title: string;
+}
+
+export type WorkspaceRole = "owner" | "editor" | "member" | "viewer";
+
+export interface WorkspaceMemberInput {
+  user_id: string;
+  role: WorkspaceRole;
+}
+
+export interface CreateWorkspaceInput {
+  name: string;
+  slug: string;
 }
