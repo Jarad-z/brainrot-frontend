@@ -23,17 +23,9 @@ export default function AgentDetailPage() {
 
   async function onSubmit(input: AgentInput) {
     setSubmitError(null);
-    // PATCH accepts partial; handle is read-only. We send the editable fields.
-    const patch: Partial<AgentInput> = {
-      name: input.name,
-      avatar_url: input.avatar_url,
-      description: input.description,
-      instructions: input.instructions,
-      model: input.model,
-      custom_env: input.custom_env,
-      custom_args: input.custom_args,
-      mcp_config: input.mcp_config,
-    };
+    // handle is read-only on PATCH; runtime_id is set at create time and not editable here.
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { handle: _handle, runtime_id: _runtimeId, ...patch } = input;
     try {
       await mutation.mutateAsync(patch);
     } catch (err) {
@@ -60,9 +52,10 @@ export default function AgentDetailPage() {
         mode="edit"
         initial={agent}
         runtimes={runtimes}
-        isSubmitting={mutation.isPending}
+        isSubmitting={agent.archived || mutation.isPending}
         submitError={submitError}
         onSubmit={onSubmit}
+        key={agent.updated_at}
       />
     </main>
   );
