@@ -27,4 +27,34 @@
 
   /* Default accent (overridden at runtime by applyAccent()) */
   --accent: var(--accent-poppy);
+
+  /* ----------------------------------------------------------------
+     Project swatch tri-stops — every project color exists in three
+     coordinated tones: stripe (loud), border (mid), text (low).
+     Used by sidebar 3px rails, project chips, kanban topstrips, and
+     status badges so the same project reads consistently everywhere.
+     ---------------------------------------------------------------- */
+  --swatch-green-stripe: oklch(58% 0.10 145);
+  --swatch-green-border: oklch(40% 0.08 145);
+  --swatch-green-text: oklch(34% 0.07 145);
+
+  --swatch-blue-stripe: oklch(50% 0.07 245);
+  --swatch-blue-border: oklch(34% 0.06 245);
+  --swatch-blue-text: oklch(28% 0.05 245);
+
+  --swatch-pink-stripe: oklch(60% 0.13 25);
+  --swatch-pink-border: oklch(48% 0.12 25);
+  --swatch-pink-text: oklch(38% 0.10 25);
+
+  --swatch-amber-stripe: var(--accent-honey);
+  --swatch-amber-border: oklch(48% 0.10 75);
+  --swatch-amber-text: oklch(36% 0.08 75);
+
+  --swatch-violet-stripe: oklch(50% 0.08 320);
+  --swatch-violet-border: oklch(34% 0.07 320);
+  --swatch-violet-text: oklch(28% 0.06 320);
+
+  --swatch-teal-stripe: oklch(55% 0.07 200);
+  --swatch-teal-border: oklch(40% 0.06 200);
+  --swatch-teal-text: oklch(32% 0.05 200);
 }
