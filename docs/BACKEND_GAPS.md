@@ -355,3 +355,14 @@
   - 方案 A（推荐，最小改动）：把 `DELETE /api/v1/workspaces/{ws}/members/{user_id}` 的鉴权放宽为"owner 可删任意成员；任意成员可删自己（user_id == 调用者 id）"。返回 204。Owner 删自己额外考虑：不能让工作区零 owner，所以拒绝（403 + body 解释）；除非有第二个 owner 存在。
   - 方案 B：单独 `DELETE /api/v1/workspaces/{ws}/membership` 表达"删除调用者自己的成员关系"，鉴权简单（必须是成员），同样守护"不能让工作区零 owner"。
 - **前端 unlock 路径**：Settings 页"危险区"加"离开工作区"按钮（ConfirmDialog 确认），调用对应端点。viewer/editor 默认显示，owner 仅在 owner 数 > 1 时显示。
+
+## #30 WS `message.appended` 事件 payload 没走 jsonb 解码（#24 收尾遗漏）
+
+- **状态**：未实现（S5 实测 2026-05-19 发现）
+- **发现**：S5 手测发消息时 chat 出现空气泡 + 重复，前端排查后定位
+- **影响**：`GET /api/v1/tasks/{id}/messages` 通过 `MessageView` 把 `content`/`metadata` 解码成对象（#24 ✅），但 `internal/service/message.go:163` 的 WS 推送直接 `Payload: map[string]any{"message": msg, "runs": runs}`，`msg` 是 `dbgen.Message` 原始行 —— `Content []byte` 经 Go 默认 JSON marshal 仍然是 base64 字符串。前端 WS handler 收到后 `parseMessageContent` 把 base64 string 当对象 → `raw.text` undefined → fallback `text=""` → 渲染为空气泡。表现为每条新发消息都有 1 个真实气泡 + 1 个空气泡的"重复"。
+- **复现**：在前端发任意消息 → 立刻看到 N 个对应空白行（取决于 WS 推送速度 vs REST 响应顺序）。
+- **根因**：`internal/service/message.go:163-165` 没有应用与 `internal/handler/jsonb.go` `MessageView` 同样的解码层。同样问题大概率也影响 `internal/service/run.go:57`（agent 跑出来的消息 broadcast）。
+- **Workaround（S5 前端，已落地）**：`lib/parse-message.ts:coerceContent` 和 `lib/chat/enrich-message.ts` 都加了 base64 string detect-and-decode 兜底。前端能正确渲染，但兜底代码本应由后端 #24 一并处理。
+- **Need**：后端在 WS publish 之前对 `msg` 应用 `MessageView` 转换（或定义专门的 wire 形态）。理想做法：service 层不直接吐 `dbgen.Message`，统一过一层 view。
+- **优先级**：中。前端已兜底所以不阻塞功能，但兜底是 redundant base64 处理，希望删掉。

@@ -36,8 +36,32 @@ function coercePayload(payload: unknown): unknown {
   }
 }
 
-export function parseMessageContent(content: Record<string, unknown>): ParsedMessage {
-  const raw = content as RawWithType;
+/**
+ * Defensive decode for the legacy WS push path. Backend's REST GET decodes the
+ * jsonb columns server-side (BACKEND_GAPS #24), but the WS event payload still
+ * carries the raw `[]byte` which Go's default JSON marshal encodes as base64.
+ * Detect and decode rather than rendering an empty bubble.
+ */
+function coerceContent(content: Record<string, unknown> | string | null | undefined): Record<string, unknown> {
+  if (content == null) return {};
+  if (typeof content === "string") {
+    if (content === "") return {};
+    try {
+      const decoded = atob(content);
+      const parsed = JSON.parse(decoded) as unknown;
+      if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+        return parsed as Record<string, unknown>;
+      }
+    } catch {
+      // not base64 or not JSON — fall through
+    }
+    return {};
+  }
+  return content;
+}
+
+export function parseMessageContent(content: Record<string, unknown> | string | null | undefined): ParsedMessage {
+  const raw = coerceContent(content) as RawWithType;
   if (!raw.type) {
     return {
       type: "user",
