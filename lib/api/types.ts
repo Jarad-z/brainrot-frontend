@@ -89,10 +89,10 @@ export interface Message {
   role: "user" | "agent" | "system";
   author_user_id: string | null;
   author_agent_id: string | null;
-  content: string;
+  content: Record<string, unknown>;
   task_run_id: string | null;
   seq: number | null;
-  metadata: string;
+  metadata: Record<string, unknown>;
   created_at: string;
 }
 

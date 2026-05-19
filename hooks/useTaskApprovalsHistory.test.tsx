@@ -25,7 +25,7 @@ function permMsg(approvalId: string): ClientMessage {
     id: `m-${approvalId}`,
     task_card_id: "t1",
     role: "agent", author_user_id: null, author_agent_id: "a1",
-    content: "", task_run_id: "r1", seq: 1, metadata: "",
+    content: {}, task_run_id: "r1", seq: 1, metadata: {},
     created_at: "2026-05-17T10:00:00Z", meta: {},
     parsed: {
       type: "permission_request",

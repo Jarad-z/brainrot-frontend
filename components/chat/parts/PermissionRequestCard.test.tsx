@@ -15,10 +15,10 @@ const pendingMsg: ClientMessage = {
   role: "agent",
   author_user_id: null,
   author_agent_id: "a1",
-  content: "",
+  content: {},
   task_run_id: "r1",
   seq: 1,
-  metadata: "",
+  metadata: {},
   created_at: "2026-05-16T10:00:00Z",
   parsed: {
     type: "permission_request",

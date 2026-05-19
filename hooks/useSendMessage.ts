@@ -4,7 +4,6 @@ import { nanoid } from "nanoid";
 import { sendMessage, type SendMessageInput } from "@/lib/api/messages";
 import { enrichMessage } from "@/lib/chat/enrich-message";
 import { upsertMessage } from "@/lib/chat/upsert-message";
-import { encodeJSON } from "@/lib/codec";
 import { queryKeys } from "@/lib/api/keys";
 import { useSession } from "./useSession";
 import type { ClientMessage, Message } from "@/lib/api/types";
@@ -24,10 +23,10 @@ export function useSendMessage(taskId: string) {
         role: "user",
         author_user_id: me?.id ?? null,
         author_agent_id: null,
-        content: encodeJSON({ text: input.text, mentions: input.mentions }),
+        content: { text: input.text, mentions: input.mentions },
         task_run_id: null,
         seq: null,
-        metadata: "",
+        metadata: {},
         created_at: new Date().toISOString(),
         parsed: { type: "user", text: input.text, mentions: input.mentions },
         meta: {},

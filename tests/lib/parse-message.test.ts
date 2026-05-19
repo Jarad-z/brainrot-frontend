@@ -1,9 +1,8 @@
 import { describe, it, expect } from "vitest";
 import { parseMessageContent, type ParsedMessage } from "@/lib/parse-message";
-import { encodeJSON } from "@/lib/codec";
 
-function parsed(input: object): ParsedMessage {
-  return parseMessageContent(encodeJSON(input));
+function parsed(input: Record<string, unknown>): ParsedMessage {
+  return parseMessageContent(input);
 }
 
 describe("parseMessageContent variants", () => {

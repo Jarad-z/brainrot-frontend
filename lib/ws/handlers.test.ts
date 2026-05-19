@@ -2,7 +2,6 @@ import { describe, it, expect, vi } from "vitest";
 import { QueryClient } from "@tanstack/react-query";
 import { onMessageAppended, onTaskMutation, onApprovalDecided, onRunCompleted } from "./handlers";
 import { queryKeys } from "@/lib/api/keys";
-import { encodeJSON } from "@/lib/codec";
 import type { Message, TaskCard } from "@/lib/api/types";
 
 describe("WS handlers", () => {
@@ -16,10 +15,10 @@ describe("WS handlers", () => {
       role: "user",
       author_user_id: "u1",
       author_agent_id: null,
-      content: encodeJSON({ text: "hi", mentions: [] }),
+      content: { text: "hi", mentions: [] },
       task_run_id: null,
       seq: null,
-      metadata: "",
+      metadata: {},
       created_at: "2026-05-16T10:00:00Z",
     };
     onMessageAppended(

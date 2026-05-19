@@ -1,10 +1,9 @@
 import { describe, it, expect } from "vitest";
 import { parseMessageContent } from "./parse-message";
-import { encodeJSON } from "./codec";
 
 describe("parseMessageContent — permission_request payload", () => {
   it("decodes permission_request with all optional fields", () => {
-    const b64 = encodeJSON({
+    const parsed = parseMessageContent({
       type: "permission_request",
       payload: {
         tool_use_id: "tu-1",
@@ -14,7 +13,6 @@ describe("parseMessageContent — permission_request payload", () => {
         expires_at: "2026-05-16T10:00:00Z",
       },
     });
-    const parsed = parseMessageContent(b64);
     expect(parsed.type).toBe("permission_request");
     if (parsed.type === "permission_request") {
       expect(parsed.payload.approval_id).toBe("ap-1");
@@ -24,11 +22,10 @@ describe("parseMessageContent — permission_request payload", () => {
   });
 
   it("decodes permission_request with only required fields", () => {
-    const b64 = encodeJSON({
+    const parsed = parseMessageContent({
       type: "permission_request",
       payload: { tool_use_id: "tu-2", tool_name: "Write" },
     });
-    const parsed = parseMessageContent(b64);
     expect(parsed.type).toBe("permission_request");
     if (parsed.type === "permission_request") {
       expect(parsed.payload.approval_id).toBeUndefined();
@@ -37,8 +34,7 @@ describe("parseMessageContent — permission_request payload", () => {
   });
 
   it("decodes user message (no type field)", () => {
-    const b64 = encodeJSON({ text: "hi @writer", mentions: ["agent-1"] });
-    const parsed = parseMessageContent(b64);
+    const parsed = parseMessageContent({ text: "hi @writer", mentions: ["agent-1"] });
     expect(parsed.type).toBe("user");
     if (parsed.type === "user") {
       expect(parsed.text).toBe("hi @writer");
@@ -47,18 +43,25 @@ describe("parseMessageContent — permission_request payload", () => {
   });
 
   it("decodes assistant_text message", () => {
-    const b64 = encodeJSON({ type: "assistant_text", payload: { text: "hello" } });
-    const parsed = parseMessageContent(b64);
+    const parsed = parseMessageContent({ type: "assistant_text", payload: { text: "hello" } });
     expect(parsed.type).toBe("assistant_text");
     if (parsed.type === "assistant_text") expect(parsed.payload.text).toBe("hello");
   });
 
+  it("decodes assistant_text with stringified payload (seed-data quirk)", () => {
+    const parsed = parseMessageContent({
+      type: "assistant_text",
+      payload: JSON.stringify({ text: "hello from seed" }),
+    });
+    expect(parsed.type).toBe("assistant_text");
+    if (parsed.type === "assistant_text") expect(parsed.payload.text).toBe("hello from seed");
+  });
+
   it("decodes tool_use message", () => {
-    const b64 = encodeJSON({
+    const parsed = parseMessageContent({
       type: "tool_use",
       payload: { tool_name: "Read", tool_use_id: "x", input: { path: "a.txt" } },
     });
-    const parsed = parseMessageContent(b64);
     expect(parsed.type).toBe("tool_use");
   });
 });
