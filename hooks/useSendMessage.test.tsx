@@ -4,7 +4,6 @@ import { renderHook, act, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useSendMessage } from "./useSendMessage";
 import { queryKeys } from "@/lib/api/keys";
-import { encodeJSON } from "@/lib/codec";
 
 vi.mock("@/lib/api/messages", () => ({
   sendMessage: vi.fn(),
@@ -31,8 +30,8 @@ describe("useSendMessage", () => {
       message: {
         id: "srv-1", task_card_id: "t1", role: "user",
         author_user_id: "u1", author_agent_id: null,
-        content: encodeJSON({ text: "hi", mentions: [] }),
-        task_run_id: null, seq: null, metadata: "",
+        content: { text: "hi", mentions: [] },
+        task_run_id: null, seq: null, metadata: {},
         created_at: "2026-05-16T10:00:01Z",
       },
       runs: [],

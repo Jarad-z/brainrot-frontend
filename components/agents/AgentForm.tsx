@@ -95,7 +95,8 @@ export function AgentForm({
           value={handle}
           onChange={(e) => setHandle(e.target.value)}
           placeholder={m.handlePlaceholder}
-          className="px-3 py-2 border-[1.5px] border-hairline rounded-sm text-sm font-mono"
+          disabled={mode === "edit"}
+          className="px-3 py-2 border-[1.5px] border-hairline rounded-sm text-sm font-mono disabled:opacity-50 disabled:cursor-not-allowed"
         />
         <span className="text-xs text-ink-2">{m.handleHelp}</span>
       </label>

@@ -1,8 +1,11 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useGlobalPendingApprovals } from "@/hooks/useGlobalPendingApprovals";
 import { useWorkspaces } from "@/hooks/useWorkspaces";
+import { BulkApprovalsList } from "@/components/approvals/BulkApprovalsList";
+import { messages } from "@/lib/messages";
 import type { PendingApproval } from "@/lib/api/types";
 
 function groupByWorkspace(
@@ -24,6 +27,14 @@ function groupByWorkspace(
 export default function TopLevelApprovalsPage() {
   const { data = [], isLoading, isError } = useGlobalPendingApprovals();
   const { data: wsList = [] } = useWorkspaces();
+  const [toast, setToast] = useState<string | null>(null);
+  const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    };
+  }, []);
 
   if (isLoading) {
     return <main className="p-6 text-sm text-ink-2">加载中…</main>;
@@ -53,12 +64,10 @@ export default function TopLevelApprovalsPage() {
             </span>
             <span className="text-xs text-ink-2">{group.items.length} 项</span>
           </header>
-          <ul className="flex flex-col gap-2">
-            {group.items.map((it) => (
-              <li
-                key={it.id}
-                className="border-[1.5px] border-hairline rounded-md p-3 text-sm bg-paper-0"
-              >
+          <BulkApprovalsList
+            items={group.items}
+            renderRow={(it) => (
+              <div className="border-[1.5px] border-hairline rounded-md p-3 text-sm bg-paper-0">
                 <div className="flex items-center justify-between">
                   <span className="font-semibold">{it.tool_name}</span>
                   <span className="text-xs text-ink-2">@{it.agent_handle}</span>
@@ -70,11 +79,21 @@ export default function TopLevelApprovalsPage() {
                 >
                   在工作区中处理 →
                 </Link>
-              </li>
-            ))}
-          </ul>
+              </div>
+            )}
+            onResult={(r) => {
+              if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+              setToast(messages.bulkApprovals.summarySimple(r.ok.length, r.fail.length));
+              toastTimerRef.current = setTimeout(() => setToast(null), 3000);
+            }}
+          />
         </section>
       ))}
+      {toast && (
+        <div className="fixed bottom-4 right-4 px-3 py-2 bg-ink-0 text-paper-0 rounded-sm text-sm shadow-[var(--shadow-current)]">
+          {toast}
+        </div>
+      )}
     </main>
   );
 }

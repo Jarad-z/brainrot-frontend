@@ -1,6 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { fetchMessages, sendMessage } from "./messages";
-import { encodeJSON } from "@/lib/codec";
 
 const fetchSpy = vi.fn();
 
@@ -18,8 +17,8 @@ describe("fetchMessages", () => {
         {
           id: "m1", task_card_id: "t1", role: "user",
           author_user_id: "u1", author_agent_id: null,
-          content: encodeJSON({ text: "hi", mentions: [] }),
-          task_run_id: null, seq: null, metadata: "",
+          content: { text: "hi", mentions: [] },
+          task_run_id: null, seq: null, metadata: {},
           created_at: "2026-05-16T10:00:00Z",
         },
       ],
@@ -43,8 +42,8 @@ describe("sendMessage", () => {
         message: {
           id: "srv-1", task_card_id: "t1", role: "user",
           author_user_id: "u1", author_agent_id: null,
-          content: encodeJSON({ text: "hi", mentions: [] }),
-          task_run_id: null, seq: null, metadata: "",
+          content: { text: "hi", mentions: [] },
+          task_run_id: null, seq: null, metadata: {},
           created_at: "2026-05-16T10:00:00Z",
         },
         runs: [],

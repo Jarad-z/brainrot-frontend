@@ -7,7 +7,7 @@ function mkUse(id: string, tool_use_id: string): ClientMessage {
   return {
     id, task_card_id: "t1", role: "agent",
     author_user_id: null, author_agent_id: "a1",
-    content: "", task_run_id: "r1", seq: 1, metadata: "",
+    content: {}, task_run_id: "r1", seq: 1, metadata: {},
     created_at: "2026-05-16T10:00:00Z",
     parsed: { type: "tool_use", payload: { tool_name: "Bash", tool_use_id, input: {} } },
     meta: {},
@@ -17,7 +17,7 @@ function mkResult(id: string, tool_use_id: string): ClientMessage {
   return {
     id, task_card_id: "t1", role: "agent",
     author_user_id: null, author_agent_id: "a1",
-    content: "", task_run_id: "r1", seq: 2, metadata: "",
+    content: {}, task_run_id: "r1", seq: 2, metadata: {},
     created_at: "2026-05-16T10:00:01Z",
     parsed: { type: "tool_result", payload: { tool_use_id, is_error: false, content: "ok" } },
     meta: {},
@@ -27,7 +27,7 @@ function mkPerm(id: string, tool_use_id: string): ClientMessage {
   return {
     id, task_card_id: "t1", role: "agent",
     author_user_id: null, author_agent_id: "a1",
-    content: "", task_run_id: "r1", seq: 3, metadata: "",
+    content: {}, task_run_id: "r1", seq: 3, metadata: {},
     created_at: "2026-05-16T10:00:02Z",
     parsed: { type: "permission_request", payload: { tool_use_id, tool_name: "Write" } },
     meta: {},

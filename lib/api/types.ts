@@ -49,7 +49,7 @@ export interface TaskCard {
 
 export type AgentBackendType = "claude";
 
-/** Decoded form used everywhere except inside lib/api/agents.ts. */
+/** Agent as returned by the backend (jsonb columns are decoded server-side). */
 export interface Agent {
   id: string;
   workspace_id: string;
@@ -64,26 +64,6 @@ export interface Agent {
   custom_env: Record<string, string>;
   custom_args: string[];
   mcp_config: Record<string, unknown>;
-  archived: boolean;
-  created_at: string;
-  updated_at: string;
-}
-
-/** Wire form returned by the backend — three jsonb fields arrive base64-encoded. */
-export interface AgentWire {
-  id: string;
-  workspace_id: string;
-  runtime_id: string;
-  handle: string;
-  name: string;
-  avatar_url: string | null;
-  description: string;
-  instructions: string;
-  backend_type: AgentBackendType;
-  model: string | null;
-  custom_env: string;
-  custom_args: string;
-  mcp_config: string;
   archived: boolean;
   created_at: string;
   updated_at: string;
@@ -109,10 +89,10 @@ export interface Message {
   role: "user" | "agent" | "system";
   author_user_id: string | null;
   author_agent_id: string | null;
-  content: string;
+  content: Record<string, unknown>;
   task_run_id: string | null;
   seq: number | null;
-  metadata: string;
+  metadata: Record<string, unknown>;
   created_at: string;
 }
 
@@ -171,6 +151,33 @@ export interface EnqueuedRun {
   RuntimeID: string;
 }
 
+export type RunStatus =
+  | "pending"
+  | "claimed"
+  | "running"
+  | "awaiting_approval"
+  | "done"
+  | "canceled"
+  | "failed";
+
+// GET /tasks/{id}/runs — BACKEND_GAPS #26 (closed). agent_snapshot/metadata are
+// intentionally stripped server-side (would leak custom_env / API keys).
+export interface RunView {
+  id: string;
+  workspace_id: string;
+  task_card_id: string;
+  agent_id: string;
+  runtime_id: string;
+  trigger_message_id: string | null;
+  session_id: string | null;
+  status: RunStatus;
+  error: string | null;
+  created_at: string;
+  claimed_at: string | null;
+  started_at: string | null;
+  finished_at: string | null;
+}
+
 export interface Runtime {
   id: string;
   workspace_id: string;
@@ -198,7 +205,7 @@ export interface PendingApproval extends ApprovalRequest {
   agent_handle: string;
 }
 
-export type WorkspaceRole = "owner" | "editor" | "member" | "viewer";
+export type WorkspaceRole = "owner" | "editor" | "viewer";
 
 export interface WorkspaceMemberInput {
   user_id: string;
@@ -208,4 +215,24 @@ export interface WorkspaceMemberInput {
 export interface CreateWorkspaceInput {
   name: string;
   slug: string;
+}
+
+export interface WorkspaceMember {
+  workspace_id: string;
+  user_id: string;
+  role: WorkspaceRole;
+  joined_at: string;
+  email: string;
+  name: string;
+  avatar_url: string | null;
+}
+
+export interface UpdateWorkspaceInput {
+  name?: string;
+  slug?: string;
+}
+
+export interface InviteInput {
+  email: string;
+  role: WorkspaceRole;
 }

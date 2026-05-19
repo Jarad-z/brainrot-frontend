@@ -11,6 +11,7 @@ export const queryKeys = {
     agents: (wsId: string) => ["workspaces", wsId, "agents"] as const,
     runtimes: (wsId: string) => ["workspaces", wsId, "runtimes"] as const,
     approvals: (wsId: string) => ["workspaces", wsId, "approvals"] as const,
+    members: (wsId: string) => ["workspaces", wsId, "members"] as const,
   },
   agents: {
     detail: (agentId: string) => ["agents", agentId] as const,
@@ -24,6 +25,7 @@ export const queryKeys = {
     detail: (taskId: string) => ["tasks", taskId] as const,
     messages: (taskId: string) => ["tasks", taskId, "messages"] as const,
     artifacts: (taskId: string) => ["tasks", taskId, "artifacts"] as const,
+    runs: (taskId: string) => ["tasks", taskId, "runs"] as const,
   },
   approvals: {
     task: (taskId: string) => ["approvals", "task", taskId] as const,
