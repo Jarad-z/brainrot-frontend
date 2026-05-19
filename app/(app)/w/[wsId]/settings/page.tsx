@@ -6,6 +6,7 @@ import { apiFetch } from "@/lib/api/client";
 import { queryKeys } from "@/lib/api/keys";
 import { WorkspaceInfoForm } from "@/components/workspace/WorkspaceInfoForm";
 import { MembersList } from "@/components/workspace/MembersList";
+import { LeaveWorkspaceButton } from "@/components/workspace/LeaveWorkspaceButton";
 import type { Workspace } from "@/lib/api/types";
 import { messages } from "@/lib/messages";
 import {
@@ -62,14 +63,17 @@ export default function WorkspaceSettingsPage() {
           <h2 className="font-mono text-[11px] uppercase tracking-[0.1em] text-state-failed font-bold mb-3">
             {m.dangerSection}
           </h2>
-          <button
-            type="button"
-            disabled
-            title={m.dangerArchiveSoon}
-            className="px-3 py-1.5 border-[1.5px] border-state-failed text-state-failed rounded-sm font-semibold text-sm opacity-50"
-          >
-            {m.dangerArchive}
-          </button>
+          <div className="flex items-center gap-3 flex-wrap">
+            <button
+              type="button"
+              disabled
+              title={m.dangerArchiveSoon}
+              className="px-3 py-1.5 border-[1.5px] border-state-failed text-state-failed rounded-sm font-semibold text-sm opacity-50"
+            >
+              {m.dangerArchive}
+            </button>
+            {ws && <LeaveWorkspaceButton wsId={wsId} wsName={ws.name} />}
+          </div>
         </Card>
       </div>
     </main>
