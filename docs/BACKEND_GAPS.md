@@ -144,7 +144,8 @@
 
 ## #18 `promoteQueued` 用错 agent — 排队消息被前一个 agent 接管（正确性 bug）
 
-- **状态**：后端 bug（不是接口缺失，是行为错误）
+- **状态**：✅ 已验证已修（2026-05-19，PR https://github.com/Jarad-z/brainrot/pull/4）— 审计当前 `internal/service/run.go` `promoteQueued` 已正确实现：解析 `msg.Content.mentions`、维护 `metadata.promoted_agents` 防止重复派工、用 `pickedAgent.RuntimeID`（而非 `run.RuntimeID`）、按 agent 维度调 `resumeSession(cardID, pickedID)`。回归测试见 `internal/service/run_promote_test.go` Case A-E：同 agent、跨 agent、多 mention 串行、归档 agent 兜底、legacy 消息回退。
+- **原状态**：后端 bug（不是接口缺失，是行为错误）
 - **发现**：2026-05-17，S3 后端代码审计
 - **影响**：用户发的 "@editor xxx" 在被排队晋升时，实际由 **上一个跑完的 agent**（比如 writer）接管执行。msg.mentions 写的是 editor，但产生回复的是 writer。前端看不出这是 bug，因为 message 流照常更新，只是回复内容/风格"奇怪"——这是个**隐蔽的正确性 bug**。
 - **场景复现**：
@@ -335,3 +336,33 @@
 - **影响**：跟 #24 部分重叠 —— 前端要拿 message 文本必须 `JSON.parse(atob(msg.content)).text`，没法 `msg.text`。
 - **建议**：后端在 message 序列化时把 `text` 从 content jsonb 里提到顶层（同时保留 content 给以后可能的富格式字段），这样最常见的"读消息文本"操作不用解码 jsonb。或者**至少**把 content 反序列化成对象（即修 #24）。
 - **优先级**：低 —— 修 #24 顺带就解决了。这一条主要是提醒前端**不要写 `msg.text`**，统一走 content 字段。
+
+## #28 缺 `PATCH /api/v1/artifacts/{id} { excluded }`（artifact 排除写端点）
+
+- **状态**：✅ 已完成（2026-05-19，PR https://github.com/Jarad-z/brainrot/pull/4）— 实现 `PATCH /api/v1/artifacts/{artifact_id} { excluded }` → `204`。鉴权：owner / editor 可改，viewer → `403`，未知 artifact_id → `404`。复用已有 `SetArtifactExcluded` SQL，没加新 SQL。Service 层 `Artifact.Get` / `Artifact.SetExcluded`（`internal/service/artifact.go`）+ `ArtifactHandler.PatchExcluded`（`internal/handler/artifact.go`）。
+- **原状态**：未实现（S5 设计阶段 2026-05-19 记录）
+- **发现**：S5 brainstorm 阶段，对比 spec §6 vs API.md 资产章节时
+- **影响**：前端没有把 artifact 标记为 `excluded=true` 的路径。`GET /api/v1/tasks/{taskId}/artifacts` 已经做服务端过滤（不返回 excluded=true 的行），但**没有写端点让前端切换状态**。这意味着 spec §6.2 假设的"排除按钮 + 显示已排除 toggle"现在没法实现。
+- **Workaround（S5）**：整块"排除"UI 完全不在 S5 范围。Artifact tab 只读列表保持现状。
+- **Need**：✅ 已满足。可选扩展：让 `GET /tasks/{taskId}/artifacts?include_excluded=1` 接受参数返回全部行（含 excluded=true），方便前端做"显示已排除" toggle 而不必双查询 —— **本次未实现**，需要另立项。
+- **前端 unlock 路径**：在 `components/task-detail/RightTabs/ArtifactsTab.tsx` 加"排除"按钮（PATCH `excluded=true`）。"显示已排除" toggle 依赖上述可选扩展，暂不可做。
+
+## #29 缺非 owner 自离工作区接口
+
+- **状态**：✅ 已完成（2026-05-19，PR https://github.com/Jarad-z/brainrot/pull/4）— 实现 `DELETE /api/v1/workspaces/{ws_id}/members/me` → `204`。任意成员（owner / editor / viewer）可调，无需 owner 介入。**末位 owner 离开返回 `409 Conflict`** 防止工作区无主；非成员返回 `403`。路径用字面量 `me`，与 owner-only 的 `DELETE /workspaces/{ws_id}/members/{user_id}` 并存。新增 SQL `CountWorkspaceOwners` 支撑末位 owner 守卫。
+- **原状态**：未实现（S5 设计阶段 2026-05-19 记录）
+- **发现**：S5 brainstorm 阶段，确认 #20 实现状态时发现
+- **影响**：editor / viewer 没有自己"离开工作区"的路径。当前 `DELETE /api/v1/workspaces/{ws_id}/members/{user_id}` 仅 owner 可调（鉴权矩阵第 659 行），所以非 owner 完全没有自助离开方式 —— 必须求 owner 帮忙 kick。
+- **Workaround（S5）**：Settings 页不出"离开工作区"按钮。S5 设计 §2.1 explicitly 排除。
+- **Need**：✅ 已满足。实现选了方案 A 的变体：单独走字面量 `me` 路径，调用者必须是成员，末位 owner 拒绝（409 + 解释）。
+- **前端 unlock 路径**：Settings 页"危险区"加"离开工作区"按钮（ConfirmDialog 确认），调用 `DELETE /api/v1/workspaces/{ws_id}/members/me`。处理 `409`（"你是唯一 owner，先升级另一个成员为 owner"）和 `403`（"你不是这个工作区的成员"）。viewer/editor 默认显示；owner 可以一直显示（按钮点了再让后端 409，UI 不用查 owner 计数）。
+
+## #30 WS `message.appended` 事件 payload 没走 jsonb 解码（#24 收尾遗漏）
+
+- **状态**：✅ 已完成（2026-05-19，PR https://github.com/Jarad-z/brainrot/pull/4）— `MessageView` 从 `internal/handler/jsonb.go` 提取到新包 `internal/wire/message_view.go`（避免 service → handler 反向依赖），`internal/handler/jsonb.go` 用 `type MessageView = wire.MessageView` 别名保持向后兼容。`internal/service/message.go` 的 `AppendUser` bus publish 现在用 `wire.ToMessageView(msg)`，`content` / `metadata` 是真对象。新增回归测试 `internal/service/ws_payload_test.go` 守护 `AppendUser` 和 `AppendAgentMessage` 两条发布路径。
+- **原状态**：未实现（S5 实测 2026-05-19 发现）
+- **发现**：S5 手测发消息时 chat 出现空气泡 + 重复，前端排查后定位
+- **影响**：`GET /api/v1/tasks/{id}/messages` 通过 `MessageView` 把 `content`/`metadata` 解码成对象（#24 ✅），但 `internal/service/message.go:163` 的 WS 推送直接 `Payload: map[string]any{"message": msg, "runs": runs}`，`msg` 是 `dbgen.Message` 原始行 —— `Content []byte` 经 Go 默认 JSON marshal 仍然是 base64 字符串。前端 WS handler 收到后 `parseMessageContent` 把 base64 string 当对象 → `raw.text` undefined → fallback `text=""` → 渲染为空气泡。表现为每条新发消息都有 1 个真实气泡 + 1 个空气泡的"重复"。
+- **Workaround（S5 前端，已落地）**：`lib/parse-message.ts:coerceContent` 和 `lib/chat/enrich-message.ts` 都加了 base64 string detect-and-decode 兜底。前端能正确渲染，但兜底代码本应由后端 #24 一并处理。
+- **Need**：✅ 已满足。
+- **前端 unlock 路径**：`lib/parse-message.ts` 和 `lib/chat/enrich-message.ts` 里的 base64 detect-and-decode 兜底现在是 redundant，可以删掉（删之前确认所有部署的后端都升级到本次 PR 之后的版本）。
