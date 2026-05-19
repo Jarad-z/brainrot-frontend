@@ -2,92 +2,70 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { useWorkspaceAgents } from "@/hooks/useWorkspaceAgents";
 import { messages } from "@/lib/messages";
-import {
-  PageHeader,
-  PageTitle,
-  PageSub,
-  PageHeaderTitleBlock,
-  PageHeaderActions,
-} from "@/components/brand/page-header";
-import { AgentCard } from "@/components/brand/agent-card";
-import { EmptyState } from "@/components/brand/empty-state";
 
 export default function AgentsListPage() {
   const { wsId } = useParams<{ wsId: string }>();
-  const router = useRouter();
   const { data: agents = [], isLoading } = useWorkspaceAgents(wsId);
   const [showArchived, setShowArchived] = useState(false);
 
   const visible = showArchived ? agents : agents.filter((a) => !a.archived);
 
   return (
-    <main className="p-7 overflow-y-auto h-full">
-      <PageHeader editorial>
-        <PageHeaderTitleBlock>
-          <PageTitle editorial>{messages.agents.listTitle}</PageTitle>
-          <PageSub editorial>
-            工作区里的 agent 团队。每位 agent 有自己的句柄、模型与人格。
-          </PageSub>
-        </PageHeaderTitleBlock>
-        <PageHeaderActions>
-          <label className="flex items-center gap-1.5 text-xs text-ink-2 font-semibold">
+    <main className="p-6 overflow-y-auto h-full">
+      <header className="flex items-center justify-between mb-4">
+        <h1 className="text-lg font-bold">{messages.agents.listTitle}</h1>
+        <div className="flex items-center gap-3">
+          <label className="text-xs flex items-center gap-1.5">
             <input
               type="checkbox"
               checked={showArchived}
               onChange={(e) => setShowArchived(e.target.checked)}
-              className="accent-ink-0"
             />
             {messages.agents.showArchived}
           </label>
           <Link
             href={`/w/${wsId}/agents/new`}
-            className="ink-stamp active:ink-stamp-active px-4 py-2 bg-ink-0 text-paper-0 border-[1.5px] border-ink-0 rounded-md font-semibold text-sm shadow-[var(--shadow-current)]"
+            className="px-3 py-1.5 bg-ink-0 text-paper-0 border-[1.5px] border-ink-0 rounded-sm font-semibold text-sm"
           >
             {messages.agents.newCta}
           </Link>
-        </PageHeaderActions>
-      </PageHeader>
+        </div>
+      </header>
 
       {isLoading ? (
         <p className="text-sm text-ink-2">加载中…</p>
       ) : visible.length === 0 ? (
-        <EmptyState
-          glyph="@"
-          title={
-            agents.length === 0
-              ? messages.agents.emptyTitle
-              : messages.agents.emptyAllArchived
-          }
-          hint="新建一位 agent，给他一个 handle、一个模型，让他开干。"
-          action={
-            <Link
-              href={`/w/${wsId}/agents/new`}
-              className="ink-stamp active:ink-stamp-active inline-block px-4 py-2 bg-ink-0 text-paper-0 border-[1.5px] border-ink-0 rounded-md font-semibold text-sm shadow-[var(--shadow-current)]"
-            >
-              {messages.agents.newCta}
-            </Link>
-          }
-        />
+        <p className="text-sm text-ink-2">
+          {agents.length === 0
+            ? messages.agents.emptyTitle
+            : messages.agents.emptyAllArchived}
+        </p>
       ) : (
-        <ul className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 list-none p-0">
+        <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {visible.map((a) => (
-            <li key={a.id} className={a.archived ? "opacity-60" : undefined}>
-              <AgentCard
-                handle={a.handle}
-                name={a.name || `@${a.handle}`}
-                model={a.model ?? "—"}
-                description={a.description || undefined}
-                avatarGlyph={a.handle.charAt(0).toUpperCase()}
-                onClick={() => router.push(`/w/${wsId}/agents/${a.id}`)}
-              />
-              {a.archived && (
-                <span className="mt-2 inline-block px-1.5 py-0.5 bg-paper-1 border-[1.5px] border-hairline rounded text-[11px] font-bold text-ink-2">
-                  {messages.agents.archivedBadge}
-                </span>
-              )}
+            <li key={a.id}>
+              <Link
+                href={`/w/${wsId}/agents/${a.id}`}
+                className={
+                  a.archived
+                    ? "block border-[1.5px] border-hairline rounded-md p-3 bg-paper-2 opacity-70"
+                    : "block border-[1.5px] border-hairline rounded-md p-3 bg-paper-0 hover:border-ink-1"
+                }
+              >
+                <div className="flex items-center justify-between">
+                  <span className="font-semibold">@{a.handle}</span>
+                  {a.archived ? (
+                    <span className="text-xs px-1.5 py-0.5 bg-paper-1 border border-hairline rounded">
+                      {messages.agents.archivedBadge}
+                    </span>
+                  ) : null}
+                </div>
+                <div className="text-xs text-ink-2 mt-1 truncate">{a.name}</div>
+                <div className="text-xs text-ink-3 mt-1">{a.model}</div>
+              </Link>
             </li>
           ))}
         </ul>
