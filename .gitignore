@@ -10,6 +10,7 @@ dist
 coverage
 .vscode
 .gstack/
+.worktrees/
 
 # Local-only postmortems (not pushed; kept for self-reference)
 docs/superpowers/reports/2026-05-19-pr10-revert-postmortem.md
