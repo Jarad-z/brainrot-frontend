@@ -184,6 +184,12 @@
     forbiddenViewer: "需要 editor 或 owner 权限",
     loading: "加载中...",
     loadError: "加载失败",
+    dropZoneTitle: "拖拽到任意位置上传",
+    dropZoneSubtitle: "上传到当前项目的素材",
+    pasteUploading: "正在上传截图…",
+    pasteUploadedHint: (filename: string) =>
+      `已上传 ${filename}（见右栏 Assets）`,
+    pasteUploadFailed: "截图上传失败",
   },
   artifacts: {
     exclude: "排除",

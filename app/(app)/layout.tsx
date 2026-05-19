@@ -4,6 +4,7 @@ import { WSProvider } from "@/lib/ws/provider";
 import { WorkspaceProvider } from "@/lib/workspace-context";
 import { PageSkeleton } from "@/components/common/PageSkeleton";
 import { ThreeColumnShell } from "@/components/nav/ThreeColumnShell";
+import { DropZoneOverlay } from "@/components/upload/DropZoneOverlay";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { isPending, data: user } = useSession();
@@ -13,6 +14,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     <WorkspaceProvider>
       <WSProvider>
         <ThreeColumnShell user={user}>{children}</ThreeColumnShell>
+        <DropZoneOverlay />
       </WSProvider>
     </WorkspaceProvider>
   );

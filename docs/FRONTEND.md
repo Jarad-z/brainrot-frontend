@@ -452,6 +452,14 @@ class WSClient {
 7. **资产上传**：`multipart/form-data`，单文件 100MB 上限；超限后端返 413，UI 要在选文件时本地预检。
 8. **登出**：`POST /auth/logout` 后**清空所有 TanStack Query 缓存**（`queryClient.clear()`）+ 关闭 WS + Zustand reset。否则下个用户登录后会闪一下前一个用户的数据。
 
+### 拖拽 + 粘贴上传 (S6 PR3a)
+
+- `<DropZoneOverlay />` 挂在 `app/(app)/layout.tsx` 中（authenticated 区域），监听 `document` 的 dragenter / over / leave / drop。仅当 `useProjectIdFromRoute()` 返回非 null 时接管（task / project 路由），否则 overlay 不渲染且不调 `preventDefault`，让浏览器默认行为接管。
+- DropZoneOverlay 使用 drag counter + `dataTransfer.types.includes("Files")` 守卫，过滤非文件拖拽（如纯文本、URL）。
+- Composer 通过 `PasteImageExtension`（Tiptap 扩展 + ProseMirror plugin）拦截 `image/*` 类剪贴板项，调用 `screenshotFilename(now, mime)` 重命名（剪贴板 File 通常无原名），再调用 `useUploadAssets(projectId).start(files)`。上传成功后在编辑器插入 "已上传 …（见右栏 Assets）" 提示行。
+- 富文本粘贴里的 `<img src="data:...">` / `<img src="https://...">` 与浏览器 tab 间拖 PDF（`dataTransfer.files` 为空、只有 URL）暂不支持，让默认 paste 走文本。
+- 进度状态：DropZoneOverlay 和 Assets tab 各自调 `useUploadAssets`，progress 列表互不共享。S6 接受此分裂，未来若有真 toast 库可统一。
+
 ---
 
 ## 10. 可访问性 & 国际化

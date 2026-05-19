@@ -20,7 +20,7 @@ function wrap(children: React.ReactNode) {
 
 describe("Composer", () => {
   it("renders the editor wrapper and footer hint", () => {
-    const { getByText } = render(wrap(<Composer wsId="w1" taskId="t1" />));
+    const { getByText } = render(wrap(<Composer wsId="w1" taskId="t1" projectId="p1" />));
     expect(getByText(/Ctrl\+Enter/)).toBeInTheDocument();
   });
 });

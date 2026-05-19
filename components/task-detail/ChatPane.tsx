@@ -8,10 +8,11 @@ import type { TaskCard } from "@/lib/api/types";
 interface ChatPaneProps {
   wsId: string;
   taskId: string;
+  projectId: string;
   task: TaskCard | null | undefined;
 }
 
-export function ChatPane({ wsId, taskId, task }: ChatPaneProps) {
+export function ChatPane({ wsId, taskId, projectId, task }: ChatPaneProps) {
   return (
     <section className="flex flex-col min-h-0 bg-paper-1">
       <TaskHeader task={task} taskId={taskId} />
@@ -20,7 +21,7 @@ export function ChatPane({ wsId, taskId, task }: ChatPaneProps) {
       </div>
       <ThinkingBar taskId={taskId} wsId={wsId} />
       <div className="border-t-[1.5px] border-hairline bg-paper-0 p-4">
-        <Composer wsId={wsId} taskId={taskId} />
+        <Composer wsId={wsId} taskId={taskId} projectId={projectId} />
       </div>
     </section>
   );
