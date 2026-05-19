@@ -366,3 +366,15 @@
 - **Workaround（S5 前端，已落地）**：`lib/parse-message.ts:coerceContent` 和 `lib/chat/enrich-message.ts` 都加了 base64 string detect-and-decode 兜底。前端能正确渲染，但兜底代码本应由后端 #24 一并处理。
 - **Need**：✅ 已满足。
 - **前端 unlock 路径**：`lib/parse-message.ts` 和 `lib/chat/enrich-message.ts` 里的 base64 detect-and-decode 兜底现在是 redundant，可以删掉（删之前确认所有部署的后端都升级到本次 PR 之后的版本）。
+
+
+## #31 缺 raw blob endpoints（asset / artifact 文件读路径）
+
+- **状态**：待办（2026-05-19，S6 brainstorm 阶段记录）
+- **发现**：S6 brainstorm，对比 D 项文件预览设计 vs API.md 资产章节时
+- **影响**：前端目前能列出 asset / artifact 行（filename, mime_type, size, sha256, blob_key），但**没法 fetch 实际文件字节**。`AssetRow` / `ArtifactRow` 只能显示元信息，无法做缩略图、预览、下载。S6 D 项（文件预览：图片 + PDF 首页）阻塞在此。
+- **Workaround（S6）**：S6 不做 D 项 PR3b，文件预览推到 S7。
+- **Need**：
+  - `GET /api/v1/assets/{asset_id}/blob` → raw bytes，`Content-Type` 取自 `mime_type` 列，鉴权 = 任意 ws 成员（403 / 404），SHOULD 支持 `Range` 请求（PDF / 大图懒加载）
+  - `GET /api/v1/artifacts/{artifact_id}/blob` → 同上，鉴权同 list 接口（任意 ws 成员）；excluded=true 行也应可访问（用户软删除不应该等同丢失访问权）或返回 410，看后端决策
+- **前端 unlock 路径**：实现后 S6 PR3b 即可启动（`lib/api/blob.ts` 加 helper + 在 AssetThumbnail / MediaPreviewModal 直接给 `<img src>` / `<embed src>`）。

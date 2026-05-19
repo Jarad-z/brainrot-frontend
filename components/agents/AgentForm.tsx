@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Agent, AgentInput, Runtime } from "@/lib/api/types";
 import { messages } from "@/lib/messages";
 
@@ -39,6 +39,15 @@ export function AgentForm({
   const [name, setName] = useState(initial?.name ?? "");
   const [model, setModel] = useState(initial?.model ?? MODELS[1]);
   const [runtimeId, setRuntimeId] = useState(initial?.runtime_id ?? runtimes[0]?.id ?? "");
+
+  // runtimes may arrive after first render (loading async). If we still don't
+  // have a selection, fall back to the first one — otherwise the <select>
+  // *displays* runtimes[0] but state stays "" and submit is silently blocked.
+  useEffect(() => {
+    if (!runtimeId && runtimes.length > 0 && runtimes[0]) {
+      setRuntimeId(runtimes[0].id);
+    }
+  }, [runtimes, runtimeId]);
   const [instructions, setInstructions] = useState(initial?.instructions ?? "");
   const [envRaw, setEnvRaw] = useState(
     initial ? JSON.stringify(initial.custom_env, null, 2) : "",
@@ -53,6 +62,7 @@ export function AgentForm({
   const [envError, setEnvError] = useState(false);
   const [argsError, setArgsError] = useState(false);
   const [mcpError, setMcpError] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
 
   function validateOnBlur(setter: (b: boolean) => void, raw: string) {
     setter(!tryParse(raw).ok);
@@ -60,7 +70,20 @@ export function AgentForm({
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!HANDLE_RE.test(handle) || name.trim() === "" || !runtimeId) return;
+    setFormError(null);
+
+    if (!HANDLE_RE.test(handle)) {
+      setFormError(m.handleInvalid);
+      return;
+    }
+    if (name.trim() === "") {
+      setFormError(m.nameRequired);
+      return;
+    }
+    if (!runtimeId) {
+      setFormError(m.runtimeRequired);
+      return;
+    }
 
     const env = tryParse(envRaw);
     const args = tryParse(argsRaw);
@@ -69,6 +92,7 @@ export function AgentForm({
       setEnvError(!env.ok);
       setArgsError(!args.ok);
       setMcpError(!mcp.ok);
+      setFormError(m.jsonInvalid);
       return;
     }
 
@@ -223,6 +247,7 @@ export function AgentForm({
         {mcpError ? <span className="text-xs text-state-failed">{m.jsonInvalid}</span> : null}
       </label>
 
+      {formError ? <p className="text-sm text-state-failed">{formError}</p> : null}
       {submitError ? (
         <p className="text-sm text-state-failed">{submitError}</p>
       ) : null}
