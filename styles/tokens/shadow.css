@@ -11,4 +11,8 @@
   /* Tweaks block-depth runtime override */
   --depth: 4px;
   --shadow-current: var(--depth) var(--depth) 0 var(--ink-0);
+
+  /* Hover lift — used on interactive cards (kanban, approval, agent,
+     runtime, asset). Cards translateY(-2px) and swap shadow-1 → lift. */
+  --shadow-lift: 5px 5px 0 var(--ink-0);
 }
