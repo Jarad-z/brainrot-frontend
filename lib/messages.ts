@@ -173,6 +173,16 @@
     loading: "加载中...",
     loadError: "加载失败",
   },
+  artifacts: {
+    exclude: "排除",
+    excludeConfirmTitle: "排除产出？",
+    excludeConfirmBody: (filename: string) =>
+      `确定要从产出列表里排除 ${filename} 吗？这条不会再显示出来。`,
+    excludeConfirm: "排除",
+    excludeCancel: "取消",
+    excludeFailed: "排除失败",
+    excludeForbidden: "需要 editor 或 owner 权限",
+  },
   addMember: {
     title: "邀请成员",
     emailLabel: "Email",
