@@ -9,7 +9,13 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/brand/tooltip";
-import { PageHeader, PageTitle, PageSub } from "@/components/brand/page-header";
+import {
+  PageHeader,
+  PageTitle,
+  PageSub,
+  PageHeaderTitleBlock,
+  PageHeaderActions,
+} from "@/components/brand/page-header";
 import { EmptyState } from "@/components/common/EmptyState";
 import { TaskGrid } from "@/components/tasks/TaskGrid";
 import { useProject } from "@/hooks/useProject";
@@ -28,19 +34,23 @@ export default function ProjectHomePage({ params }: PageProps) {
   return (
     <TooltipProvider>
       <div className="p-8 h-full overflow-y-auto">
-        <PageHeader>
-          <div className="flex-1 min-w-0">
-            <PageTitle>{project?.name ?? "…"}</PageTitle>
-            {project?.description && <PageSub>{project.description}</PageSub>}
-          </div>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <span>
-                <Button disabled>新建任务</Button>
-              </span>
-            </TooltipTrigger>
-            <TooltipContent>{messages.shell.writesDisabled}</TooltipContent>
-          </Tooltip>
+        <PageHeader editorial>
+          <PageHeaderTitleBlock>
+            <PageTitle editorial>{project?.name ?? "…"}</PageTitle>
+            {project?.description && (
+              <PageSub editorial>{project.description}</PageSub>
+            )}
+          </PageHeaderTitleBlock>
+          <PageHeaderActions>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span>
+                  <Button disabled>新建任务</Button>
+                </span>
+              </TooltipTrigger>
+              <TooltipContent>{messages.shell.writesDisabled}</TooltipContent>
+            </Tooltip>
+          </PageHeaderActions>
         </PageHeader>
 
         {isPending && (
