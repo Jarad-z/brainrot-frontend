@@ -37,7 +37,16 @@ export function StatCard({
       >
         {label}
       </div>
-      <div className="stat-num text-[44px] font-extrabold my-1.5">{value}</div>
+      <div
+        className={cn(
+          "stat-num text-[44px] font-extrabold my-1.5",
+          // Dimmed when value is a placeholder dash — keeps the empty
+          // dashboard from reading as broken/dead.
+          value === "—" && (hot ? "opacity-60" : "text-ink-3"),
+        )}
+      >
+        {value}
+      </div>
       {foot && (
         <div
           className={cn(
