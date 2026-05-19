@@ -17,9 +17,9 @@ export const NavItem = forwardRef<HTMLDivElement, NavItemProps>(
       data-active={active || undefined}
       data-disabled={disabled || undefined}
       className={cn(
-        "group relative mx-2.5 my-0.5 pl-4 pr-3 py-2 rounded-lg flex items-center gap-2.5",
+        "mx-2.5 my-0.5 px-3 py-2 rounded-lg flex items-center gap-2.5",
         "text-[13.5px] font-semibold text-ink-1 cursor-pointer select-none whitespace-nowrap",
-        "border-[1.5px] border-transparent transition-colors",
+        "border-[1.5px] border-transparent",
         active && "bg-paper-2 text-ink-0 border-hairline",
         !active && !disabled && "hover:bg-paper-2",
         disabled && "opacity-50 cursor-not-allowed",
@@ -27,13 +27,6 @@ export const NavItem = forwardRef<HTMLDivElement, NavItemProps>(
       )}
       {...rest}
     >
-      <span
-        aria-hidden
-        className={cn(
-          "absolute left-1 top-2 bottom-2 rounded-sm bg-accent transition-[width,opacity]",
-          active ? "w-[3px] opacity-100" : "w-0 opacity-0 group-hover:w-[2px] group-hover:opacity-70",
-        )}
-      />
       {icon && (
         <span className="shrink-0 w-[18px] h-[18px] text-ink-1">{icon}</span>
       )}

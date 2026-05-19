@@ -4,18 +4,10 @@ import { useState } from "react";
 import { useParams } from "next/navigation";
 import { useWorkspaceRuntimes } from "@/hooks/useWorkspaceRuntimes";
 import { useIssueInstallToken } from "@/hooks/useIssueInstallToken";
+import { RuntimeRow } from "@/components/runtimes/RuntimeRow";
 import { InstallTokenModal } from "@/components/workspace/InstallTokenModal";
 import type { InstallToken } from "@/lib/api/types";
 import { messages } from "@/lib/messages";
-import {
-  PageHeader,
-  PageTitle,
-  PageSub,
-  PageHeaderTitleBlock,
-  PageHeaderActions,
-} from "@/components/brand/page-header";
-import { RuntimeCard } from "@/components/brand/runtime-card";
-import { EmptyState } from "@/components/brand/empty-state";
 
 export default function RuntimesPage() {
   const { wsId } = useParams<{ wsId: string }>();
@@ -36,67 +28,33 @@ export default function RuntimesPage() {
     }
   }
 
-  const m = messages.runtimes;
-
   return (
-    <main className="p-7 overflow-y-auto h-full">
-      <PageHeader editorial>
-        <PageHeaderTitleBlock>
-          <PageTitle editorial>{m.title}</PageTitle>
-          <PageSub editorial>
-            注册到工作区的执行机器。agent 进程在这里被孵化、调度、心跳。
-          </PageSub>
-        </PageHeaderTitleBlock>
-        <PageHeaderActions>
-          <button
-            type="button"
-            onClick={onIssue}
-            disabled={issue.isPending}
-            className="ink-stamp active:ink-stamp-active px-4 py-2 bg-ink-0 text-paper-0 border-[1.5px] border-ink-0 rounded-md font-semibold text-sm shadow-[var(--shadow-current)] disabled:opacity-60"
-          >
-            {m.issueToken}
-          </button>
-        </PageHeaderActions>
-      </PageHeader>
+    <main className="p-6 overflow-y-auto h-full">
+      <header className="flex items-center justify-between mb-4">
+        <h1 className="text-lg font-bold">{messages.runtimes.title}</h1>
+        <button
+          type="button"
+          onClick={onIssue}
+          disabled={issue.isPending}
+          className="px-3 py-1.5 bg-ink-0 text-paper-0 border-[1.5px] border-ink-0 rounded-sm font-semibold text-sm disabled:opacity-60"
+        >
+          {messages.runtimes.issueToken}
+        </button>
+      </header>
 
-      {issueError ? (
-        <p className="text-sm text-state-failed mb-3">{issueError}</p>
-      ) : null}
+      {issueError ? <p className="text-sm text-state-failed mb-3">{issueError}</p> : null}
 
       {isLoading ? (
         <p className="text-sm text-ink-2">加载中…</p>
       ) : runtimes.length === 0 ? (
-        <EmptyState
-          glyph="♥"
-          title={m.emptyTitle}
-          hint={m.emptyHelp}
-          action={
-            <button
-              type="button"
-              onClick={onIssue}
-              disabled={issue.isPending}
-              className="ink-stamp active:ink-stamp-active px-4 py-2 bg-ink-0 text-paper-0 border-[1.5px] border-ink-0 rounded-md font-semibold text-sm shadow-[var(--shadow-current)]"
-            >
-              {m.issueToken}
-            </button>
-          }
-        />
+        <div className="text-sm text-ink-2">
+          <p className="font-semibold">{messages.runtimes.emptyTitle}</p>
+          <p className="mt-1">{messages.runtimes.emptyHelp}</p>
+        </div>
       ) : (
-        <ul className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 list-none p-0">
+        <ul className="flex flex-col gap-2">
           {runtimes.map((r) => (
-            <li key={r.id}>
-              <RuntimeCard
-                name={r.host}
-                host={r.host}
-                capacity={r.capacity}
-                online={r.online}
-                lastHeartbeat={
-                  r.last_heartbeat
-                    ? `${m.lastHeartbeat} ${r.last_heartbeat}`
-                    : undefined
-                }
-              />
-            </li>
+            <RuntimeRow key={r.id} runtime={r} />
           ))}
         </ul>
       )}
@@ -105,7 +63,7 @@ export default function RuntimesPage() {
         open={modalOpen}
         onOpenChange={(o) => {
           setModalOpen(o);
-          if (!o) setIssued(null);
+          if (!o) setIssued(null); // clear secret from memory when closing
         }}
         token={issued}
       />
