@@ -8,6 +8,14 @@ import { useWorkspacePendingApprovals } from "@/hooks/useWorkspacePendingApprova
 import { ApprovalHubCard } from "./ApprovalHubCard";
 import { ToolFilterInput } from "./ToolFilterInput";
 import type { TaskCard } from "@/lib/api/types";
+import {
+  PageHeader,
+  PageTitle,
+  PageSub,
+  PageHeaderTitleBlock,
+  PageHeaderActions,
+} from "@/components/brand/page-header";
+import { EmptyState } from "@/components/brand/empty-state";
 
 interface ApprovalsHubPageProps {
   wsId: string;
@@ -53,27 +61,30 @@ export function ApprovalsHubPage({ wsId }: ApprovalsHubPageProps) {
   );
 
   return (
-    <div className="h-full overflow-y-auto p-6">
-      <div className="flex items-start justify-between gap-4 mb-5">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 bg-accent rounded-full" />
-            <h1 className="text-2xl font-extrabold text-ink-0 page-title">
+    <div className="h-full overflow-y-auto p-7">
+      <PageHeader editorial>
+        <PageHeaderTitleBlock>
+          <div className="flex items-center gap-3">
+            <span className="w-2.5 h-2.5 bg-accent rounded-full border-[1.5px] border-ink-0" />
+            <PageTitle editorial>
               待审批 · {visible.length} 件
-            </h1>
+            </PageTitle>
           </div>
-          <p className="text-sm text-ink-2 mt-1">所有待你决定的工具调用</p>
-        </div>
-        <ToolFilterInput onChange={setFilter} />
-      </div>
+          <PageSub editorial>所有待你决定的工具调用。</PageSub>
+        </PageHeaderTitleBlock>
+        <PageHeaderActions>
+          <ToolFilterInput onChange={setFilter} />
+        </PageHeaderActions>
+      </PageHeader>
 
       {visible.length === 0 ? (
-        <div className="text-center py-20 text-ink-2">
-          <div className="text-4xl mb-2">✓</div>
-          <div>全部处理完了</div>
-        </div>
+        <EmptyState
+          glyph="✓"
+          title="全部处理完了"
+          hint="队列里没有待你决定的工具调用，agent 安静着。"
+        />
       ) : (
-        <div className="flex flex-col gap-3 max-w-3xl">
+        <div className="flex flex-col gap-4 max-w-3xl">
           {visible.map((a) => (
             <ApprovalHubCard key={a.id} approval={a} />
           ))}

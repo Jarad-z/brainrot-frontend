@@ -38,11 +38,11 @@ export function ApprovalHubCard({ approval }: ApprovalHubCardProps) {
   }
 
   return (
-    <div className="border-[1.5px] border-ink-0 rounded-md overflow-hidden shadow-[var(--shadow-current)] bg-paper-0">
-      <div className="flex items-center justify-between px-4 py-2 bg-role-approval text-paper-0">
+    <div className="card-lift hover:card-lift-hover border-[1.5px] border-ink-0 rounded-xl overflow-hidden shadow-[var(--shadow-current)] bg-paper-0">
+      <div className="pending-stripes flex items-center justify-between px-4 py-2.5 text-paper-0">
         <span className="font-bold">{approval.toolName} 请求批准</span>
         <span
-          className={`font-mono text-xs ${urgent ? "text-state-failed font-bold animate-pulse" : ""}`}
+          className={`font-mono text-xs ${urgent ? "text-state-failed font-bold animate-pulse" : "text-paper-0/85"}`}
         >
           {label}
         </span>
@@ -69,21 +69,21 @@ export function ApprovalHubCard({ approval }: ApprovalHubCardProps) {
               <button
                 onClick={() => submit("denied")}
                 disabled={disabled}
-                className="px-3 py-1 border-[1.5px] border-ink-0 rounded-sm font-semibold disabled:opacity-50"
+                className="ink-stamp active:ink-stamp-active px-3 py-1 border-[1.5px] border-ink-0 rounded-sm font-semibold disabled:opacity-50 bg-paper-0"
               >
                 拒绝
               </button>
               <button
                 onClick={() => setNoteOpen(true)}
                 disabled={disabled}
-                className="px-3 py-1 border-[1.5px] border-ink-0 rounded-sm font-semibold disabled:opacity-50"
+                className="ink-stamp active:ink-stamp-active px-3 py-1 border-[1.5px] border-ink-0 rounded-sm font-semibold disabled:opacity-50 bg-paper-0"
               >
                 批准并修改
               </button>
               <button
                 onClick={() => submit("approved")}
                 disabled={disabled}
-                className="px-3 py-1 bg-ink-0 text-paper-0 border-[1.5px] border-ink-0 rounded-sm font-semibold shadow-[var(--shadow-current)] disabled:opacity-50"
+                className="ink-stamp active:ink-stamp-active px-3 py-1 bg-ink-0 text-paper-0 border-[1.5px] border-ink-0 rounded-sm font-semibold shadow-[var(--shadow-current)] disabled:opacity-50"
               >
                 批准
               </button>
