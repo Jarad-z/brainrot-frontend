@@ -8,6 +8,13 @@ import { WorkspaceInfoForm } from "@/components/workspace/WorkspaceInfoForm";
 import { MembersList } from "@/components/workspace/MembersList";
 import type { Workspace } from "@/lib/api/types";
 import { messages } from "@/lib/messages";
+import {
+  PageHeader,
+  PageTitle,
+  PageSub,
+  PageHeaderTitleBlock,
+} from "@/components/brand/page-header";
+import { Card } from "@/components/brand/card";
 
 function useWorkspace(wsId: string) {
   return useQuery({
@@ -23,31 +30,48 @@ export default function WorkspaceSettingsPage() {
   const { data: ws, isLoading } = useWorkspace(wsId);
 
   return (
-    <main className="p-6 overflow-y-auto h-full max-w-2xl flex flex-col gap-8">
-      <h1 className="text-lg font-bold">{m.title}</h1>
+    <main className="p-7 overflow-y-auto h-full max-w-3xl">
+      <PageHeader editorial>
+        <PageHeaderTitleBlock>
+          <PageTitle editorial>{m.title}</PageTitle>
+          <PageSub editorial>工作区基础信息、成员管理与危险操作。</PageSub>
+        </PageHeaderTitleBlock>
+      </PageHeader>
 
-      <section>
-        <h2 className="text-sm font-semibold mb-2">{m.basicSection}</h2>
-        {isLoading || !ws ? (
-          <p className="text-sm text-ink-2">加载中…</p>
-        ) : (
-          <WorkspaceInfoForm workspace={ws} />
-        )}
-      </section>
+      <div className="flex flex-col gap-4">
+        <Card chunky className="p-5">
+          <h2 className="font-mono text-[11px] uppercase tracking-[0.1em] text-ink-2 font-bold mb-3">
+            {m.basicSection}
+          </h2>
+          {isLoading || !ws ? (
+            <p className="text-sm text-ink-2">加载中…</p>
+          ) : (
+            <WorkspaceInfoForm workspace={ws} />
+          )}
+        </Card>
 
-      <MembersList wsId={wsId} />
+        <Card chunky className="p-5">
+          <MembersList wsId={wsId} />
+        </Card>
 
-      <section className="border-t-[1.5px] border-hairline pt-4">
-        <h2 className="text-sm font-semibold mb-2">{m.dangerSection}</h2>
-        <button
-          type="button"
-          disabled
-          title={m.dangerArchiveSoon}
-          className="px-3 py-1.5 border-[1.5px] border-state-failed text-state-failed rounded-sm font-semibold text-sm opacity-50"
+        <Card
+          chunky
+          className="p-5"
+          style={{ borderColor: "var(--state-failed)" }}
         >
-          {m.dangerArchive}
-        </button>
-      </section>
+          <h2 className="font-mono text-[11px] uppercase tracking-[0.1em] text-state-failed font-bold mb-3">
+            {m.dangerSection}
+          </h2>
+          <button
+            type="button"
+            disabled
+            title={m.dangerArchiveSoon}
+            className="px-3 py-1.5 border-[1.5px] border-state-failed text-state-failed rounded-sm font-semibold text-sm opacity-50"
+          >
+            {m.dangerArchive}
+          </button>
+        </Card>
+      </div>
     </main>
   );
 }
