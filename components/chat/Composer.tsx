@@ -11,20 +11,26 @@ import { useSendMessage } from "@/hooks/useSendMessage";
 import { Button } from "@/components/brand/button";
 import { MentionList, type MentionListHandle } from "./MentionList";
 import { createMentionExtension } from "./MentionExtension";
+import { createPasteImageExtension } from "./PasteImageExtension";
 import { serializeEditor } from "@/lib/chat/serialize-editor";
+import { useUploadAssets } from "@/hooks/useUploadAssets";
+import { screenshotFilename } from "@/lib/upload/screenshot-filename";
+import { messages } from "@/lib/messages";
 
 interface ComposerProps {
   wsId: string;
   taskId: string;
+  projectId: string;
 }
 
-export function Composer({ wsId, taskId }: ComposerProps) {
+export function Composer({ wsId, taskId, projectId }: ComposerProps) {
   const { data: agents = [] } = useWorkspaceAgents(wsId);
   const activeAgents = useMemo(() => agents.filter((a) => !a.archived), [agents]);
   const agentsRef = useRef<ReadonlyArray<Agent>>(activeAgents);
   agentsRef.current = activeAgents;
 
   const sendMutation = useSendMessage(taskId);
+  const { start: startUpload } = useUploadAssets(projectId);
   const mentionListRef = useRef<MentionListHandle>(null);
   const [mentionState, setMentionState] = useState<{
     open: boolean;
@@ -64,6 +70,29 @@ export function Composer({ wsId, taskId }: ComposerProps) {
         },
         onExit: () => setMentionState((s) => ({ ...s, open: false })),
         onKeyDown: (event) => mentionListRef.current?.onKeyDown(event) ?? false,
+      }),
+      createPasteImageExtension({
+        onPasteImages: (files: File[]) => {
+          const now = new Date();
+          const named: File[] = files.map((f) =>
+            f.name && f.name !== "image.png"
+              ? f
+              : new File([f], screenshotFilename(now, f.type || "image/png"), {
+                  type: f.type,
+                }),
+          );
+          void (async () => {
+            await startUpload(named);
+            if (!editor) return;
+            for (const f of named) {
+              editor
+                .chain()
+                .focus()
+                .insertContent(messages.assets.pasteUploadedHint(f.name) + "\n")
+                .run();
+            }
+          })();
+        },
       }),
     ],
     editorProps: {
