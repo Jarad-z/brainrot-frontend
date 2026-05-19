@@ -35,9 +35,33 @@ describe("enrichMessage", () => {
 
   it("handles empty content string gracefully", () => {
     const r = buildRaw({ content: "" });
-    // CodecError on empty — must not crash; fall back to a system parse error
+    // Empty content is treated as an empty user message (post-#24 wire
+    // path returns `{}` for never-set content, base64 path returned "").
     const enriched = enrichMessage(r);
-    expect(enriched.parsed.type).toBe("system");
+    expect(enriched.parsed.type).toBe("user");
+    if (enriched.parsed.type === "user") {
+      expect(enriched.parsed.text).toBe("");
+    }
+  });
+
+  it("accepts already-decoded object content (post-#24 wire format)", () => {
+    // Backend PR #2 serves `content` as a structured object on REST.
+    // Cast through unknown because the wire type still claims `string`
+    // until the WS push path catches up (#30) and we can tighten it.
+    const r = buildRaw({
+      content: { text: "from object", mentions: [] } as unknown as string,
+    });
+    const enriched = enrichMessage(r);
+    expect(enriched.parsed.type).toBe("user");
+    if (enriched.parsed.type === "user") {
+      expect(enriched.parsed.text).toBe("from object");
+    }
+  });
+
+  it("accepts already-decoded object metadata", () => {
+    const r = buildRaw({ metadata: { queued: true } as unknown as string });
+    const enriched = enrichMessage(r);
+    expect(enriched.meta.queued).toBe(true);
   });
 
   it("handles malformed metadata gracefully (returns empty meta)", () => {
