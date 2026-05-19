@@ -25,6 +25,7 @@ export const queryKeys = {
     detail: (taskId: string) => ["tasks", taskId] as const,
     messages: (taskId: string) => ["tasks", taskId, "messages"] as const,
     artifacts: (taskId: string) => ["tasks", taskId, "artifacts"] as const,
+    runs: (taskId: string) => ["tasks", taskId, "runs"] as const,
   },
   approvals: {
     task: (taskId: string) => ["approvals", "task", taskId] as const,

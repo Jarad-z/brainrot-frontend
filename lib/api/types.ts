@@ -151,6 +151,33 @@ export interface EnqueuedRun {
   RuntimeID: string;
 }
 
+export type RunStatus =
+  | "pending"
+  | "claimed"
+  | "running"
+  | "awaiting_approval"
+  | "done"
+  | "canceled"
+  | "failed";
+
+// GET /tasks/{id}/runs — BACKEND_GAPS #26 (closed). agent_snapshot/metadata are
+// intentionally stripped server-side (would leak custom_env / API keys).
+export interface RunView {
+  id: string;
+  workspace_id: string;
+  task_card_id: string;
+  agent_id: string;
+  runtime_id: string;
+  trigger_message_id: string | null;
+  session_id: string | null;
+  status: RunStatus;
+  error: string | null;
+  created_at: string;
+  claimed_at: string | null;
+  started_at: string | null;
+  finished_at: string | null;
+}
+
 export interface Runtime {
   id: string;
   workspace_id: string;
