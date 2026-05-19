@@ -127,6 +127,18 @@
     dangerArchiveSoon: "即将上线",
     permissionOwner: "需要 owner 权限",
     permissionEditor: "需要 editor 权限",
+    leaveWs: "离开工作区",
+    leaveWsConfirmTitle: "离开工作区？",
+    leaveWsConfirmBody: (wsName: string) =>
+      `确定要离开 ${wsName} 吗？你将失去对所有项目和产出的访问权限。`,
+    leaveWsConfirm: "离开",
+    leaveWsCancel: "取消",
+    leaveWsLastOwner:
+      "你是这个工作区唯一的 owner，先把另一个成员升级为 owner 再离开。",
+    leaveWsLastOwnerTitle: "无法离开",
+    leaveWsLastOwnerClose: "知道了",
+    leaveWsNotMember: "你已经不是这个工作区的成员了",
+    leaveWsFailed: "操作失败",
   },
   members: {
     you: "你",
@@ -172,6 +184,16 @@
     forbiddenViewer: "需要 editor 或 owner 权限",
     loading: "加载中...",
     loadError: "加载失败",
+  },
+  artifacts: {
+    exclude: "排除",
+    excludeConfirmTitle: "排除产出？",
+    excludeConfirmBody: (filename: string) =>
+      `确定要从产出列表里排除 ${filename} 吗？这条不会再显示出来。`,
+    excludeConfirm: "排除",
+    excludeCancel: "取消",
+    excludeFailed: "排除失败",
+    excludeForbidden: "需要 editor 或 owner 权限",
   },
   addMember: {
     title: "邀请成员",

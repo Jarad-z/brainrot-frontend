@@ -23,7 +23,7 @@ export function ArtifactsTab({ taskId }: ArtifactsTabProps) {
   return (
     <ul className="flex flex-col">
       {items.map((a) => (
-        <ArtifactRow key={a.id} artifact={a} />
+        <ArtifactRow key={a.id} artifact={a} taskId={taskId} />
       ))}
     </ul>
   );

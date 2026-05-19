@@ -60,3 +60,14 @@ export async function inviteByEmail(
     body: JSON.stringify(input),
   });
 }
+
+/**
+ * DELETE /api/v1/workspaces/{ws_id}/members/me → 204.
+ * 409 if caller is the last remaining owner. 403 if caller isn't a member.
+ * See BACKEND_GAPS #29.
+ */
+export async function leaveWorkspace(wsId: string): Promise<void> {
+  await apiFetch<void>(`/api/v1/workspaces/${wsId}/members/me`, {
+    method: "DELETE",
+  });
+}
