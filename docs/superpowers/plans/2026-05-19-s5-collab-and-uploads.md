@@ -489,11 +489,6 @@ git commit -m "feat(agents): restore real useAgent query + wire PATCH from detai
 Append to `lib/api/types.ts`:
 
 ```ts
-export interface PgText {
-  String: string;
-  Valid: boolean;
-}
-
 export interface WorkspaceMember {
   workspace_id: string;
   user_id: string;
@@ -501,7 +496,7 @@ export interface WorkspaceMember {
   joined_at: string;
   email: string;
   name: string;
-  avatar_url: PgText;
+  avatar_url: string | null;
 }
 
 export interface UpdateWorkspaceInput {
