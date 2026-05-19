@@ -15,5 +15,11 @@ export function serializeEditor(editor: Editor): { text: string; mentions: strin
     }
     return true;
   });
-  return { text: text.replace(/\n+$/, ""), mentions };
+  // Collapse runs of 2+ spaces that immediately follow a mention handle.
+  // The MentionExtension auto-inserts a single space after the picked mention;
+  // when the user also types a space, two adjacent text nodes get concatenated
+  // and we end up with "@handle  text". We fix it in serialization only —
+  // the editor doc itself keeps the auto-space for UX reasons.
+  const collapsed = text.replace(/(@[A-Za-z0-9_-]+)  +/g, "$1 ");
+  return { text: collapsed.replace(/\n+$/, ""), mentions };
 }

@@ -41,4 +41,47 @@ describe("serializeEditor", () => {
     const ed = mockEditor({ descendants: (cb) => { for (const n of nodes) cb(n); } });
     expect(serializeEditor(ed)).toEqual({ text: "hello world", mentions: [] });
   });
+
+  it("collapses double space after a mention", () => {
+    const nodes = [
+      paragraphNode(),
+      mentionNode("a1", "coder"),
+      textNode(" "), // auto-inserted by MentionExtension
+      textNode(" 你好"), // user typed
+    ];
+    const ed = mockEditor({ descendants: (cb) => { for (const n of nodes) cb(n); } });
+    expect(serializeEditor(ed)).toEqual({ text: "@coder 你好", mentions: ["a1"] });
+  });
+
+  it("leaves a single space alone", () => {
+    const nodes = [paragraphNode(), mentionNode("a1", "coder"), textNode(" 你好")];
+    const ed = mockEditor({ descendants: (cb) => { for (const n of nodes) cb(n); } });
+    expect(serializeEditor(ed)).toEqual({ text: "@coder 你好", mentions: ["a1"] });
+  });
+
+  it("handles no space (mention followed immediately by text)", () => {
+    const nodes = [paragraphNode(), mentionNode("a1", "coder"), textNode("你好")];
+    const ed = mockEditor({ descendants: (cb) => { for (const n of nodes) cb(n); } });
+    expect(serializeEditor(ed)).toEqual({ text: "@coder你好", mentions: ["a1"] });
+  });
+
+  it("collapses double space after each of two consecutive mentions", () => {
+    const nodes = [
+      paragraphNode(),
+      mentionNode("a1", "a"),
+      textNode(" "),
+      textNode(" "), // user typed extra space
+      mentionNode("a2", "b"),
+      textNode(" "),
+      textNode(" 你好"),
+    ];
+    const ed = mockEditor({ descendants: (cb) => { for (const n of nodes) cb(n); } });
+    expect(serializeEditor(ed)).toEqual({ text: "@a @b 你好", mentions: ["a1", "a2"] });
+  });
+
+  it("does not collapse double spaces elsewhere in the text", () => {
+    const nodes = [paragraphNode(), textNode("hello  world")];
+    const ed = mockEditor({ descendants: (cb) => { for (const n of nodes) cb(n); } });
+    expect(serializeEditor(ed)).toEqual({ text: "hello  world", mentions: [] });
+  });
 });
