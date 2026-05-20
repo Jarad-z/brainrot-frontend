@@ -1,4 +1,4 @@
-/* tokens/shadow.css — solid-offset "block" shadows + one soft */
+/* tokens/shadow.css — solid-offset "block" shadows + soft float */
 :root {
   --shadow-0: none;
   --shadow-1: 3px 3px 0 var(--ink-0);
@@ -15,4 +15,12 @@
   /* Hover lift — used on interactive cards (kanban, approval, agent,
      runtime, asset). Cards translateY(-2px) and swap shadow-1 → lift. */
   --shadow-lift: 5px 5px 0 var(--ink-0);
+
+  /* Pixel hover collapse — cards shrink shadow on hover */
+  --shadow-pixel-sm: 2px 2px 0 var(--ink-0);
+  --shadow-pixel-md: 3px 3px 0 var(--ink-0);
+
+  /* Spring easing for hover lift transitions */
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-out-fast: cubic-bezier(0.16, 1, 0.3, 1);
 }
