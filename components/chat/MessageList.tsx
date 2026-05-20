@@ -1,5 +1,5 @@
 "use client";
-import { useRef, useEffect, useMemo } from "react";
+import { useRef, useEffect, useMemo, useState } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { useTaskMessages } from "@/hooks/useTaskMessages";
 import { useToolPairing } from "@/hooks/useToolPairing";
@@ -57,6 +57,18 @@ export function MessageList({ taskId, wsId }: MessageListProps) {
     [messages, pairing.consumed],
   );
 
+  const prevCountRef = useRef(visible.length);
+  const [newFromIndex, setNewFromIndex] = useState(visible.length);
+  // Count of messages when the user last left the bottom — new messages are
+  // those that arrived after this point while the user is scrolled up.
+  const countWhenLeftBottomRef = useRef<number | null>(null);
+  useEffect(() => {
+    if (visible.length > prevCountRef.current) {
+      setNewFromIndex(prevCountRef.current);
+    }
+    prevCountRef.current = visible.length;
+  }, [visible.length]);
+
   const virtualizer = useVirtualizer({
     count: visible.length,
     getScrollElement: () => parentRef.current,
@@ -75,7 +87,15 @@ export function MessageList({ taskId, wsId }: MessageListProps) {
     const el = parentRef.current;
     if (!el) return;
     const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 50;
-    setAnchor(taskId, atBottom ? "bottom" : "manual");
+    if (atBottom) {
+      countWhenLeftBottomRef.current = null;
+      setAnchor(taskId, "bottom");
+    } else {
+      if (countWhenLeftBottomRef.current === null) {
+        countWhenLeftBottomRef.current = visible.length;
+      }
+      setAnchor(taskId, "manual");
+    }
   };
 
   if (isPending) return <MessageListSkeleton />;
@@ -95,11 +115,12 @@ export function MessageList({ taskId, wsId }: MessageListProps) {
       <div
         ref={parentRef}
         onScroll={onScroll}
-        className="h-full overflow-y-auto px-6 py-4"
+        className="h-full overflow-y-auto px-8 py-6"
         aria-live="polite"
         aria-label="任务消息流"
       >
         <div
+          className="mx-auto max-w-3xl"
           style={{ height: virtualizer.getTotalSize(), position: "relative", width: "100%" }}
         >
           {virtualizer.getVirtualItems().map((vi) => {
@@ -115,20 +136,29 @@ export function MessageList({ taskId, wsId }: MessageListProps) {
                 data-index={vi.index}
                 style={{ position: "absolute", top: vi.start, left: 0, width: "100%" }}
               >
-                <MessageItem msg={msg} pairing={itemPairing} taskId={taskId} authors={authors} />
+                <MessageItem
+                  msg={msg}
+                  pairing={itemPairing}
+                  taskId={taskId}
+                  authors={authors}
+                  isNew={scrollAnchor === "bottom" && vi.index >= newFromIndex}
+                />
               </div>
             );
           })}
         </div>
       </div>
-      {scrollAnchor === "manual" && (
-        <NewMessageFloatingButton
-          onClick={() => {
-            setAnchor(taskId, "bottom");
-            virtualizer.scrollToIndex(visible.length - 1, { align: "end" });
-          }}
-        />
-      )}
+      {scrollAnchor === "manual" &&
+        countWhenLeftBottomRef.current !== null &&
+        visible.length > countWhenLeftBottomRef.current && (
+          <NewMessageFloatingButton
+            onClick={() => {
+              countWhenLeftBottomRef.current = null;
+              setAnchor(taskId, "bottom");
+              virtualizer.scrollToIndex(visible.length - 1, { align: "end" });
+            }}
+          />
+        )}
     </div>
   );
 }
