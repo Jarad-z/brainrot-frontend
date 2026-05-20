@@ -378,3 +378,101 @@
   - `GET /api/v1/assets/{asset_id}/blob` → raw bytes，`Content-Type` 取自 `mime_type` 列，鉴权 = 任意 ws 成员（403 / 404），SHOULD 支持 `Range` 请求（PDF / 大图懒加载）
   - `GET /api/v1/artifacts/{artifact_id}/blob` → 同上，鉴权同 list 接口（任意 ws 成员）；excluded=true 行也应可访问（用户软删除不应该等同丢失访问权）或返回 410，看后端决策
 - **前端 unlock 路径**：实现后 S6 PR3b 即可启动（`lib/api/blob.ts` 加 helper + 在 AssetThumbnail / MediaPreviewModal 直接给 `<img src>` / `<embed src>`）。
+
+## #32 工作区软归档（C 项前置依赖）
+
+- **状态**：待办（2026-05-20，S7 候选记录）
+- **发现**：S4 #20 实现末尾，archive 路径因为涉及多处下游过滤而延后
+- **影响**：用户不能把不再用的工作区从 sidebar / 工作区列表里清退；唯一退出途径是 `DELETE /workspaces/{ws}/members/me` 自己离开，但 ws 仍存在、其他成员也看得到
+- **Workaround（S6）**：Settings 危险区的 "归档工作区" 按钮 disabled + tooltip "即将上线"
+- **Need**：
+  - `POST /api/v1/workspaces/{ws_id}/archive` → 204；鉴权 = owner only；幂等（已归档再调返回 204 或 409 任选）
+  - `GET /api/v1/workspaces` 默认**不返回** archived 行；新增可选参数 `?include_archived=1` 用于设置页面回显
+  - `GET /api/v1/workspaces/{ws_id}` 对 archived ws 仍 200（用于显示 "this ws is archived" 提示），但带 `archived: true` 字段
+  - 下游过滤 — 决策点：
+    - `GET /workspaces/{ws}/projects` archived 时返回 410，还是返回空数组？建议 410 + 标准化错误体
+    - `GET /workspaces/{ws}/runtimes` 同理
+    - `POST /tasks/{id}/messages` archived ws 下应返回 410（防止用户在归档 ws 里继续发消息）
+  - 是否支持反归档？`POST /workspaces/{ws_id}/unarchive` 还是归档=永久？建议支持反归档，owner 可调
+- **前端 unlock 路径**：Settings 危险区把 "归档工作区" 改 enabled、ConfirmDialog（强确认 "输入 ws 名"）→ `POST /archive` → 跳 `/`；sidebar 自动消失（依赖 `?include_archived=1` 默认不带）；overview 页对 archived ws 显示 readonly banner
+
+## #33 缺 `GET /api/v1/tasks/{taskId}/artifacts?include_excluded=1`（artifact 反悔 + toggle 前置依赖）
+
+- **状态**：待办（2026-05-20，S7 候选记录）
+- **发现**：S6 brainstorm 决策 5，#28 实现时 explicitly 没做这条
+- **影响**：用户 PATCH excluded=true 后不能反悔（接口在 #28 已有，但 GET 默认过滤 excluded=true → 用户根本看不到那条 artifact，没法点 "取消排除"）
+- **Workaround（S6）**：UI 不出 "显示已排除" toggle、"排除" 是单向操作（spec §4.1 explicitly 决策不做反悔路径）
+- **Need**：
+  - `GET /api/v1/tasks/{task_id}/artifacts?include_excluded=1` → 返回该 task 下所有 artifact（含 excluded=true），其它语义不变；不带参数时维持现状
+  - 不需要改写端点 — `PATCH /artifacts/{id} { excluded: false }` 已经能反向，#28 已有
+- **前端 unlock 路径**：`ArtifactsTab.tsx` 加 toggle（"显示已排除" / "仅未排除"），默认未排除；excluded=true 的行用 strike-through + 灰字 + "取消排除" 按钮（已有 `setArtifactExcluded(id, false)` mutation 直接复用）；`useTaskArtifacts(taskId, includeExcluded)` 接受 boolean 参数加入 query key
+
+## #34 全局搜索接口（F 项前置依赖）
+
+- **状态**：待办（2026-05-20，S7 候选记录）
+- **发现**：S6 brainstorm F 项排除
+- **影响**：前端 Cmd+K 全局搜索没接口可调
+- **Workaround**：S6 不做 F 项
+- **Need**：
+  - 决策点：fulltext (PG `tsvector` + GIN 索引) 还是 trigram (`pg_trgm`)？前者精确分词、需要语料维护；后者模糊匹配、对中文友好但慢。建议**先 trigram**（实现简单 + 中文 OK），用户量上去再迁 tsvector
+  - 接口形态：`GET /api/v1/workspaces/{ws_id}/search?q=<query>&types=task,project,agent&limit=20`
+  - 返回结构：
+    ```ts
+    Array<{
+      type: "task" | "project" | "agent" | "asset" | "artifact",
+      id: string,
+      title: string,           // task title / project name / agent name / filename
+      snippet?: string,        // 短预览（message text 用、task title 截断也用）
+      workspace_id: string,
+      project_id?: string,
+      task_id?: string
+    }>
+    ```
+  - 索引哪些资源 — 建议分两步：
+    - **S7 PR**: tasks (title)、projects (name)、agents (name + handle)、asset/artifact filenames — 5 个 jsonb 列；总数据量小、索引简单
+    - **S8 follow-up**: message text fulltext — 数据量大，需要更激进的索引策略
+  - 鉴权：调用者必须是 ws 成员；只在该 ws 内搜索；跨 ws 全局搜索 = stretch goal，建议不做
+  - 性能：`limit` 强制 ≤ 50；空 query 返回 `[]` 而不是全表
+- **前端 unlock 路径**：新建 `components/search/CommandK.tsx` modal（参考 Linear / GitHub Cmd+K）；`hooks/useGlobalSearch.ts` debounce 200ms；快捷键 `Cmd/Ctrl+K` 在 `app/(app)/layout.tsx` 绑定
+
+## #35 daemon 真实 LLM call 联通 + WS run 状态推送（E 项前置依赖）
+
+- **状态**：待办（2026-05-20，S7 候选记录）；**跨后端 + daemon + LLM 集成，S7 里最大的 unknown**
+- **发现**：整个 S5/S6 测试期间 daemon 在 claim + heartbeat 但**从未真跑过 Claude**；agent 永远不回复
+- **影响**：产品端到端不通。用户发 `@coder 帮我写代码` → 看到自己的 user message → 然后什么都不发生。spec 里写的 "approval flow / artifact 产出 / ThinkingBar" 全是空跑
+- **Workaround**：S6 ThinkingBar 加了 5s polling `/runs` 兜底（伪 active 状态）；从来没真触发过
+- **Need**（按里程碑拆）：
+  - **M1 daemon 真调 Claude**：daemon 接到 run claim → 启动 Claude Code subprocess → stdin 推 user message + agent system prompt + workdir → 读 stdout → 转发到后端 `POST /api/v1/daemon/run/{run_id}/messages`
+  - **M2 后端推 WS 事件**：服务端在 message 写库 + bus publish 后，WS 广播给所有订阅 `task` scope 的客户端。前端已经处理 `message.appended`（S2 起就有），主要要确认 `run.started` / `run.completed` / `run.failed` 这三个事件 schema 和广播路径都通
+  - **M3 tool call → approval**：daemon 转发 Claude Code 的 tool_use 事件 → 后端创建 ApprovalRequest 行 + WS 推 `approval.requested` → 前端弹审批 UI → 用户批/拒 → 后端写 ApprovalRequest decided + WS 推 `approval.decided` + daemon 长 polling 拿到决定继续/中止
+  - **M4 artifact 收尾**：run 结束时 daemon 扫 workdir diff → POST `/runs/{id}/artifacts` 登记产出文件
+- **前端 unlock 路径**：
+  - 去掉 `hooks/useActiveRuns.ts` 的 `refetchInterval` polling、改成纯 WS 事件驱动
+  - ThinkingBar 接 WS `run.started/completed/failed`，不再用 polling 兜底
+  - 验证 `approval.requested` / `approval.decided` 全链路（已实现但从未真测）
+- **优先级**：🔴 最高 — 没这个产品永远是"看上去能用"
+
+## #36 telemetry / evaluation 基础设施（L 项前置依赖）
+
+- **状态**：待办（2026-05-20，S7 候选记录）；范围未定
+- **发现**：S6 brainstorm L 项排除
+- **影响**：
+  - 前端 unhandled error / API 失败没有上报路径 — 用户报 bug 后只能让他截图 + 描述步骤
+  - 没有 agent 输出质量 evaluation — 不知道哪些 agent / 哪些 prompt 经常翻车
+  - 没有性能数据 — bundle size / API latency / WS 重连频率全靠拍脑袋
+- **Workaround**：完全没有；目前依赖手测 + console.log
+- **Need** — 分两层决策：
+  - **运维最低门槛版（建议先做）**：
+    - `POST /api/v1/log` → 前端 `lib/log.ts` 把 unhandled error / ApiError 500+ 上报；body = `{level, message, stack?, url, user_agent, ws_id?, ts}`
+    - 后端落表 `frontend_logs`、保留 7 天
+    - 简单 `/admin/logs` 页面（owner-only）按 level 过滤、按时间倒序
+    - 不依赖第三方 SaaS
+  - **完整版（推后）**：
+    - Sentry / Datadog / 自建 OpenTelemetry collector
+    - 前端 `web-vitals` 采集 LCP/CLS/INP
+    - 后端 prometheus 指标
+    - Agent quality eval：用户对 agent 回复打分（"👍/👎" 或 "重新生成"），后端按 agent + model 聚合
+- **前端 unlock 路径**：
+  - 最低门槛版：`lib/log.ts` + 全局 `window.onerror` + `window.onunhandledrejection` 监听 + `apiFetch` 失败时分级上报
+  - 完整版：选 Sentry 的话就 `@sentry/nextjs` 一行 init；选自建就维护多一点
+- **优先级**：🟢 低 — 没用户 / 没 prod / 没 SLA 之前过早做
