@@ -71,6 +71,10 @@
   --shadow-current: var(--shadow-current);
   --shadow-soft: var(--shadow-soft);
   --shadow-lift: var(--shadow-lift);
+  --shadow-pixel-sm: var(--shadow-pixel-sm);
+  --shadow-pixel-md: var(--shadow-pixel-md);
+  --ease-spring: var(--ease-spring);
+  --ease-out-fast: var(--ease-out-fast);
 
   --font-display: var(--font-display);
   --font-body: var(--font-display);
@@ -230,4 +234,42 @@ body {
   color: var(--ink-3, oklch(60% 0.02 300));
   pointer-events: none;
   height: 0;
+}
+
+/* Chat structural indent — avatar 36px + gap-3 12px = 48px = --sp-12.
+ * Used by ToolPair, PermissionRequestCard, OrphanToolResult to align
+ * card bodies with message text. Single definition so avatar-size
+ * changes only need updating here. */
+@utility chat-indent {
+  margin-left: var(--sp-12);
+}
+
+/* Composer focus ring — soft glow on the wrapper div when the Tiptap
+ * editor or send button has focus. */
+@utility composer-focus-ring {
+  transition: box-shadow 100ms ease;
+}
+.composer-focus-ring:focus-within {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ink-0) 12%, transparent);
+}
+
+/* MentionList dropdown entry animation. */
+@keyframes mention-in {
+  from { opacity: 0; transform: translateY(-4px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@utility mention-enter {
+  animation: mention-in 100ms ease-out forwards;
+  transform-origin: top left;
+}
+
+/* New chat message entry animation — slide up from 6px below. Only applied
+ * to messages appended at the bottom while the user is already at the bottom
+ * of the scroll; not applied to initial page load. */
+@keyframes msg-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@utility msg-enter {
+  animation: msg-in 120ms ease-out forwards;
 }
