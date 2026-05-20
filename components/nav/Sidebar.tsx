@@ -3,9 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
-import { projectsApi } from "@/lib/api/projects";
-import { queryKeys } from "@/lib/api/keys";
+import { useProjects } from "@/hooks/useProjects";
 import { BrandMark } from "@/components/brand/brand-mark";
 import { WorkspaceSwitcherDropdown } from "@/components/workspace/WorkspaceSwitcherDropdown";
 import { NavItem } from "@/components/brand/nav-item";
@@ -43,15 +41,24 @@ export function Sidebar() {
     }
   }, []);
 
-  const effectiveWsId = wsId ?? lastWsId ?? wsList[0]?.id ?? null;
+  // Only honor lastWsId if it's still a workspace the user is a member of —
+  // otherwise sidebar links would point to a 403 ws and trap the user.
+  const isLastWsValid = !!lastWsId && wsList.some((w) => w.id === lastWsId);
+  useEffect(() => {
+    if (lastWsId && wsList.length > 0 && !isLastWsValid) {
+      try {
+        localStorage.removeItem(LAST_WS_KEY);
+      } catch {
+        // ignore
+      }
+      setLastWsId(null);
+    }
+  }, [lastWsId, wsList, isLastWsValid]);
 
-  const { data: projects = [] } = useQuery({
-    queryKey: effectiveWsId
-      ? queryKeys.workspaces.projects(effectiveWsId)
-      : ["projects-disabled"],
-    queryFn: () => projectsApi.list(effectiveWsId!),
-    enabled: !!effectiveWsId,
-  });
+  const effectiveWsId =
+    wsId ?? (isLastWsValid ? lastWsId : null) ?? wsList[0]?.id ?? null;
+
+  const { data: projects = [] } = useProjects(effectiveWsId ?? "");
 
   const isOverview = !!wsId && pathname === `/w/${wsId}`;
   const isApprovals =

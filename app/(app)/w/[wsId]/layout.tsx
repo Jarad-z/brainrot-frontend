@@ -19,16 +19,31 @@ export default function WorkspaceLayout({ children, params }: LayoutProps) {
   const { wsId } = use(params);
   const router = useRouter();
   const setSelection = useAppStore((s) => s.setSelection);
-  const { isPending, error } = useProjects(wsId);
+  const { isPending, error, data } = useProjects(wsId);
+
+  const isAccessDenied =
+    error instanceof ApiError && (error.status === 403 || error.status === 404);
 
   useEffect(() => {
     setSelection({ wsId, projectId: null });
-    localStorage.setItem("brainrot.lastWsId", wsId);
-  }, [wsId, setSelection]);
+    // Only persist as lastWsId after we've confirmed access — otherwise a
+    // cross-workspace approval jump can pin sidebar links to a 403 ws.
+    if (!isAccessDenied) {
+      localStorage.setItem("brainrot.lastWsId", wsId);
+    }
+  }, [wsId, setSelection, isAccessDenied]);
 
-  if (isPending) return <PageSkeleton />;
+  // If the persisted lastWsId points at this denied ws, clear it so the next
+  // navigation falls back to a workspace the user is actually a member of.
+  useEffect(() => {
+    if (isAccessDenied && localStorage.getItem("brainrot.lastWsId") === wsId) {
+      localStorage.removeItem("brainrot.lastWsId");
+    }
+  }, [isAccessDenied, wsId]);
 
-  if (error instanceof ApiError && (error.status === 403 || error.status === 404)) {
+  if (isPending && !data) return <PageSkeleton />;
+
+  if (isAccessDenied) {
     return (
       <ErrorBanner kind="card" variant="error">
         <p className="mb-3">
