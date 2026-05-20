@@ -1,5 +1,6 @@
 "use client";
 import { useEditor, EditorContent } from "@tiptap/react";
+import type { Editor } from "@tiptap/core";
 import Document from "@tiptap/extension-document";
 import Paragraph from "@tiptap/extension-paragraph";
 import Text from "@tiptap/extension-text";
@@ -32,6 +33,11 @@ export function Composer({ wsId, taskId, projectId }: ComposerProps) {
   const sendMutation = useSendMessage(taskId);
   const { start: startUpload } = useUploadAssets(projectId);
   const mentionListRef = useRef<MentionListHandle>(null);
+  // Editor ref — onPasteImages closure runs after async upload; capturing
+  // `editor` by name returns null because the closure was constructed during
+  // the first render when useEditor hadn't returned yet. Use a ref synced
+  // below to always read the live editor at paste time.
+  const editorRef = useRef<Editor | null>(null);
   const [mentionState, setMentionState] = useState<{
     open: boolean;
     items: Agent[];
@@ -83,10 +89,10 @@ export function Composer({ wsId, taskId, projectId }: ComposerProps) {
           );
           void (async () => {
             await startUpload(named);
-            if (!editor) return;
+            const ed = editorRef.current;
+            if (!ed) return;
             for (const f of named) {
-              editor
-                .chain()
+              ed.chain()
                 .focus()
                 .insertContent(messages.assets.pasteUploadedHint(f.name) + "\n")
                 .run();
@@ -110,6 +116,7 @@ export function Composer({ wsId, taskId, projectId }: ComposerProps) {
     },
     immediatelyRender: false,
   });
+  editorRef.current = editor;
 
   function send() {
     if (!editor) return;
