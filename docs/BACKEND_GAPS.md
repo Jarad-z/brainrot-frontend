@@ -435,22 +435,36 @@
   - 性能：`limit` 强制 ≤ 50；空 query 返回 `[]` 而不是全表
 - **前端 unlock 路径**：新建 `components/search/CommandK.tsx` modal（参考 Linear / GitHub Cmd+K）；`hooks/useGlobalSearch.ts` debounce 200ms；快捷键 `Cmd/Ctrl+K` 在 `app/(app)/layout.tsx` 绑定
 
-## #35 daemon 真实 LLM call 联通 + WS run 状态推送（E 项前置依赖）
+## #35 daemon 真实 LLM call 联通：已实现，但从未端到端验证（E 项前置依赖）
 
-- **状态**：待办（2026-05-20，S7 候选记录）；**跨后端 + daemon + LLM 集成，S7 里最大的 unknown**
-- **发现**：整个 S5/S6 测试期间 daemon 在 claim + heartbeat 但**从未真跑过 Claude**；agent 永远不回复
-- **影响**：产品端到端不通。用户发 `@coder 帮我写代码` → 看到自己的 user message → 然后什么都不发生。spec 里写的 "approval flow / artifact 产出 / ThinkingBar" 全是空跑
-- **Workaround**：S6 ThinkingBar 加了 5s polling `/runs` 兜底（伪 active 状态）；从来没真触发过
-- **Need**（按里程碑拆）：
-  - **M1 daemon 真调 Claude**：daemon 接到 run claim → 启动 Claude Code subprocess → stdin 推 user message + agent system prompt + workdir → 读 stdout → 转发到后端 `POST /api/v1/daemon/run/{run_id}/messages`
-  - **M2 后端推 WS 事件**：服务端在 message 写库 + bus publish 后，WS 广播给所有订阅 `task` scope 的客户端。前端已经处理 `message.appended`（S2 起就有），主要要确认 `run.started` / `run.completed` / `run.failed` 这三个事件 schema 和广播路径都通
-  - **M3 tool call → approval**：daemon 转发 Claude Code 的 tool_use 事件 → 后端创建 ApprovalRequest 行 + WS 推 `approval.requested` → 前端弹审批 UI → 用户批/拒 → 后端写 ApprovalRequest decided + WS 推 `approval.decided` + daemon 长 polling 拿到决定继续/中止
-  - **M4 artifact 收尾**：run 结束时 daemon 扫 workdir diff → POST `/runs/{id}/artifacts` 登记产出文件
-- **前端 unlock 路径**：
-  - 去掉 `hooks/useActiveRuns.ts` 的 `refetchInterval` polling、改成纯 WS 事件驱动
-  - ThinkingBar 接 WS `run.started/completed/failed`，不再用 polling 兜底
-  - 验证 `approval.requested` / `approval.decided` 全链路（已实现但从未真测）
-- **优先级**：🔴 最高 — 没这个产品永远是"看上去能用"
+- **状态**：⚠️ 代码已实现，端到端未验证（2026-05-20 重新核对）
+- **发现**：S5/S6 测试期间 daemon 一直回 `(fake) ok` 不动作，原以为 LLM 集成未实现。重读 `D:\brainrot` 后发现整套架构其实**早就写好了**，只是用户机器上 `claude` CLI 不在 PATH → `cmd/daemon/main.go:46-49` 检测失败 → 自动 fallback 到 fake backend。
+- **代码现状（已实现，2026-05-20 核对 `D:\brainrot` main 分支）**：
+  - ✅ `cmd/daemon/main.go` 检测 `claude` CLI；在 PATH → real backend，不在 → fake backend
+  - ✅ `internal/daemon/backend/claude/claude.go` — `Execute()` 用 `-p --output-format stream-json --input-format stream-json --verbose`；支持 `--model` / `--resume <session>` / `--mcp-config` / custom args
+  - ✅ `internal/daemon/backend/claude/stream.go` — stdout 流解析
+  - ✅ `internal/daemon/backend/claude/mcp.go` — agent MCP config 写盘
+  - ✅ `internal/daemon/runner.go:handleTask` — prepareWorkdir → before-snapshot → backend.Execute → 每个事件 → `Client.ReportMessageWithRetry` → 完成时 scanNewFiles → `Client.UploadArtifact` → `Client.Complete`
+  - ✅ `internal/daemon/runner.go:handlePermissionRequest` — `ReportApproval` → 等 decision channel → `b.WriteApproval(tool_use_id, decision)` 写回 Claude stdin
+  - ✅ `internal/service/run.go` 发 `events.RunCompleted` WS 事件（payload: `{run_id, status, error}`，status ∈ done/failed/canceled）
+  - ✅ 前端 `lib/ws/handlers.ts:90 onRunCompleted` 已接 + invalidate runs query
+- **真未决项**：
+  1. **WS 事件分层**：当前只发 `RunCompleted`（done/failed/canceled 都走这一条），没有独立的 `RunStarted` 事件。前端 ThinkingBar 想知道 "run 开始了 → 显示思考中" 没有 WS 事件触发，只能靠 polling `/runs` 兜底（S6 实现 `hooks/useActiveRuns.ts` 的 5s refetchInterval）。是否要加 `events.RunStarted`？决策点。
+  2. **端到端从未跑通过**：所有 M1-M4 代码都没在真 Claude CLI 环境跑过哪怕一次。最可能挂的几环：
+     - agent 的 `custom_env`（ANTHROPIC_API_KEY 等）是否正确传给 subprocess 环境？看 `claude.go` 是否读 `task.CustomEnv` 并 set 到 `exec.Cmd.Env`
+     - `claude` subprocess 的 stdout stream-json 解析是否兼容当前 Claude CLI 版本
+     - tool_use → permission_request 事件的 JSON shape 是否对得上 `handlePermissionRequest` 的反序列化
+     - `scanNewFiles` 是否在用户 workdir 真能找到 Claude 写的文件（路径/权限）
+- **Workaround**：daemon 跑 fake，agent 回 `(fake) ok`，看起来"在工作"但没真实输出
+- **Need**：
+  - 端到端验证 sprint（见 task #49）：装 Claude CLI + 配 agent API key + 真发消息 + 记录每一环的真实行为
+  - 然后基于真实失败点决定要补什么。可能完全不需要新接口，只需要修小 bug + 决定 `RunStarted` 事件要不要加
+- **前端 unlock 路径**（基本独立于上面）：
+  - 去掉 `hooks/useActiveRuns.ts` 的 `refetchInterval` polling — 改成纯 WS 事件驱动
+  - ThinkingBar 监听 `MessageAppended`（run 期间会持续来事件）来判断 active，而不是 polling
+  - 如果决定加 `RunStarted`，把 ThinkingBar 改成 listen `RunStarted` + `RunCompleted` 两端
+  - 验证 `approval.requested` / `approval.decided` 全链路（代码完整但从未真测）
+- **优先级**：🔴 最高 — 没这个产品永远是"看上去能用"。但工程量比原 #35 描述小得多
 
 ## #36 telemetry / evaluation 基础设施（L 项前置依赖）
 
