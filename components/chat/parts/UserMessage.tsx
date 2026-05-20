@@ -31,7 +31,7 @@ export function UserMessage({
             </span>
           )}
         </div>
-        <div className="inline-block px-4 py-2 bg-role-user rounded-2xl max-w-[70%] break-words">
+        <div className="inline-block px-4 py-2.5 bg-role-user border-2 border-ink-0 rounded-lg max-w-[75%] break-words shadow-[2px_2px_0_var(--ink-0)]">
           <MentionedText text={msg.parsed.text} />
         </div>
       </div>
