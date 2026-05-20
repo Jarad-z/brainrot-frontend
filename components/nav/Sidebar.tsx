@@ -1,7 +1,8 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { projectsApi } from "@/lib/api/projects";
 import { queryKeys } from "@/lib/api/keys";
@@ -17,17 +18,44 @@ import {
 } from "@/components/brand/tooltip";
 import { swatchFromId } from "@/lib/swatch";
 import { messages } from "@/lib/messages";
+import { useWorkspaceContext } from "@/lib/workspace-context";
+
+const LAST_WS_KEY = "brainrot.lastWsId";
 
 export function Sidebar() {
   const params = useParams<{ wsId?: string; projectId?: string }>();
+  const pathname = usePathname() ?? "";
   const wsId = params.wsId ?? null;
   const activeProjectId = params.projectId ?? null;
+  const { wsList } = useWorkspaceContext();
+
+  // Fallback wsId so nav items remain functional on workspace-agnostic pages
+  // (e.g. top-level /approvals). Read localStorage lazily on the client only.
+  const [lastWsId, setLastWsId] = useState<string | null>(null);
+  useEffect(() => {
+    try {
+      setLastWsId(localStorage.getItem(LAST_WS_KEY));
+    } catch {
+      // localStorage may be unavailable — ignore
+    }
+  }, []);
+
+  const effectiveWsId = wsId ?? lastWsId ?? wsList[0]?.id ?? null;
 
   const { data: projects = [] } = useQuery({
-    queryKey: wsId ? queryKeys.workspaces.projects(wsId) : ["projects-disabled"],
-    queryFn: () => projectsApi.list(wsId!),
-    enabled: !!wsId,
+    queryKey: effectiveWsId
+      ? queryKeys.workspaces.projects(effectiveWsId)
+      : ["projects-disabled"],
+    queryFn: () => projectsApi.list(effectiveWsId!),
+    enabled: !!effectiveWsId,
   });
+
+  const isOverview = !!wsId && pathname === `/w/${wsId}`;
+  const isApprovals =
+    pathname === "/approvals" || /^\/w\/[^/]+\/approvals$/.test(pathname);
+  const isAgents = !!wsId && pathname === `/w/${wsId}/agents`;
+  const isRuntimes = !!wsId && pathname === `/w/${wsId}/runtimes`;
+  const isSettings = !!wsId && pathname === `/w/${wsId}/settings`;
 
   return (
     <TooltipProvider>
@@ -59,33 +87,33 @@ export function Sidebar() {
           <p className="px-4 pt-3 pb-1.5 text-[10.5px] font-extrabold tracking-[0.08em] text-ink-3 uppercase">
             导航
           </p>
-          {wsId ? (
-            <Link href={`/w/${wsId}`}>
-              <NavItem active>概览</NavItem>
+          {effectiveWsId ? (
+            <Link href={`/w/${effectiveWsId}`}>
+              <NavItem active={isOverview}>概览</NavItem>
             </Link>
           ) : (
             <NavItem>概览</NavItem>
           )}
           <Link href="/approvals">
-            <NavItem>{messages.shell.pendingApprovals}</NavItem>
+            <NavItem active={isApprovals}>{messages.shell.pendingApprovals}</NavItem>
           </Link>
-          {wsId ? (
-            <Link href={`/w/${wsId}/agents`}>
-              <NavItem>{messages.shell.agents}</NavItem>
+          {effectiveWsId ? (
+            <Link href={`/w/${effectiveWsId}/agents`}>
+              <NavItem active={isAgents}>{messages.shell.agents}</NavItem>
             </Link>
           ) : (
             <NavItem>{messages.shell.agents}</NavItem>
           )}
-          {wsId ? (
-            <Link href={`/w/${wsId}/runtimes`}>
-              <NavItem>{messages.shell.runtimes}</NavItem>
+          {effectiveWsId ? (
+            <Link href={`/w/${effectiveWsId}/runtimes`}>
+              <NavItem active={isRuntimes}>{messages.shell.runtimes}</NavItem>
             </Link>
           ) : (
             <NavItem>{messages.shell.runtimes}</NavItem>
           )}
-          {wsId ? (
-            <Link href={`/w/${wsId}/settings`}>
-              <NavItem>{messages.shell.settings}</NavItem>
+          {effectiveWsId ? (
+            <Link href={`/w/${effectiveWsId}/settings`}>
+              <NavItem active={isSettings}>{messages.shell.settings}</NavItem>
             </Link>
           ) : (
             <NavItem>{messages.shell.settings}</NavItem>
@@ -95,9 +123,9 @@ export function Sidebar() {
           <p className="px-4 pt-4 pb-1.5 text-[10.5px] font-extrabold tracking-[0.08em] text-ink-3 uppercase">
             {messages.shell.projects}
           </p>
-          {wsId &&
+          {effectiveWsId &&
             projects.map((p) => (
-              <Link key={p.id} href={`/w/${wsId}/p/${p.id}`}>
+              <Link key={p.id} href={`/w/${effectiveWsId}/p/${p.id}`}>
                 <ProjItem
                   swatch={swatchFromId(p.id)}
                   active={p.id === activeProjectId}
