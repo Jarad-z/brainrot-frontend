@@ -10,6 +10,7 @@ import type { Agent } from "@/lib/api/types";
 import { useWorkspaceAgents } from "@/hooks/useWorkspaceAgents";
 import { useSendMessage } from "@/hooks/useSendMessage";
 import { Button } from "@/components/brand/button";
+import { Loader2 } from "lucide-react";
 import { MentionList, type MentionListHandle } from "./MentionList";
 import { createMentionExtension } from "./MentionExtension";
 import { createPasteImageExtension } from "./PasteImageExtension";
@@ -103,7 +104,7 @@ export function Composer({ wsId, taskId, projectId }: ComposerProps) {
     ],
     editorProps: {
       attributes: {
-        class: "composer-input outline-none min-h-[60px] py-2 px-1 text-base",
+        class: "composer-input outline-none min-h-[56px] py-2 px-1 text-base",
       },
       handleKeyDown(_view, event) {
         if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
@@ -137,12 +138,19 @@ export function Composer({ wsId, taskId, projectId }: ComposerProps) {
   }
 
   return (
-    <div className="composer-wrap border-[1.5px] border-ink-0 rounded-md bg-paper-0 p-3 shadow-[var(--shadow-current)] flex flex-col gap-2">
+    <div className="composer-wrap composer-focus-ring border-2 border-ink-0 rounded-lg bg-paper-0 p-4 shadow-[var(--shadow-2)] flex flex-col gap-3">
       <EditorContent editor={editor} />
       <div className="flex items-center justify-between text-xs text-ink-2">
         <span>Ctrl+Enter 发送</span>
         <Button onClick={send} disabled={!editor || editor.isEmpty || sendMutation.isPending}>
-          {sendMutation.isPending ? "发送中…" : "发送"}
+          {sendMutation.isPending ? (
+            <>
+              <Loader2 className="animate-spin" aria-hidden />
+              发送中
+            </>
+          ) : (
+            "发送"
+          )}
         </Button>
       </div>
       {mentionState.open && mentionState.anchorRect && (
