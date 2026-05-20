@@ -22,12 +22,12 @@ interface ThreeColumnShellProps {
 export function ThreeColumnShell({ user, children }: ThreeColumnShellProps) {
   return (
     <TooltipProvider>
-      <div className="min-h-screen bg-paper-1 flex flex-col">
+      <div className="h-screen bg-paper-1 flex flex-col overflow-hidden">
         <OfflineBanner />
         <div className="flex flex-1 min-h-0">
           <Sidebar />
           <div className="flex-1 flex flex-col min-w-0">
-            <header className="h-14 border-b-[1.5px] border-hairline bg-paper-0 px-5 flex items-center gap-3.5 shrink-0">
+            <header className="h-12 border-b-2 border-ink-0/10 bg-paper-0 px-5 flex items-center gap-3.5 shrink-0">
               <Breadcrumb />
               <div className="flex-1" />
               <Tooltip>
