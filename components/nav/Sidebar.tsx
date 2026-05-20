@@ -19,6 +19,7 @@ import {
 import { swatchFromId } from "@/lib/swatch";
 import { messages } from "@/lib/messages";
 import { useWorkspaceContext } from "@/lib/workspace-context";
+import { CreateProjectModal } from "@/components/projects/CreateProjectModal";
 
 const LAST_WS_KEY = "brainrot.lastWsId";
 
@@ -28,6 +29,8 @@ export function Sidebar() {
   const wsId = params.wsId ?? null;
   const activeProjectId = params.projectId ?? null;
   const { wsList } = useWorkspaceContext();
+
+  const [createProjectOpen, setCreateProjectOpen] = useState(false);
 
   // Fallback wsId so nav items remain functional on workspace-agnostic pages
   // (e.g. top-level /approvals). Read localStorage lazily on the client only.
@@ -135,18 +138,41 @@ export function Sidebar() {
                 </ProjItem>
               </Link>
             ))}
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <span>
-                <ProjItem disabled>+ 新建项目</ProjItem>
-              </span>
-            </TooltipTrigger>
-            <TooltipContent side="right">
-              {messages.shell.writesDisabled}
-            </TooltipContent>
-          </Tooltip>
+          {effectiveWsId ? (
+            <ProjItem
+              role="button"
+              tabIndex={0}
+              onClick={() => setCreateProjectOpen(true)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  setCreateProjectOpen(true);
+                }
+              }}
+            >
+              + 新建项目
+            </ProjItem>
+          ) : (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span>
+                  <ProjItem disabled>+ 新建项目</ProjItem>
+                </span>
+              </TooltipTrigger>
+              <TooltipContent side="right">
+                {messages.shell.wsListEmpty}
+              </TooltipContent>
+            </Tooltip>
+          )}
         </nav>
       </aside>
+      {effectiveWsId ? (
+        <CreateProjectModal
+          open={createProjectOpen}
+          onOpenChange={setCreateProjectOpen}
+          wsId={effectiveWsId}
+        />
+      ) : null}
     </TooltipProvider>
   );
 }

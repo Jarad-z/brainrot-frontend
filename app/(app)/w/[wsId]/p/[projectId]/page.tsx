@@ -1,14 +1,8 @@
 "use client";
 
-import { use } from "react";
+import { use, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/brand/button";
-import {
-  TooltipProvider,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/brand/tooltip";
 import {
   PageHeader,
   PageTitle,
@@ -18,6 +12,7 @@ import {
 } from "@/components/brand/page-header";
 import { EmptyState } from "@/components/common/EmptyState";
 import { TaskGrid } from "@/components/tasks/TaskGrid";
+import { CreateTaskModal } from "@/components/tasks/CreateTaskModal";
 import { useProject } from "@/hooks/useProject";
 import { useTasks } from "@/hooks/useTasks";
 import { messages } from "@/lib/messages";
@@ -28,11 +23,12 @@ interface PageProps {
 
 export default function ProjectHomePage({ params }: PageProps) {
   const { wsId, projectId } = use(params);
+  const [createOpen, setCreateOpen] = useState(false);
   const { data: project } = useProject(projectId);
   const { data: tasks, isPending } = useTasks(projectId);
 
   return (
-    <TooltipProvider>
+    <>
       <div className="p-8 h-full overflow-y-auto">
         <PageHeader editorial>
           <PageHeaderTitleBlock>
@@ -42,14 +38,7 @@ export default function ProjectHomePage({ params }: PageProps) {
             )}
           </PageHeaderTitleBlock>
           <PageHeaderActions>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <span>
-                  <Button disabled>新建任务</Button>
-                </span>
-              </TooltipTrigger>
-              <TooltipContent>{messages.shell.writesDisabled}</TooltipContent>
-            </Tooltip>
+            <Button onClick={() => setCreateOpen(true)}>新建任务</Button>
           </PageHeaderActions>
         </PageHeader>
 
@@ -69,6 +58,12 @@ export default function ProjectHomePage({ params }: PageProps) {
           <TaskGrid tasks={tasks} wsId={wsId} projectId={projectId} />
         )}
       </div>
-    </TooltipProvider>
+      <CreateTaskModal
+        open={createOpen}
+        onOpenChange={setCreateOpen}
+        wsId={wsId}
+        projectId={projectId}
+      />
+    </>
   );
 }

@@ -217,6 +217,17 @@ export interface CreateWorkspaceInput {
   slug: string;
 }
 
+export interface CreateProjectInput {
+  name: string;
+  description?: string;
+}
+
+export interface CreateTaskInput {
+  title: string;
+  summary?: string;
+  sort_order?: number;
+}
+
 export interface WorkspaceMember {
   workspace_id: string;
   user_id: string;

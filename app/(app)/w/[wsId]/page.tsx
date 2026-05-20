@@ -1,6 +1,6 @@
 "use client";
 
-import { use } from "react";
+import { use, useState } from "react";
 import {
   HeroEyebrow,
   HeroTitle,
@@ -26,6 +26,7 @@ import {
 import { EmptyState } from "@/components/common/EmptyState";
 import { PageSkeleton } from "@/components/common/PageSkeleton";
 import { ProjectGrid } from "@/components/projects/ProjectGrid";
+import { CreateProjectModal } from "@/components/projects/CreateProjectModal";
 import { useProjects } from "@/hooks/useProjects";
 import { useSession } from "@/hooks/useSession";
 import { messages } from "@/lib/messages";
@@ -36,6 +37,7 @@ interface PageProps {
 
 export default function WorkspaceHomePage({ params }: PageProps) {
   const { wsId } = use(params);
+  const [createOpen, setCreateOpen] = useState(false);
   const { data: projects, isPending } = useProjects(wsId);
   const session = useSession();
   const user = session.data;
@@ -61,16 +63,9 @@ export default function WorkspaceHomePage({ params }: PageProps) {
             </HeroTitle>
             <HeroSub>该开始干了。先把今天最重要的一件事拎出来。</HeroSub>
             <div className="flex gap-2.5 flex-wrap items-center">
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <span>
-                    <Button size="big" disabled>
-                      + 新建项目
-                    </Button>
-                  </span>
-                </TooltipTrigger>
-                <TooltipContent>{messages.shell.writesDisabled}</TooltipContent>
-              </Tooltip>
+              <Button size="big" onClick={() => setCreateOpen(true)}>
+                + 新建项目
+              </Button>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <span>
@@ -118,6 +113,7 @@ export default function WorkspaceHomePage({ params }: PageProps) {
           </section>
         </div>
       </div>
+      <CreateProjectModal open={createOpen} onOpenChange={setCreateOpen} wsId={wsId} />
     </TooltipProvider>
   );
 }
