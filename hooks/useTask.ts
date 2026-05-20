@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchTask } from "@/lib/api/task";
 import { queryKeys } from "@/lib/api/keys";
 import type { TaskCard } from "@/lib/api/types";
@@ -26,5 +26,7 @@ export function useTask(taskId: string) {
       return null;
     },
     enabled: !!taskId,
+    staleTime: 60_000,
+    placeholderData: keepPreviousData,
   });
 }

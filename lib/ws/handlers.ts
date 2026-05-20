@@ -1,5 +1,8 @@
 import type { QueryClient } from "@tanstack/react-query";
 import type { Message, TaskCard, ApprovalDecision, ClientMessage } from "@/lib/api/types";
+// run.completed payload lacks project_id/ws_id (see lib/ws/events.ts), so we
+// reverse-look projectId from the task detail cache to scope invalidation.
+// Tracked in docs/BACKEND_GAPS.md.
 import { queryKeys } from "@/lib/api/keys";
 import { enrichMessage } from "@/lib/chat/enrich-message";
 import { upsertMessage } from "@/lib/chat/upsert-message";
@@ -88,10 +91,17 @@ export function onTaskMutation(
 }
 
 export function onRunCompleted(
-  _ev: Extract<WSEvent, { type: "run.completed" }>,
+  ev: Extract<WSEvent, { type: "run.completed" }>,
   qc: QueryClient,
 ): void {
-  qc.invalidateQueries({ queryKey: ["projects"] });
+  const taskId = ev.id;
+  qc.invalidateQueries({ queryKey: queryKeys.tasks.detail(taskId) });
+  qc.invalidateQueries({ queryKey: queryKeys.tasks.runs(taskId) });
+  const cachedTask = qc.getQueryData<TaskCard>(queryKeys.tasks.detail(taskId));
+  const projectId = cachedTask?.project_id;
+  if (projectId) {
+    qc.invalidateQueries({ queryKey: queryKeys.projects.tasks(projectId) });
+  }
 }
 
 export function onApprovalDecided(

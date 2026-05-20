@@ -67,18 +67,35 @@ describe("WS handlers", () => {
     expect(record).toHaveBeenCalledWith("a1", expect.objectContaining({ decision: "approved" }));
   });
 
-  it("onRunCompleted invalidates project task lists", () => {
+  it("onRunCompleted invalidates only the affected task and its project task list", () => {
     const qc = new QueryClient();
+    const taskId = "t1";
+    const projectId = "p1";
+    const task: TaskCard = {
+      id: taskId,
+      project_id: projectId,
+      title: "T",
+      summary: "",
+      status: "in_progress",
+      sort_order: 0,
+      created_by: "u",
+      created_at: "",
+      updated_at: "",
+      done_at: null,
+    };
+    qc.setQueryData(queryKeys.tasks.detail(taskId), task);
     const invSpy = vi.spyOn(qc, "invalidateQueries");
     onRunCompleted(
       {
         type: "run.completed",
         scope: "task",
-        id: "t1",
+        id: taskId,
         payload: { run_id: "r1", status: "done" },
       },
       qc,
     );
-    expect(invSpy).toHaveBeenCalledWith(expect.objectContaining({ queryKey: ["projects"] }));
+    expect(invSpy).toHaveBeenCalledWith({ queryKey: queryKeys.tasks.detail(taskId) });
+    expect(invSpy).toHaveBeenCalledWith({ queryKey: queryKeys.tasks.runs(taskId) });
+    expect(invSpy).toHaveBeenCalledWith({ queryKey: queryKeys.projects.tasks(projectId) });
   });
 });

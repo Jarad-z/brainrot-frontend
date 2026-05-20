@@ -19,13 +19,13 @@ export default function ProjectLayout({ children, params }: LayoutProps) {
   const { wsId, projectId } = use(params);
   const router = useRouter();
   const setSelection = useAppStore((s) => s.setSelection);
-  const { isPending, error } = useProject(projectId);
+  const { isPending, error, data } = useProject(projectId);
 
   useEffect(() => {
     setSelection({ projectId });
   }, [projectId, setSelection]);
 
-  if (isPending) return <PageSkeleton />;
+  if (isPending && !data) return <PageSkeleton />;
 
   if (error instanceof ApiError && (error.status === 403 || error.status === 404)) {
     return (
