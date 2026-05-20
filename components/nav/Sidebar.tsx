@@ -69,9 +69,9 @@ export function Sidebar() {
 
   return (
     <TooltipProvider>
-      <aside className="w-60 shrink-0 bg-paper-0 border-r-[1.5px] border-hairline flex flex-col overflow-hidden">
+      <aside className="w-[220px] shrink-0 bg-paper-0 border-r-2 border-ink-0/15 flex flex-col overflow-hidden">
         {/* head */}
-        <div className="relative flex items-center gap-2.5 px-4 py-4 border-b-[1.5px] border-hairline">
+        <div className="relative flex items-center gap-2.5 px-4 py-4 border-b-2 border-ink-0/10">
           <span
             aria-hidden
             className="absolute inset-x-0 top-0 h-[3px] pending-stripes opacity-90"
@@ -94,7 +94,7 @@ export function Sidebar() {
 
         {/* nav */}
         <nav className="flex-1 overflow-y-auto py-2">
-          <p className="px-4 pt-3 pb-1.5 text-[10.5px] font-extrabold tracking-[0.08em] text-ink-3 uppercase">
+          <p className="px-4 pt-3 pb-1.5 pixel-label">
             导航
           </p>
           {effectiveWsId ? (
@@ -130,7 +130,7 @@ export function Sidebar() {
           )}
 
           {/* projects */}
-          <p className="px-4 pt-4 pb-1.5 text-[10.5px] font-extrabold tracking-[0.08em] text-ink-3 uppercase">
+          <p className="px-4 pt-4 pb-1.5 pixel-label">
             {messages.shell.projects}
           </p>
           {effectiveWsId &&
