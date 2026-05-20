@@ -40,7 +40,7 @@ describe("ToolPair", () => {
 
   it("shows 'running…' when no result yet", () => {
     const { getByText } = render(<ToolPair useMsg={useMsg} taskId="t1" />);
-    expect(getByText(/正在运行/)).toBeInTheDocument();
+    expect(getByText(/运行中/)).toBeInTheDocument();
   });
 
   it("toggle expands/collapses body", () => {
