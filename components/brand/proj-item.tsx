@@ -56,9 +56,10 @@ export const ProjItem = forwardRef<HTMLDivElement, ProjItemProps>(
       {swatch && (
         <span
           className={cn(
-            "absolute left-1 top-1 bottom-1 rounded-sm transition-[width]",
+            "absolute left-1 top-1 bottom-1 rounded-sm",
+            "transition-[width] duration-0 [transition-timing-function:steps(1,end)]",
             railClass[swatch],
-            active ? "w-[5px]" : "w-[3px] group-hover:w-[4px]",
+            active ? "w-[5px]" : "w-[3px] group-hover:w-[5px]",
           )}
           aria-hidden
         />
