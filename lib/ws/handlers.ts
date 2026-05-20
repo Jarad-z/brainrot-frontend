@@ -18,7 +18,17 @@ interface ChatUIStoreSlice {
 export type WSEvent =
   | { type: "task.created"; scope: "project"; id: string; payload: { task: TaskCard } }
   | { type: "task.updated"; scope: "project"; id: string; payload: { task: TaskCard } }
-  | { type: "message.appended"; scope: "task"; id: string; payload: { message: Message } }
+  | {
+      type: "message.appended";
+      scope: "task";
+      id: string;
+      // Backend sends two payload shapes (see backend/docs/API.md, message.appended row):
+      //   user-message path  : { message: Message, runs?: EnqueuedRun[] }
+      //   agent stream path  : { message_id, seq, content }  (no full Message)
+      payload:
+        | { message: Message }
+        | { message_id: string; seq: number; content: unknown };
+    }
   | {
       type: "run.completed";
       scope: "task";
@@ -70,10 +80,18 @@ export function onMessageAppended(
   ev: Extract<WSEvent, { type: "message.appended" }>,
   qc: QueryClient,
 ): void {
-  const enriched = enrichMessage(ev.payload.message);
-  qc.setQueryData<ClientMessage[]>(queryKeys.tasks.messages(ev.id), (old = []) =>
-    upsertMessage(old, enriched),
-  );
+  const payload = ev.payload;
+  if ("message" in payload && payload.message) {
+    const enriched = enrichMessage(payload.message);
+    qc.setQueryData<ClientMessage[]>(queryKeys.tasks.messages(ev.id), (old = []) =>
+      upsertMessage(old, enriched),
+    );
+    return;
+  }
+  // Agent-stream payload lacks the full Message (no role/author/created_at), so
+  // we cannot synthesize a ClientMessage. Invalidate and let the REST refetch
+  // bring in the complete record. Cheap because the user is already on the task.
+  qc.invalidateQueries({ queryKey: queryKeys.tasks.messages(ev.id) });
 }
 
 export function onTaskMutation(

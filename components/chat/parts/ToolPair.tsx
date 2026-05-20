@@ -22,12 +22,17 @@ export function ToolPair({ useMsg, resultMsg, taskId }: ToolPairProps) {
 
   const isError =
     resultMsg?.parsed.type === "tool_result" && resultMsg.parsed.payload.is_error;
-  const resultContent =
-    resultMsg?.parsed.type === "tool_result"
-      ? typeof resultMsg.parsed.payload.content === "string"
-        ? resultMsg.parsed.payload.content
-        : JSON.stringify(resultMsg.parsed.payload.content)
-      : null;
+  const resultContent: string | null = (() => {
+    if (resultMsg?.parsed.type !== "tool_result") return null;
+    const c = resultMsg.parsed.payload.content;
+    if (c == null) return "";
+    if (typeof c === "string") return c;
+    try {
+      return JSON.stringify(c);
+    } catch {
+      return String(c);
+    }
+  })();
 
   return (
     <div className="ml-12 my-2">

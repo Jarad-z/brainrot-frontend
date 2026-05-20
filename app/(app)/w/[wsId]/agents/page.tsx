@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useWorkspaceAgents } from "@/hooks/useWorkspaceAgents";
+import { useWorkspaceRuntimes } from "@/hooks/useWorkspaceRuntimes";
 import { messages } from "@/lib/messages";
 import {
   PageHeader,
@@ -19,8 +20,10 @@ export default function AgentsListPage() {
   const { wsId } = useParams<{ wsId: string }>();
   const router = useRouter();
   const { data: agents = [], isLoading } = useWorkspaceAgents(wsId);
+  const { data: runtimes = [] } = useWorkspaceRuntimes(wsId);
   const [showArchived, setShowArchived] = useState(false);
 
+  const onlineRuntimeIds = new Set(runtimes.filter((r) => r.online).map((r) => r.id));
   const visible = showArchived ? agents : agents.filter((a) => !a.archived);
 
   return (
@@ -79,6 +82,7 @@ export default function AgentsListPage() {
                 handle={a.handle}
                 name={a.name || `@${a.handle}`}
                 model={a.model ?? "—"}
+                online={onlineRuntimeIds.has(a.runtime_id)}
                 description={a.description || undefined}
                 avatarGlyph={a.handle.charAt(0).toUpperCase()}
                 onClick={() => router.push(`/w/${wsId}/agents/${a.id}`)}
