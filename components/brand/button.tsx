@@ -5,8 +5,8 @@ import { cn } from "@/lib/utils";
 
 const base =
   "inline-flex items-center gap-2 rounded-md text-sm font-bold whitespace-nowrap " +
-  "border-[1.5px] transition-transform " +
-  "active:translate-y-[var(--depth)] active:shadow-none " +
+  "border-2 btn-spring " +
+  "active:scale-[0.94] active:shadow-none " +
   "disabled:opacity-50 disabled:pointer-events-none disabled:shadow-none " +
   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink-0 focus-visible:ring-offset-2 focus-visible:ring-offset-paper-1 " +
   "[&_svg]:size-4 [&_svg]:shrink-0";
@@ -22,7 +22,7 @@ const variants = {
 const sizes = {
   default: "px-3.5 py-2.5",
   sm: "px-2.5 py-1.5 text-xs",
-  big: "px-5 py-3 text-base rounded-full border-[1.75px]",
+  big: "px-5 py-3 text-base rounded-full border-2",
   icon: "p-0 w-9 h-9 justify-center",
 } as const;
 
