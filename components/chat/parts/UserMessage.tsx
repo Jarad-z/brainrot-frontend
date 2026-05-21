@@ -1,37 +1,37 @@
 import type { ClientMessage } from "@/lib/api/types";
-import { Avatar } from "@/components/brand/avatar";
 import { MentionedText } from "../MentionedText";
 
 interface UserMessageProps {
   msg: ClientMessage;
   authorName?: string;
   authorHandle?: string;
+  isFirstInGroup?: boolean;
 }
 
 export function UserMessage({
   msg,
   authorName = "You",
-  authorHandle = "",
+  isFirstInGroup = true,
 }: UserMessageProps) {
   if (msg.parsed.type !== "user") return null;
   const time = msg.created_at
     ? new Date(msg.created_at).toTimeString().slice(0, 5)
     : "";
   return (
-    <div className="flex gap-3 my-3">
-      <Avatar name={authorName} size={36} />
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 text-xs text-ink-2 mb-1">
-          <span className="font-bold text-ink-0">{authorName}</span>
-          {authorHandle && <span>@{authorHandle}</span>}
-          <span>· {time}</span>
+    <div className={`flex justify-end ${isFirstInGroup ? "mt-4" : "mt-0.5"}`}>
+      <div className="max-w-[72%] min-w-0">
+        {isFirstInGroup && (
+          <div className="flex items-baseline justify-end gap-1.5 mb-1">
+            <span className="text-[11px] text-ink-3">{time}</span>
+            <span className="text-[13px] font-medium text-ink-1">{authorName}</span>
+          </div>
+        )}
+        <div className="px-3.5 py-2 bg-bg-secondary rounded-xl rounded-tr-sm break-words text-[14px] text-ink-0 leading-[1.7] whitespace-pre-wrap">
           {msg.meta.queued && (
-            <span className="ml-2 px-2 py-0.5 text-[11px] text-ink-2 border-[1.5px] border-dashed border-ink-2 rounded-full">
+            <span className="inline-block mr-2 px-1.5 py-0.5 text-[10px] text-ink-3 border border-dashed border-ink-3 rounded-full align-middle">
               排队中
             </span>
           )}
-        </div>
-        <div className="inline-block px-4 py-2.5 bg-role-user border-2 border-ink-0 rounded-lg max-w-[75%] break-words shadow-[2px_2px_0_var(--ink-0)]">
           <MentionedText text={msg.parsed.text} />
         </div>
       </div>

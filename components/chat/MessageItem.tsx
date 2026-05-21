@@ -20,23 +20,24 @@ interface MessageItemProps {
   taskId: string;
   authors: AuthorMaps;
   isNew?: boolean;
+  isFirstInGroup?: boolean;
 }
 
-export function MessageItem({ msg, pairing, taskId, authors, isNew }: MessageItemProps) {
+export function MessageItem({ msg, pairing, taskId, authors, isNew, isFirstInGroup = true }: MessageItemProps) {
   const animClass = isNew ? "msg-enter" : undefined;
 
   let inner: React.ReactNode;
   switch (msg.parsed.type) {
     case "user": {
       const u = msg.author_user_id ? authors.users[msg.author_user_id] : undefined;
-      inner = <UserMessage msg={msg} authorName={u?.name} authorHandle={u?.handle} />;
+      inner = <UserMessage msg={msg} authorName={u?.name} authorHandle={u?.handle} isFirstInGroup={isFirstInGroup} />;
       break;
     }
     case "assistant_text":
     case "thinking": {
       const a = msg.author_agent_id ? authors.agents[msg.author_agent_id] : undefined;
       const agent = a ?? { name: "agent", handle: "agent" };
-      inner = <AssistantMessage msg={msg} taskId={taskId} agent={agent} />;
+      inner = <AssistantMessage msg={msg} taskId={taskId} agent={agent} isFirstInGroup={isFirstInGroup} />;
       break;
     }
     case "tool_use":

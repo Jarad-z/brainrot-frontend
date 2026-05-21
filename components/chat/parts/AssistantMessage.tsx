@@ -1,16 +1,17 @@
 "use client";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import type { ClientMessage } from "@/lib/api/types";
-import { Avatar } from "@/components/brand/avatar";
+import { Avatar, agentColor } from "@/components/brand/avatar";
 import { useChatUIStore } from "@/lib/store/chat-ui";
 
 interface AssistantMessageProps {
   msg: ClientMessage;
   taskId: string;
   agent: { name: string; handle: string };
+  isFirstInGroup?: boolean;
 }
 
-export function AssistantMessage({ msg, taskId, agent }: AssistantMessageProps) {
+export function AssistantMessage({ msg, taskId, agent, isFirstInGroup = true }: AssistantMessageProps) {
   const expanded = useChatUIStore(
     (s) => s.byTask[taskId]?.expandedThinkings.has(msg.id) ?? false,
   );
@@ -19,42 +20,63 @@ export function AssistantMessage({ msg, taskId, agent }: AssistantMessageProps) 
   if (msg.parsed.type !== "assistant_text" && msg.parsed.type !== "thinking") {
     return null;
   }
+
   const time = msg.created_at
     ? new Date(msg.created_at).toTimeString().slice(0, 5)
     : "";
+  const color = agentColor(agent.handle);
+  const avatarSize = 28;
 
   return (
-    <div className="flex gap-3 my-3">
-      <Avatar name={agent.name} size={36} />
+    <div className={`flex gap-3 ${isFirstInGroup ? "mt-4" : "mt-0.5"}`}>
+      {/* Avatar column — fixed width so text always aligns; avatar only on first */}
+      <div className="shrink-0" style={{ width: avatarSize }}>
+        {isFirstInGroup && (
+          <Avatar name={agent.name} color={color} size={avatarSize} radius={6} />
+        )}
+      </div>
+
       <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 text-xs text-ink-2 mb-1.5">
-          <span className="font-bold text-ink-0">{agent.name}</span>
-          <span className="text-ink-3">@{agent.handle}</span>
-          <span>· {time}</span>
-          {msg.task_run_id && (
-            <span className="font-mono text-[10px] px-2 py-0.5 bg-paper-2 border-[1.5px] border-hairline rounded-full text-ink-2">
-              run#{msg.task_run_id.slice(0, 4)}
+        {/* Name row — only on first message in group */}
+        {isFirstInGroup && (
+          <div className="flex items-baseline gap-1.5 mb-1">
+            <span className="text-[13px] font-medium" style={{ color }}>
+              {agent.name}
             </span>
-          )}
-        </div>
-        {msg.parsed.type === "assistant_text" && (
-          <div className="px-4 py-2.5 bg-role-agent border-[1.5px] border-hairline rounded-2xl max-w-[75%] break-words whitespace-pre-wrap shadow-[2px_2px_0_var(--ink-0)]">
-            {msg.parsed.payload.text}
+            <span className="text-[11px] text-ink-3">@{agent.handle}</span>
+            {time && <span className="text-[11px] text-ink-3">· {time}</span>}
           </div>
         )}
+
+        {/* Primary response — bare text, highest visual weight */}
+        {msg.parsed.type === "assistant_text" && (
+          <p className="text-[14px] text-ink-0 leading-[1.7] whitespace-pre-wrap break-words m-0">
+            {msg.parsed.payload.text}
+          </p>
+        )}
+
+        {/* Thinking — lowest weight, collapsed by default */}
         {msg.parsed.type === "thinking" && (
-          <div
-            className="thinking-card flex items-center gap-2 pl-4 pr-3 py-2 bg-paper-2 border-l-[3px] border-ink-3 rounded-lg text-xs italic text-ink-2 cursor-pointer max-w-[75%] hover:bg-paper-1 transition-colors"
+          <button
+            type="button"
+            className="flex items-center gap-1.5 text-[12px] text-ink-3 hover:text-ink-2 transition-colors cursor-pointer text-left w-full"
             onClick={() => toggle(taskId, msg.id)}
           >
-            <span className="font-bold not-italic text-ink-2">思考</span>
-            <span className={expanded ? "whitespace-pre-wrap" : "truncate"} style={{ flex: 1 }}>
-              {msg.parsed.payload.text}
+            <span className="shrink-0">
+              {expanded ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
             </span>
-            <span className="shrink-0 text-ink-3">
-              {expanded ? <ChevronDown size={13} /> : <ChevronRight size={13} />}
-            </span>
-          </div>
+            <span className="italic">思考</span>
+            {expanded && (
+              <span className="ml-2 text-ink-2 not-italic whitespace-pre-wrap break-words">
+                {msg.parsed.payload.text}
+              </span>
+            )}
+            {!expanded && (
+              <span className="truncate text-ink-3 max-w-[40ch]">
+                {msg.parsed.payload.text.slice(0, 80)}…
+              </span>
+            )}
+          </button>
         )}
       </div>
     </div>

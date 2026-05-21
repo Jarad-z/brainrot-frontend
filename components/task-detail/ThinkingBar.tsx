@@ -1,7 +1,7 @@
 "use client";
 import { useActiveRuns } from "@/hooks/useActiveRuns";
 import { useWorkspaceAgents } from "@/hooks/useWorkspaceAgents";
-import { Avatar } from "@/components/brand/avatar";
+import { Avatar, agentColor } from "@/components/brand/avatar";
 
 interface ThinkingBarProps {
   taskId: string;
@@ -15,18 +15,19 @@ export function ThinkingBar({ taskId, wsId }: ThinkingBarProps) {
   if (runs.length === 0) return null;
 
   return (
-    <div className="flex items-center gap-2 px-6 py-2.5 border-t-[1.5px] border-ink-0 pending-stripes text-paper-0 text-xs">
-      <span className="w-2 h-2 rounded-full bg-paper-0 animate-pulse shrink-0" />
+    <div className="flex items-center gap-2 px-4 py-2 border-t border-hairline bg-bg-secondary text-ink-2 text-[12px]">
+      <span className="w-1.5 h-1.5 rounded-full bg-state-running animate-status-pulse shrink-0" />
       {runs.map((r) => {
         const a = r.agentId ? agents.find((x) => x.id === r.agentId) : undefined;
+        const color = agentColor(a?.handle ?? "agent");
         return (
           <span key={r.runId} className="flex items-center gap-1.5">
-            <Avatar name={a?.name ?? "agent"} size={20} />
-            <span className="font-semibold">@{a?.handle ?? "agent"}</span>
+            <Avatar name={a?.name ?? "agent"} color={color} size={18} radius={4} />
+            <span className="font-medium" style={{ color }}>@{a?.handle ?? "agent"}</span>
           </span>
         );
       })}
-      <span className="text-paper-0/80">正在思考…</span>
+      <span className="text-ink-3">正在思考…</span>
     </div>
   );
 }

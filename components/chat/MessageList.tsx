@@ -57,6 +57,20 @@ export function MessageList({ taskId, wsId }: MessageListProps) {
     [messages, pairing.consumed],
   );
 
+  // Compute grouping: a message is the first in its group when the author
+  // changes from the previous visible message. Tool calls (no author) always
+  // break grouping so they never collapse into an agent's message run.
+  const authorKey = (m: ClientMessage): string => {
+    if (m.author_agent_id) return `agent:${m.author_agent_id}`;
+    if (m.author_user_id) return `user:${m.author_user_id}`;
+    return `sys:${m.parsed.type}`;
+  };
+  const isFirstInGroup = useMemo(
+    () => visible.map((m, i) => i === 0 || authorKey(visible[i - 1]!) !== authorKey(m)),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [visible],
+  );
+
   const prevCountRef = useRef(visible.length);
   const [newFromIndex, setNewFromIndex] = useState(visible.length);
   // Count of messages when the user last left the bottom — new messages are
@@ -142,6 +156,7 @@ export function MessageList({ taskId, wsId }: MessageListProps) {
                   taskId={taskId}
                   authors={authors}
                   isNew={scrollAnchor === "bottom" && vi.index >= newFromIndex}
+                  isFirstInGroup={isFirstInGroup[vi.index] ?? true}
                 />
               </div>
             );
