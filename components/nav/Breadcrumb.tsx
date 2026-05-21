@@ -6,6 +6,7 @@ import { projectsApi } from "@/lib/api/projects";
 import { queryKeys } from "@/lib/api/keys";
 import { Crumb, CrumbSeg, CrumbSep } from "@/components/brand/crumb";
 import { useTask } from "@/hooks/useTask";
+import { useWorkspaceContext } from "@/lib/workspace-context";
 
 export function Breadcrumb() {
   const params = useParams<{ wsId?: string; projectId?: string; taskId?: string }>();
@@ -22,11 +23,10 @@ export function Breadcrumb() {
   });
 
   const { data: task } = useTask(taskId ?? "");
+  const { wsList } = useWorkspaceContext();
 
   if (!wsId) return null;
-  // BACKEND_GAPS #5: no `GET /workspaces/{wsId}` endpoint, so the workspace
-  // name is hardcoded to match `Sidebar.tsx` until the endpoint lands.
-  const wsName = "Lumen Labs";
+  const wsName = wsList.find((w) => w.id === wsId)?.name ?? "工作区";
   return (
     <Crumb>
       <CrumbSeg active={!projectId}>{wsName}</CrumbSeg>

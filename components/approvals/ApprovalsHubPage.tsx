@@ -75,7 +75,7 @@ export function ApprovalsHubPage({ wsId }: ApprovalsHubPageProps) {
       <PageHeader editorial>
         <PageHeaderTitleBlock>
           <div className="flex items-center gap-3">
-            <span className="w-2.5 h-2.5 bg-accent rounded-full border-[1.5px] border-ink-0" />
+            <span className="w-2.5 h-2.5 bg-accent rounded-full shadow-[0_0_0_3px_var(--accent-wash)]" />
             <PageTitle editorial>
               待审批 · {visible.length} 件
             </PageTitle>
@@ -105,7 +105,7 @@ export function ApprovalsHubPage({ wsId }: ApprovalsHubPageProps) {
             }}
           />
           {toast && (
-            <div className="fixed bottom-4 right-4 px-3 py-2 bg-ink-0 text-paper-0 rounded-sm text-sm shadow-[var(--shadow-current)]">
+            <div className="fixed bottom-4 right-4 px-3.5 py-2 bg-ink-0 text-paper-0 rounded-lg text-sm font-medium shadow-[var(--shadow-3)]">
               {toast}
             </div>
           )}

@@ -38,11 +38,17 @@ export function ApprovalHubCard({ approval }: ApprovalHubCardProps) {
   }
 
   return (
-    <div className="card-lift hover:card-lift-hover border-[1.5px] border-ink-0 rounded-xl overflow-hidden shadow-[var(--shadow-current)] bg-paper-0">
-      <div className="pending-stripes flex items-center justify-between px-4 py-2.5 text-paper-0">
-        <span className="font-bold">{approval.toolName} 请求批准</span>
+    <div className="card-lift hover:card-lift-hover border border-hairline rounded-xl overflow-hidden shadow-[var(--shadow-1)] bg-paper-0">
+      <div className="pending-stripes flex items-center justify-between px-4 py-2.5 border-b border-accent-wash-2">
+        <span className="font-semibold text-sm text-ink-0">
+          <span className="text-accent">●</span> {approval.toolName} 请求批准
+        </span>
         <span
-          className={`font-mono text-xs ${urgent ? "text-state-failed font-bold animate-pulse" : "text-paper-0/85"}`}
+          className={`font-mono text-xs ${
+            urgent
+              ? "text-countdown-urgent font-bold animate-pulse"
+              : "text-ink-2"
+          }`}
         >
           {label}
         </span>
@@ -51,7 +57,7 @@ export function ApprovalHubCard({ approval }: ApprovalHubCardProps) {
         <div className="text-xs text-ink-2">
           {approval.projectName} · {approval.taskTitle}
         </div>
-        <pre className="font-mono text-xs bg-paper-1 p-2 rounded-sm whitespace-pre-wrap break-all">
+        <pre className="font-mono text-xs bg-paper-1 border border-hairline px-3 py-2 rounded-lg whitespace-pre-wrap break-all text-ink-1">
           {summarizeInput(approval.toolInput)}
         </pre>
         {noteOpen && (
@@ -60,7 +66,7 @@ export function ApprovalHubCard({ approval }: ApprovalHubCardProps) {
             onChange={(e) => setNote(e.target.value)}
             maxLength={256}
             placeholder="备注（可选，≤256 字）"
-            className="border-[1.5px] border-hairline rounded-sm p-2 text-sm min-h-[60px]"
+            className="border border-hairline rounded-lg p-2.5 text-sm min-h-[60px] bg-paper-0 focus:border-accent/60 focus:outline-none"
           />
         )}
         <div className="flex justify-end gap-2">
@@ -69,21 +75,21 @@ export function ApprovalHubCard({ approval }: ApprovalHubCardProps) {
               <button
                 onClick={() => submit("denied")}
                 disabled={disabled}
-                className="ink-stamp active:ink-stamp-active px-3 py-1 border-[1.5px] border-ink-0 rounded-sm font-semibold disabled:opacity-50 bg-paper-0"
+                className="px-3.5 py-1.5 border border-hairline rounded-lg text-sm font-medium text-ink-1 hover:bg-paper-1 disabled:opacity-50 transition-colors"
               >
                 拒绝
               </button>
               <button
                 onClick={() => setNoteOpen(true)}
                 disabled={disabled}
-                className="ink-stamp active:ink-stamp-active px-3 py-1 border-[1.5px] border-ink-0 rounded-sm font-semibold disabled:opacity-50 bg-paper-0"
+                className="px-3.5 py-1.5 border border-hairline rounded-lg text-sm font-medium text-ink-1 hover:bg-paper-1 disabled:opacity-50 transition-colors"
               >
                 批准并修改
               </button>
               <button
                 onClick={() => submit("approved")}
                 disabled={disabled}
-                className="ink-stamp active:ink-stamp-active px-3 py-1 bg-ink-0 text-paper-0 border-[1.5px] border-ink-0 rounded-sm font-semibold shadow-[var(--shadow-current)] disabled:opacity-50"
+                className="px-3.5 py-1.5 bg-accent text-accent-fg rounded-lg text-sm font-semibold hover:opacity-90 shadow-[var(--shadow-1)] disabled:opacity-50 transition-opacity"
               >
                 批准
               </button>
@@ -93,7 +99,7 @@ export function ApprovalHubCard({ approval }: ApprovalHubCardProps) {
             <button
               onClick={() => submit("approved_with_edits")}
               disabled={disabled}
-              className="px-3 py-1 bg-ink-0 text-paper-0 border-[1.5px] border-ink-0 rounded-sm font-semibold shadow-[var(--shadow-current)] disabled:opacity-50"
+              className="px-3.5 py-1.5 bg-accent text-accent-fg rounded-lg text-sm font-semibold hover:opacity-90 shadow-[var(--shadow-1)] disabled:opacity-50 transition-opacity"
             >
               提交
             </button>

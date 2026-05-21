@@ -5,6 +5,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from "./dialog";
+import { Button } from "./button";
 
 interface ConfirmDialogProps {
   open: boolean;
@@ -40,25 +41,19 @@ export function ConfirmDialog({
           </p>
         )}
         <div className="flex justify-end gap-2 mt-5">
-          <button
-            onClick={() => onOpenChange(false)}
-            className="px-3 py-1.5 border-[1.5px] border-ink-0 rounded-sm font-semibold text-sm"
-          >
+          <Button variant="ghost" size="default" onClick={() => onOpenChange(false)}>
             {cancelLabel}
-          </button>
-          <button
+          </Button>
+          <Button
+            variant={destructive ? "danger" : "primary"}
+            size="default"
             onClick={() => {
               onConfirm();
               onOpenChange(false);
             }}
-            className={
-              destructive
-                ? "px-3 py-1.5 bg-state-failed text-paper-0 border-[1.5px] border-state-failed rounded-sm font-semibold text-sm"
-                : "px-3 py-1.5 bg-ink-0 text-paper-0 border-[1.5px] border-ink-0 rounded-sm font-semibold text-sm shadow-[var(--shadow-current)]"
-            }
           >
             {confirmLabel}
-          </button>
+          </Button>
         </div>
       </DialogContent>
     </Dialog>

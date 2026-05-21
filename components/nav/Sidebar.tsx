@@ -69,13 +69,9 @@ export function Sidebar() {
 
   return (
     <TooltipProvider>
-      <aside className="w-[220px] shrink-0 bg-paper-0 border-r-2 border-ink-0/15 flex flex-col overflow-hidden">
+      <aside className="sidebar aero-glass w-[228px] h-full shrink-0 rounded-2xl flex flex-col overflow-hidden">
         {/* head */}
-        <div className="relative flex items-center gap-2.5 px-4 py-4 border-b-2 border-ink-0/10">
-          <span
-            aria-hidden
-            className="absolute inset-x-0 top-0 h-[3px] pending-stripes opacity-90"
-          />
+        <div className="flex items-center gap-2.5 px-4 py-4">
           <BrandMark logo="B" />
           <div className="min-w-0 overflow-hidden">
             <div className="font-extrabold text-[17px] text-ink-0 tracking-tight truncate font-tight">

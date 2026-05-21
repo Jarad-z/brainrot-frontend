@@ -67,8 +67,8 @@ export function Avatar({
       {online !== undefined && (
         <span
           className={cn(
-            "absolute -right-[3px] -bottom-[3px] w-[11px] h-[11px] rounded-full border-2 border-paper-0",
-            online ? "bg-ink-0" : "bg-paper-0 border-ink-0",
+            "absolute -right-[2px] -bottom-[2px] w-[10px] h-[10px] rounded-full ring-2 ring-paper-0",
+            online ? "bg-accent-moss" : "bg-ink-3",
           )}
         />
       )}

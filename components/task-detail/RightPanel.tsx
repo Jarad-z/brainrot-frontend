@@ -17,13 +17,13 @@ export function RightPanel({ taskId, projectId }: RightPanelProps) {
   const { data: approvalsData } = useTaskApprovalsHistory(taskId);
 
   return (
-    <aside className="border-l-[1.5px] border-hairline bg-paper-0 flex flex-col min-h-0">
+    <aside className="aero-glass-soft rounded-xl flex flex-col min-h-0 overflow-hidden">
       <RightTabs
         active={activeTab}
         onChange={(t) => setTab(taskId, t)}
         approvalsCount={approvalsData?.length ?? 0}
       />
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto px-1">
         {activeTab === "artifacts" && <ArtifactsTab taskId={taskId} />}
         {activeTab === "assets" && <AssetsTab projectId={projectId} />}
         {activeTab === "approvals" && <ApprovalsTab taskId={taskId} />}

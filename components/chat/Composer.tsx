@@ -9,7 +9,6 @@ import { useMemo, useRef, useState } from "react";
 import type { Agent } from "@/lib/api/types";
 import { useWorkspaceAgents } from "@/hooks/useWorkspaceAgents";
 import { useSendMessage } from "@/hooks/useSendMessage";
-import { Button } from "@/components/brand/button";
 import { Loader2 } from "lucide-react";
 import { MentionList, type MentionListHandle } from "./MentionList";
 import { createMentionExtension } from "./MentionExtension";
@@ -104,7 +103,8 @@ export function Composer({ wsId, taskId, projectId }: ComposerProps) {
     ],
     editorProps: {
       attributes: {
-        class: "composer-input outline-none min-h-[56px] py-2 px-1 text-base",
+        class:
+          "composer-input outline-none min-h-[36px] py-1.5 text-[14px] leading-[1.6] text-ink-0",
       },
       handleKeyDown(_view, event) {
         if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
@@ -137,22 +137,54 @@ export function Composer({ wsId, taskId, projectId }: ComposerProps) {
     );
   }
 
+  const isPending = sendMutation.isPending;
+  const canSend = !!editor && !editor.isEmpty && !isPending;
+
   return (
-    <div className="composer-wrap composer-focus-ring border border-hairline rounded-xl bg-bg-primary p-3 flex flex-col gap-2 hover:border-ink-0/30 transition-colors">
-      <EditorContent editor={editor} />
-      <div className="flex items-center justify-end gap-3">
-        <span className="text-[11px] text-ink-3 select-none">Ctrl+Enter</span>
-        <Button size="sm" onClick={send} disabled={!editor || editor.isEmpty || sendMutation.isPending}>
-          {sendMutation.isPending ? (
-            <>
-              <Loader2 className="animate-spin" aria-hidden />
-              发送中
-            </>
-          ) : (
-            "发送"
-          )}
-        </Button>
+    <div
+      className="composer-wrap composer-focus-ring relative flex items-end gap-2 px-4 py-2 rounded-xl transition-all backdrop-blur-xl"
+      style={{
+        background:
+          "linear-gradient(180deg, rgba(255,255,255,0.86) 0%, rgba(248,250,253,0.78) 50%, rgba(240,244,249,0.76) 100%)",
+        border: "1px solid rgba(255,255,255,0.75)",
+        boxShadow:
+          "inset 0 1px 0 rgba(255,255,255,0.95), inset 0 -1px 0 rgba(50,80,110,0.06), 0 1px 2px rgba(20,62,107,0.08), 0 6px 16px rgba(20,62,107,0.10)",
+      }}
+    >
+      <div className="flex-1 min-w-0">
+        <EditorContent editor={editor} />
       </div>
+
+      <div className="flex items-center gap-2 shrink-0 pb-0.5">
+        <span className="text-[11px] text-ink-3 select-none hidden sm:inline">
+          Ctrl+Enter
+        </span>
+        <button
+          type="button"
+          onClick={send}
+          disabled={!canSend}
+          className={`inline-flex items-center justify-center w-9 h-9 rounded-lg text-white transition-all active:translate-y-px ${
+            canSend ? "aero-button hover:aero-button-hover" : ""
+          }`}
+          style={
+            canSend
+              ? undefined
+              : {
+                  background: "rgba(200,215,232,0.6)",
+                  color: "rgba(94,122,150,0.7)",
+                  border: "1px solid rgba(150,175,200,0.4)",
+                }
+          }
+          aria-label="发送"
+        >
+          {isPending ? (
+            <Loader2 className="w-4 h-4 animate-spin" aria-hidden />
+          ) : (
+            <SendGlyph />
+          )}
+        </button>
+      </div>
+
       {mentionState.open && mentionState.anchorRect && (
         <MentionList
           ref={mentionListRef}
@@ -163,5 +195,25 @@ export function Composer({ wsId, taskId, projectId }: ComposerProps) {
         />
       )}
     </div>
+  );
+}
+
+function SendGlyph() {
+  return (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 16 16"
+      fill="none"
+      aria-hidden
+    >
+      <path
+        d="M8 2.5V13.5M8 2.5L4 6.5M8 2.5L12 6.5"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
   );
 }

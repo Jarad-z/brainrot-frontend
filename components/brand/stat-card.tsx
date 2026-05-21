@@ -33,8 +33,8 @@ export function StatCard({
       </div>
       <div
         className={cn(
-          "stat-num text-[40px] font-medium my-1",
-          value === "—" && "text-ink-3",
+          "stat-num font-medium my-1",
+          value === "—" ? "text-[28px] text-ink-3" : "text-[40px]",
         )}
       >
         {value}

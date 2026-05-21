@@ -1,9 +1,8 @@
 "use client";
 import Link from "next/link";
-import { StatusChip } from "@/components/brand/status-chip";
-import { Avatar } from "@/components/brand/avatar";
 import { useWorkspaceAgents } from "@/hooks/useWorkspaceAgents";
 import { relativeTime } from "@/lib/format";
+import { agentColor } from "@/components/brand/avatar";
 import type { TaskCard } from "@/lib/api/types";
 
 interface TaskRowProps {
@@ -13,31 +12,69 @@ interface TaskRowProps {
   active: boolean;
 }
 
+const STATUS_DOT: Record<TaskCard["status"], string> = {
+  open: "bg-ink-3",
+  in_progress: "bg-accent",
+  done: "bg-accent-moss",
+  blocked: "bg-state-failed",
+  archived: "bg-ink-3 opacity-40",
+};
+
 export function TaskRow({ task, wsId, projectId, active }: TaskRowProps) {
   const { data: agents = [] } = useWorkspaceAgents(wsId);
   const agentsMap = new Map(agents.map((a) => [a.id, a]));
+  const taskAgents = (task.agents ?? []).slice(0, 3);
 
   return (
     <Link
       href={`/w/${wsId}/p/${projectId}/t/${task.id}`}
       data-active={active}
-      className={`relative block pl-5 pr-4 py-3.5 border-b-[1.5px] border-hairline hover:bg-paper-2 transition-colors ${active ? "bg-paper-1" : ""}`}
+      title={task.summary || task.title}
+      className={`block my-0.5 px-2.5 py-2 rounded-md transition-all group border ${
+        active
+          ? "aero-active border-transparent text-white"
+          : "border-transparent hover:bg-white/50 hover:border-white/55"
+      }`}
     >
-      {active && (
-        <span className="absolute left-0 top-2 bottom-2 w-[3px] rounded-r-sm bg-ink-0" aria-hidden />
-      )}
-      <div className="flex items-center justify-between gap-2 mb-1">
-        <span className="font-semibold text-sm text-ink-0 truncate flex-1">{task.title}</span>
-        <span className="font-mono text-[11px] text-ink-2">{relativeTime(task.updated_at)}</span>
+      <div className="flex items-center gap-2 min-w-0">
+        <span
+          aria-hidden
+          className={`w-1.5 h-1.5 rounded-full shrink-0 ${STATUS_DOT[task.status]} ${
+            task.busy ? "animate-status-pulse" : ""
+          }`}
+        />
+        <span
+          className={`text-[13px] truncate flex-1 ${
+            active
+              ? "font-semibold text-white"
+              : "font-medium text-ink-1 group-hover:text-ink-0"
+          }`}
+        >
+          {task.title}
+        </span>
       </div>
-      {task.summary && <div className="text-xs text-ink-2 line-clamp-2 mb-2">{task.summary}</div>}
-      <div className="flex items-center justify-between gap-2">
-        <StatusChip status={task.status} />
-        {task.agents && task.agents.length > 0 && (
-          <div className="flex -space-x-1.5">
-            {task.agents.slice(0, 3).map((id) => {
+
+      <div className="flex items-center justify-between gap-2 mt-1 pl-3.5">
+        <span className={`text-[10.5px] truncate ${active ? "text-white/85" : "text-ink-3"}`}>
+          {relativeTime(task.updated_at)}
+        </span>
+        {taskAgents.length > 0 && (
+          <div className="flex -space-x-1 shrink-0">
+            {taskAgents.map((id) => {
               const a = agentsMap.get(id);
-              return a ? <Avatar key={id} name={a.name} size={20} /> : null;
+              if (!a) return null;
+              const c = agentColor(a.handle);
+              return (
+                <span
+                  key={id}
+                  className="grid place-items-center w-4 h-4 rounded-full text-[8px] font-bold text-paper-0 ring-2 ring-paper-0"
+                  style={{ background: c }}
+                  title={`@${a.handle}`}
+                  aria-label={a.name}
+                >
+                  {a.name.slice(0, 1).toUpperCase()}
+                </span>
+              );
             })}
           </div>
         )}

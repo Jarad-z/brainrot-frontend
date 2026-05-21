@@ -1,13 +1,17 @@
-/* tokens/roles.css — who is speaking */
+/* tokens/roles.css — who is speaking in the chat stream.
+   Notion/Apple: user messages sit on a soft-blue tinted card,
+   agent messages on plain white with a hairline border, tool
+   results on a faint blue-gray wash. No more dark "approval"
+   bar — approval cards use the same soft-blue family. */
 :root {
-  --role-user-bg: var(--paper-0);
-  --role-user-border: var(--hairline);
-  --role-agent-bg: var(--paper-0);
-  --role-agent-border: var(--ink-0);
-  --role-tool-bg: #f7f1e0;
-  --role-tool-border: #e1d4a8;
-  --role-thinking-bg: transparent;
-  --role-thinking-rail: var(--ink-3);
-  --role-approval-bg: var(--ink-0);
-  --role-approval-fg: var(--paper-0);
+  --role-user-bg:        var(--accent-wash);
+  --role-user-border:    var(--accent-wash-2);
+  --role-agent-bg:       var(--paper-0);
+  --role-agent-border:   var(--hairline);
+  --role-tool-bg:        #f5f7fb;
+  --role-tool-border:    #e2e8f0;
+  --role-thinking-bg:    transparent;
+  --role-thinking-rail:  var(--ink-3);
+  --role-approval-bg:    var(--accent);
+  --role-approval-fg:    var(--accent-fg);
 }

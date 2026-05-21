@@ -15,15 +15,9 @@ export default function TaskDetailPage({ params }: PageProps) {
   const { wsId, projectId, taskId } = use(params);
   useSubscribe("task", taskId);
   useSubscribe("project", projectId);
-  // Prefetch project task list — populates the cache so useTask's fallback
-  // can find this task by id when the direct GET 404/405s (BACKEND_GAPS, no
-  // single-task endpoint yet). On deep-link navigation, useTask races
-  // useTasks(projectId); we trigger both in parallel here.
   const { data: tasks } = useTasks(projectId);
   const { data: task, refetch: refetchTask } = useTask(taskId);
 
-  // If useTask returned null but the project tasks just loaded, retry — the
-  // fallback path will now find the task in the project cache.
   const found = useMemo(
     () => tasks?.find((t) => t.id === taskId),
     [tasks, taskId],
@@ -33,7 +27,7 @@ export default function TaskDetailPage({ params }: PageProps) {
   }, [task, found, refetchTask]);
 
   return (
-    <div className="h-full grid grid-cols-[260px_1fr_320px] min-h-0 overflow-hidden">
+    <div className="h-full grid grid-cols-[210px_minmax(0,1fr)_280px] gap-2 p-2 min-h-0 overflow-hidden">
       <TaskListPane projectId={projectId} wsId={wsId} activeTaskId={taskId} />
       <ChatPane wsId={wsId} taskId={taskId} projectId={projectId} task={task ?? found} />
       <RightPanel taskId={taskId} projectId={projectId} />

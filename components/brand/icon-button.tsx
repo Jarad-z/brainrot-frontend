@@ -22,17 +22,34 @@ export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
       <button
         ref={ref}
         className={cn(
-          "relative w-9 h-9 grid place-items-center rounded-md",
-          "bg-paper-0 border-[1.5px] border-hairline text-ink-2",
-          "hover:border-ink-1 active:translate-y-px",
+          "relative w-8 h-8 grid place-items-center rounded-full text-ink-1",
+          "transition-all active:translate-y-px",
+          "hover:brightness-110 hover:text-ink-0",
           "disabled:opacity-50 disabled:cursor-not-allowed",
           className,
         )}
+        style={{
+          background:
+            "linear-gradient(180deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.30) 50%, rgba(220,235,250,0.28) 100%)",
+          border: "1px solid rgba(255,255,255,0.55)",
+          boxShadow:
+            "inset 0 1px 0 rgba(255,255,255,0.7), inset 0 -1px 0 rgba(30,72,119,0.10), 0 1px 2px rgba(30,72,119,0.08)",
+        }}
         {...rest}
       >
         {children}
         {badgeText !== undefined && (
-          <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-[5px] rounded-full bg-accent text-accent-fg text-[10px] font-bold grid place-items-center border-[1.5px] border-paper-0">
+          <span
+            className="absolute -top-1 -right-1 min-w-[16px] h-[16px] px-[4px] rounded-full text-white text-[10px] font-bold grid place-items-center"
+            style={{
+              background:
+                "linear-gradient(180deg, #f3a76b 0%, #e07c3f 50%, #c4571e 100%)",
+              border: "1px solid rgba(255,255,255,0.6)",
+              boxShadow:
+                "inset 0 1px 0 rgba(255,255,255,0.5), 0 1px 2px rgba(196,87,30,0.4)",
+              textShadow: "0 -1px 0 rgba(150,55,15,0.4)",
+            }}
+          >
             {badgeText}
           </span>
         )}

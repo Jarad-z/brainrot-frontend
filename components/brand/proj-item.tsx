@@ -43,11 +43,11 @@ export const ProjItem = forwardRef<HTMLDivElement, ProjItemProps>(
       data-active={active || undefined}
       data-swatch={swatch}
       className={cn(
-        "group relative mx-2.5 my-0.5 pl-4 pr-3 py-[7px] rounded-lg flex items-center gap-2.5",
-        "text-[13px] text-ink-1 cursor-pointer border-[1.5px] border-transparent",
-        "transition-colors",
-        active && "bg-paper-2 text-ink-0 font-bold border-hairline",
-        !active && !disabled && "hover:bg-paper-2",
+        "group relative mx-2 my-0.5 px-3 py-[7px] rounded-md flex items-center gap-2.5",
+        "text-[12.5px] text-ink-1 cursor-pointer",
+        "transition-all border border-transparent",
+        active && "aero-active text-white font-semibold",
+        !active && !disabled && "hover:bg-white/50 hover:border-white/55 hover:text-ink-0",
         disabled && "opacity-50 cursor-not-allowed",
         className,
       )}
@@ -56,22 +56,19 @@ export const ProjItem = forwardRef<HTMLDivElement, ProjItemProps>(
       {swatch && (
         <span
           className={cn(
-            "absolute left-1 top-1 bottom-1 rounded-sm",
-            "transition-[width] duration-0 [transition-timing-function:steps(1,end)]",
+            "shrink-0 rounded-full transition-all",
             railClass[swatch],
-            active ? "w-[5px]" : "w-[3px] group-hover:w-[5px]",
+            active ? "w-2.5 h-2.5" : "w-2 h-2 group-hover:w-2.5 group-hover:h-2.5",
           )}
           aria-hidden
         />
       )}
-      {/* Keep the old square swatch as a legacy fallback when callers
-        * forget to pass `swatch` — shouldn't trigger in practice. */}
       {!swatch && (
-        <span className="shrink-0 w-[14px] h-[14px] rounded-[5px] border-[1.25px] border-ink-0 bg-paper-0" />
+        <span className="shrink-0 w-2 h-2 rounded-full bg-ink-3" />
       )}
       <span className="flex-1 min-w-0 truncate">{children}</span>
       {count !== undefined && count > 0 && (
-        <span className="shrink-0 text-[11px] text-ink-2 font-bold">{count}</span>
+        <span className="shrink-0 text-[11px] text-ink-2 font-medium">{count}</span>
       )}
     </div>
   ),

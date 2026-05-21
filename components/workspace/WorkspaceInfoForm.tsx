@@ -5,6 +5,8 @@ import { useUpdateWorkspace } from "@/hooks/useUpdateWorkspace";
 import { ApiError } from "@/lib/api/client";
 import { messages } from "@/lib/messages";
 import type { Workspace } from "@/lib/api/types";
+import { Input } from "@/components/brand/input";
+import { Button } from "@/components/brand/button";
 
 interface Props {
   workspace: Workspace;
@@ -57,32 +59,27 @@ export function WorkspaceInfoForm({ workspace }: Props) {
     <form onSubmit={onSubmit} className="flex flex-col gap-3 max-w-md">
       <label className="flex flex-col gap-1">
         <span className="text-xs font-semibold text-ink-1">{m.nameLabel}</span>
-        <input
+        <Input
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="px-3 py-2 border-[1.5px] border-hairline rounded-sm text-sm"
         />
       </label>
       <label className="flex flex-col gap-1">
         <span className="text-xs font-semibold text-ink-1">{m.slugLabel}</span>
-        <input
+        <Input
           type="text"
           value={slug}
           onChange={(e) => setSlug(e.target.value)}
-          className="px-3 py-2 border-[1.5px] border-hairline rounded-sm text-sm font-mono"
+          className="font-mono"
         />
         <span className="text-xs text-ink-2">{m.slugHelp}</span>
       </label>
       {error && <p className="text-xs text-state-failed">{error}</p>}
       <div className="flex items-center gap-3">
-        <button
-          type="submit"
-          disabled={!canSubmit}
-          className="px-3 py-1.5 bg-ink-0 text-paper-0 border-[1.5px] border-ink-0 rounded-sm font-semibold text-sm disabled:opacity-60"
-        >
+        <Button type="submit" variant="primary" size="default" disabled={!canSubmit}>
           {mutation.isPending ? m.saving : m.save}
-        </button>
+        </Button>
         {savedToast && <span className="text-xs text-ink-2">{m.saved}</span>}
       </div>
     </form>

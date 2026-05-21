@@ -131,7 +131,7 @@ export function MessageList({ taskId, wsId }: MessageListProps) {
         aria-label="任务消息流"
       >
         <div
-          className="mx-auto max-w-3xl"
+          className="mx-auto w-full max-w-[920px]"
           style={{ height: virtualizer.getTotalSize(), position: "relative", width: "100%" }}
         >
           {virtualizer.getVirtualItems().map((vi) => {

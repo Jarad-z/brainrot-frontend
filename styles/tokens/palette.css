@@ -1,80 +1,100 @@
 /* ================================================================
-   tokens/palette.css — paper, ink, hairline, accent variants
-   Each variable corresponds 1:1 to a Tailwind v4 @theme entry
-   in S1 migration; see DESIGN.md §9.
+   tokens/palette.css — Windows Vista Aero theme.
+   Variable NAMES are kept identical to the previous system; values
+   retuned to a cool electric-blue + frosted-glass palette.
    ================================================================ */
 :root {
-  /* Paper (warm-white background hierarchy) */
-  --paper-0: #fdfaf2;
-  --paper-1: #f4ede1;
-  --paper-2: #ece3d2;
+  /* Paper — translucent-friendly cool whites */
+  --paper-0: #ffffff;
+  --paper-1: #eef4fb;
+  --paper-2: #dde8f5;
 
-  /* Ink (foreground hierarchy) */
-  --ink-0: #1b1820;
-  --ink-1: #3b3540;
-  --ink-2: #6f6878;
-  --ink-3: #a8a2b0;
+  /* Ink — deepened cool slate for legibility on glass + sky background.
+     ink-2 / ink-3 used to be too washed out on translucent panels. */
+  --ink-0: #0a1a2e;   /* primary text — almost black with blue cast */
+  --ink-1: #1c3552;   /* secondary text — strong navy */
+  --ink-2: #3a5878;   /* muted text — readable navy */
+  --ink-3: #5e7a99;   /* placeholder / mono accents — was too pale */
 
-  /* Hairline / 1px border */
-  --hairline: #d8cfbe;
-
-  /* Accent candidates (Tweaks panel chooses one → --accent) */
-  --accent-poppy: #cf4040;
-  --accent-moss: #5d7a3a;
-  --accent-honey: #c79029;
-  --accent-plum: #6f3b6b;
-  --accent-fg: #fdfaf2;
-
-  /* Default accent (overridden at runtime by applyAccent()) */
-  --accent: var(--accent-poppy);
+  /* Hairline — soft icy gray */
+  --hairline: #c9d8ea;
 
   /* ----------------------------------------------------------------
-     Project swatch tri-stops — every project color exists in three
-     coordinated tones: stripe (loud), border (mid), text (low).
-     Used by sidebar 3px rails, project chips, kanban topstrips, and
-     status badges so the same project reads consistently everywhere.
+     Aero accent — Vista's electric sky blue. The classic Aero button
+     samples around #5B9BD5 with deep #1E4877 inner stroke + bright
+     #B8DCF0 highlight. We expose all three so components can build
+     proper three-stop glass gradients without hardcoding hex.
      ---------------------------------------------------------------- */
-  --swatch-green-stripe: oklch(58% 0.10 145);
-  --swatch-green-border: oklch(40% 0.08 145);
-  --swatch-green-text: oklch(34% 0.07 145);
+  --accent:        #3D8FD4;   /* primary Aero blue */
+  --accent-deep:   #1E4877;   /* glass inner stroke / pressed */
+  --accent-glow:   #7FC3F2;   /* outer halo */
+  --accent-light:  #B8DCF0;   /* glass top highlight */
+  --accent-fg:     #ffffff;
 
-  --swatch-blue-stripe: oklch(50% 0.07 245);
-  --swatch-blue-border: oklch(34% 0.06 245);
-  --swatch-blue-text: oklch(28% 0.05 245);
+  /* Compat — old names re-pointed into the cool family */
+  --accent-poppy: #d94a4a;
+  --accent-moss:  #4ca64c;
+  --accent-honey: #e0a83a;
+  --accent-plum:  #6b6ad6;
 
-  --swatch-pink-stripe: oklch(60% 0.13 25);
-  --swatch-pink-border: oklch(48% 0.12 25);
-  --swatch-pink-text: oklch(38% 0.10 25);
-
-  --swatch-amber-stripe: var(--accent-honey);
-  --swatch-amber-border: oklch(48% 0.10 75);
-  --swatch-amber-text: oklch(36% 0.08 75);
-
-  --swatch-violet-stripe: oklch(50% 0.08 320);
-  --swatch-violet-border: oklch(34% 0.07 320);
-  --swatch-violet-text: oklch(28% 0.06 320);
-
-  --swatch-teal-stripe: oklch(55% 0.07 200);
-  --swatch-teal-border: oklch(40% 0.06 200);
-  --swatch-teal-text: oklch(32% 0.05 200);
+  /* Soft tinted washes (selection backgrounds, hover wash) */
+  --accent-wash:   #dfedfa;
+  --accent-wash-2: #b9d8f1;
 
   /* ----------------------------------------------------------------
-     Linear-style semantic aliases — all components must reference
-     these names; never write raw paper/ink/hex values in components.
-     Red (accent-poppy) is restricted to: danger actions + 1-2 brand
-     accent dots. Primary actions use bg-surface-action (dark).
+     Project swatch tri-stops — re-tinted to cool family so they sit
+     well on a glassy blue canvas.
      ---------------------------------------------------------------- */
-  --bg-primary: var(--paper-0);
+  --swatch-green-stripe: #6fbf73;
+  --swatch-green-border: #4ca64c;
+  --swatch-green-text:   #2e7d32;
+
+  --swatch-blue-stripe:  #5b9bd5;
+  --swatch-blue-border:  #3d7dbc;
+  --swatch-blue-text:    #1e4877;
+
+  --swatch-pink-stripe:  #e08eb8;
+  --swatch-pink-border:  #c2649c;
+  --swatch-pink-text:    #8e3a6c;
+
+  --swatch-amber-stripe: #e0a83a;
+  --swatch-amber-border: #c0892b;
+  --swatch-amber-text:   #7d5a16;
+
+  --swatch-violet-stripe:#8e8ad9;
+  --swatch-violet-border:#6b6ad6;
+  --swatch-violet-text:  #3e3d8c;
+
+  --swatch-teal-stripe:  #5dbcc6;
+  --swatch-teal-border:  #3d949f;
+  --swatch-teal-text:    #1f5d66;
+
+  /* Semantic aliases */
+  --bg-primary:   var(--paper-0);
   --bg-secondary: var(--paper-1);
-  --bg-tertiary: var(--paper-2);
-  --text-primary: var(--ink-0);
+  --bg-tertiary:  var(--paper-2);
+  --text-primary:   var(--ink-0);
   --text-secondary: var(--ink-1);
-  --text-tertiary: var(--ink-2);
+  --text-tertiary:  var(--ink-2);
 
-  /* Surface for primary action buttons: dark background, light text */
-  --bg-surface-action: var(--ink-0);
-  --text-surface-action: var(--paper-0);
+  --bg-surface-action:   var(--accent);
+  --text-surface-action: var(--accent-fg);
 
-  /* Danger: red reserved ONLY for destructive / irreversible actions */
-  --danger: var(--state-failed, #c25036);
+  --danger: #c83838;
+
+  /* ----------------------------------------------------------------
+     AERO GLASS RECIPE — composable surface used everywhere.
+     - glass-surface:   solid-ish fill for translucent panels
+     - glass-edge-top:  inset 1px highlight (top of every glass piece)
+     - glass-edge-bot:  inset 1px shadow line at bottom (depth)
+     - glass-blur:      backdrop blur amount, set per-component
+     ---------------------------------------------------------------- */
+  --glass-fill-light: rgba(255, 255, 255, 0.58);
+  --glass-fill-medium: rgba(255, 255, 255, 0.42);
+  --glass-fill-deep:   rgba(20, 50, 95, 0.32);
+  --glass-stroke: rgba(255, 255, 255, 0.55);
+  --glass-edge-inner: rgba(30, 72, 119, 0.18);
+
+  /* Editorial paper retained for back-compat (used by ChatPane bg) */
+  --paper-canvas: #d6e4f4;
 }

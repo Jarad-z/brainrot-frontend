@@ -20,7 +20,7 @@ export function ProjectCard({ wsId, project }: ProjectCardProps) {
         <ProjTopstrip swatch={swatch} className="h-[130px]" />
         <div className="p-4">
           <h3
-            className="text-lg font-extrabold text-ink-0 font-tight"
+            className="text-[15px] font-medium text-ink-0"
             style={{
               wordBreak: "keep-all",
               overflowWrap: "break-word",

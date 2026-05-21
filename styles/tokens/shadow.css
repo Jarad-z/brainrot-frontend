@@ -1,26 +1,38 @@
-/* tokens/shadow.css — solid-offset "block" shadows + soft float */
+/* tokens/shadow.css — Vista Aero shadow system: depth via blue-tinted
+   Variable NAMES are preserved (the previous "block shadow" system
+   was referenced everywhere); the values are retuned to subtle,
+   layered blurs that match a white + soft-blue light theme. */
 :root {
   --shadow-0: none;
-  --shadow-1: 3px 3px 0 var(--ink-0);
-  --shadow-2: 4px 4px 0 var(--ink-0);
-  --shadow-3: 6px 6px 0 var(--ink-0);
 
-  /* For float surfaces only (dropdown, toast, modal) */
-  --shadow-soft: 0 2px 8px rgb(27 24 32 / 0.08);
+  /* Resting elevation — almost imperceptible, used on cards in lists */
+  --shadow-1: 0 1px 2px rgb(15 23 42 / 0.04), 0 1px 1px rgb(15 23 42 / 0.03);
 
-  /* Tweaks block-depth runtime override */
-  --depth: 4px;
-  --shadow-current: var(--depth) var(--depth) 0 var(--ink-0);
+  /* Lifted elevation — for hover or "selected" surfaces */
+  --shadow-2: 0 4px 12px rgb(15 23 42 / 0.06), 0 2px 4px rgb(15 23 42 / 0.04);
 
-  /* Hover lift — used on interactive cards (kanban, approval, agent,
-     runtime, asset). Cards translateY(-2px) and swap shadow-1 → lift. */
-  --shadow-lift: 5px 5px 0 var(--ink-0);
+  /* Float — popovers, dropdowns, command palette */
+  --shadow-3: 0 12px 32px rgb(15 23 42 / 0.10), 0 4px 8px rgb(15 23 42 / 0.05);
 
-  /* Pixel hover collapse — cards shrink shadow on hover */
-  --shadow-pixel-sm: 2px 2px 0 var(--ink-0);
-  --shadow-pixel-md: 3px 3px 0 var(--ink-0);
+  /* Modal / dialog overlay */
+  --shadow-soft: 0 20px 48px rgb(15 23 42 / 0.14), 0 6px 14px rgb(15 23 42 / 0.06);
+
+  /* Tweaks block-depth runtime override — now drives drop-shadow blur */
+  --depth: 6px;
+  --shadow-current: 0 2px var(--depth) rgb(15 23 42 / 0.06);
+
+  /* Hover lift — slightly more pronounced than --shadow-1 */
+  --shadow-lift: 0 6px 18px rgb(15 23 42 / 0.08), 0 2px 4px rgb(15 23 42 / 0.04);
+
+  /* Compact hover ("pixel" naming preserved for back-compat) */
+  --shadow-pixel-sm: 0 1px 2px rgb(15 23 42 / 0.05);
+  --shadow-pixel-md: 0 4px 10px rgb(15 23 42 / 0.06), 0 1px 2px rgb(15 23 42 / 0.04);
 
   /* Spring easing for hover lift transitions */
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
   --ease-out-fast: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Focus ring — Aero blue halo */
+  --focus-ring: 0 0 0 3px rgba(91, 155, 213, 0.32),
+                0 0 12px rgba(91, 155, 213, 0.18);
 }

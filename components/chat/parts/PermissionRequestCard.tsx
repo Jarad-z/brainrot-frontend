@@ -44,9 +44,9 @@ export function PermissionRequestCard({ msg, taskId }: PermissionRequestCardProp
           ? "已拒绝"
           : "已批准（带修改）";
     return (
-      <div className="chat-indent my-2 px-3 py-2 bg-paper-1 border-[1.5px] border-hairline rounded-md flex items-center justify-between text-sm">
+      <div className="chat-indent my-2 px-3.5 py-2 bg-paper-1 border border-hairline rounded-xl flex items-center justify-between text-sm">
         <span>
-          <strong>{tool_name}</strong> · {text}
+          <strong className="font-semibold">{tool_name}</strong> · {text}
         </span>
         <StatusChip status={status} />
       </div>
@@ -55,9 +55,9 @@ export function PermissionRequestCard({ msg, taskId }: PermissionRequestCardProp
 
   if (expired) {
     return (
-      <div className="chat-indent my-2 px-3 py-2 bg-paper-1 border-[1.5px] border-hairline rounded-md opacity-60 flex items-center justify-between text-sm">
+      <div className="chat-indent my-2 px-3.5 py-2 bg-paper-1 border border-hairline rounded-xl opacity-60 flex items-center justify-between text-sm">
         <span>
-          <strong>{tool_name}</strong> · 已超时
+          <strong className="font-semibold">{tool_name}</strong> · 已超时
         </span>
       </div>
     );
@@ -81,17 +81,23 @@ export function PermissionRequestCard({ msg, taskId }: PermissionRequestCardProp
       : "";
 
   return (
-    <div className="chat-indent my-2 border-[1.5px] border-ink-0 rounded-md overflow-hidden shadow-[var(--shadow-current)] bg-paper-0">
-      <div className="flex items-center justify-between px-3 py-1.5 bg-role-approval text-paper-0">
-        <span className="font-bold">{tool_name} 请求批准</span>
+    <div className="chat-indent my-2 border border-accent-wash-2 rounded-xl overflow-hidden shadow-[var(--shadow-2)] bg-paper-0">
+      <div className="flex items-center justify-between px-3.5 py-2 bg-accent-wash text-ink-0 border-b border-accent-wash-2">
+        <span className="font-semibold text-sm">
+          <span className="text-accent">●</span> {tool_name} 请求批准
+        </span>
         <span
-          className={`font-mono text-xs ${urgent ? "text-state-failed font-bold animate-pulse" : ""}`}
+          className={`font-mono text-xs ${
+            urgent
+              ? "text-countdown-urgent font-bold animate-pulse"
+              : "text-ink-2"
+          }`}
         >
           {label}
         </span>
       </div>
-      <div className="p-3 flex flex-col gap-2">
-        <pre className="font-mono text-xs bg-paper-1 p-2 rounded-sm whitespace-pre-wrap break-all">
+      <div className="p-3.5 flex flex-col gap-2.5">
+        <pre className="font-mono text-xs bg-paper-1 border border-hairline px-3 py-2 rounded-lg whitespace-pre-wrap break-all text-ink-1">
           {inputSummary}
         </pre>
         {noteOpen && (
@@ -100,13 +106,13 @@ export function PermissionRequestCard({ msg, taskId }: PermissionRequestCardProp
             onChange={(e) => setNote(e.target.value)}
             maxLength={256}
             placeholder="备注（可选,≤256 字）"
-            className="border-[1.5px] border-hairline rounded-sm p-2 text-sm min-h-[60px]"
+            className="border border-hairline rounded-lg p-2.5 text-sm min-h-[60px] bg-paper-0 text-ink-0 focus:border-accent/60 focus:outline-none"
           />
         )}
         <div className="flex justify-end gap-2">
           <button
             onClick={() => submit("denied")}
-            className="px-3 py-1 border-[1.5px] border-ink-0 rounded-sm font-semibold"
+            className="px-3.5 py-1.5 border border-hairline rounded-lg text-sm font-medium text-ink-1 hover:bg-paper-1 transition-colors"
           >
             拒绝
           </button>
@@ -115,13 +121,13 @@ export function PermissionRequestCard({ msg, taskId }: PermissionRequestCardProp
               setNoteOpen(true);
               submit("approved_with_edits");
             }}
-            className="px-3 py-1 border-[1.5px] border-ink-0 rounded-sm font-semibold"
+            className="px-3.5 py-1.5 border border-hairline rounded-lg text-sm font-medium text-ink-1 hover:bg-paper-1 transition-colors"
           >
             批准并修改
           </button>
           <button
             onClick={() => submit("approved")}
-            className="px-3 py-1 bg-ink-0 text-paper-0 border-[1.5px] border-ink-0 rounded-sm font-semibold shadow-[var(--shadow-current)]"
+            className="px-3.5 py-1.5 bg-accent text-accent-fg rounded-lg text-sm font-semibold hover:opacity-90 shadow-[var(--shadow-1)] transition-opacity"
           >
             批准
           </button>

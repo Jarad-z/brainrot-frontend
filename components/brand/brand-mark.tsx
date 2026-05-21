@@ -12,11 +12,11 @@ export function BrandMark({ logo, size = 36, className }: BrandMarkProps) {
   return (
     <span
       className={cn(
-        "grid place-items-center bg-accent text-accent-fg font-bold rounded-xl",
-        "border-[1.5px] border-ink-0 shadow-[var(--shadow-current)]",
+        "grid place-items-center bg-accent text-accent-fg font-bold rounded-[10px]",
+        "shadow-[var(--shadow-1)]",
         className,
       )}
-      style={{ width: size, height: size, fontSize: Math.round(size * 0.5) }}
+      style={{ width: size, height: size, fontSize: Math.round(size * 0.46) }}
     >
       {logo}
     </span>

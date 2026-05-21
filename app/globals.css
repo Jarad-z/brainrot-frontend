@@ -25,6 +25,9 @@
   --color-accent-moss: var(--accent-moss);
   --color-accent-honey: var(--accent-honey);
   --color-accent-plum: var(--accent-plum);
+  --color-accent-wash: var(--accent-wash);
+  --color-accent-wash-2: var(--accent-wash-2);
+  --color-paper-canvas: var(--paper-canvas);
   --color-role-approval-bg: var(--role-approval-bg);
   --color-role-approval-fg: var(--role-approval-fg);
   --color-state-failed: var(--state-failed);
@@ -93,50 +96,59 @@
   --font-serif-cjk: var(--font-serif-cjk);
 }
 
+/* ----------------------------------------------------------------
+   Typography utilities. Names preserved (used in markup throughout)
+   but tuned for Inter — no `wdth` axis, so we lean on letter-spacing
+   and weight for hierarchy rather than width compression.
+   ---------------------------------------------------------------- */
 @utility font-tight {
-  font-variation-settings: "wdth" 88;
   letter-spacing: -0.015em;
 }
 @utility font-wide {
-  font-variation-settings: "wdth" 96;
   letter-spacing: -0.005em;
 }
 @utility font-normal-wdth {
-  font-variation-settings: "wdth" 100;
   letter-spacing: 0;
 }
 @utility hero-title {
-  font-variation-settings: "wdth" 84;
-  letter-spacing: -0.035em;
-  line-height: 0.92;
+  letter-spacing: -0.028em;
+  line-height: 1;
+  font-weight: 700;
   text-wrap: balance;
 }
 @utility stat-num {
-  font-variation-settings: "wdth" 78;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.03em;
   line-height: 1;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
 }
 @utility page-title {
-  font-variation-settings: "wdth" 88;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.018em;
+  font-weight: 600;
 }
 @utility editorial-title {
-  font-family: var(--font-serif-cjk), var(--font-display);
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  line-height: 1.02;
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.022em;
+  line-height: 1.08;
   text-wrap: balance;
 }
 @utility editorial-deck {
   font-family: var(--font-display);
   color: var(--ink-2);
   font-size: var(--text-base);
-  font-weight: 500;
-  letter-spacing: -0.005em;
-  line-height: 1.45;
+  font-weight: 400;
+  letter-spacing: -0.003em;
+  line-height: 1.55;
   max-width: 64ch;
 }
 
+/* ----------------------------------------------------------------
+   Stat / kanban "topstrip" textures. The original system used loud
+   stripes and dot patterns to brand each column; Notion/Apple wants
+   a quiet identifier instead — we render a thin solid bar in the
+   project swatch color with a faint top-light gradient.
+   ---------------------------------------------------------------- */
 @utility stat-hot-stripe {
   position: relative;
 }
@@ -146,178 +158,452 @@
   top: 0;
   left: 0;
   right: 0;
-  height: 14px;
-  background: repeating-linear-gradient(
-    -45deg,
-    rgb(255 255 255 / 0.22) 0 4px,
-    transparent 4px 9px
-  );
+  height: 3px;
+  background: linear-gradient(180deg,
+    rgb(255 255 255 / 0.6) 0%,
+    rgb(255 255 255 / 0) 100%);
   pointer-events: none;
 }
 
 @utility topstrip-green {
-  background-color: oklch(40% 0.08 145);
-  background-image: repeating-linear-gradient(45deg, oklch(58% 0.10 145) 0 6px, transparent 6px 16px);
+  background: linear-gradient(180deg, #d1fae5 0%, #ecfdf5 100%);
+  color: var(--swatch-green-text);
 }
 @utility topstrip-blue {
-  background-color: oklch(34% 0.06 245);
-  background-image: repeating-linear-gradient(0deg, oklch(50% 0.07 245) 0 4px, transparent 4px 13px);
+  background: linear-gradient(180deg, #dbeafe 0%, #eff6ff 100%);
+  color: var(--swatch-blue-text);
 }
 @utility topstrip-pink {
-  background-color: oklch(48% 0.12 25);
-  background-image: radial-gradient(rgba(255, 255, 255, 0.32) 1.4px, transparent 1.8px);
-  background-size: 12px 12px;
+  background: linear-gradient(180deg, #fce7f3 0%, #fdf2f8 100%);
+  color: var(--swatch-pink-text);
 }
 @utility topstrip-amber {
-  background-color: var(--accent-honey);
-  background-image: repeating-linear-gradient(0deg, rgb(0 0 0 / 0.35) 0 3px, transparent 3px 14px);
+  background: linear-gradient(180deg, #fef3c7 0%, #fffbeb 100%);
+  color: var(--swatch-amber-text);
 }
 @utility topstrip-violet {
-  background-color: oklch(34% 0.07 320);
-  background-image: repeating-linear-gradient(90deg, oklch(50% 0.08 320) 0 4px, transparent 4px 13px);
+  background: linear-gradient(180deg, #ede9fe 0%, #f5f3ff 100%);
+  color: var(--swatch-violet-text);
 }
 @utility topstrip-teal {
-  background-color: oklch(40% 0.06 200);
-  background-image: linear-gradient(rgba(255, 255, 255, 0.3) 1.4px, transparent 1.4px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.3) 1.4px, transparent 1.4px);
-  background-size: 18px 18px;
+  background: linear-gradient(180deg, #ccfbf1 0%, #f0fdfa 100%);
+  color: var(--swatch-teal-text);
 }
 
-/* Diagonal-stripe "pending / waiting" texture. Used on approval card
- * header bars, ThinkingBar background, and anywhere a tool call is
- * awaiting a decision. Lives as a token so the texture stays uniform. */
+/* Diagonal-stripe "pending / waiting" texture was a heavy editorial
+ * pattern. Notion/Apple swap: a soft tinted wash that reads as
+ * "active / awaiting" without the visual noise. Used on approval
+ * card header bars and ThinkingBar backgrounds. */
 @utility pending-stripes {
-  background-color: var(--ink-0);
-  background-image: repeating-linear-gradient(
-    -45deg,
-    rgb(255 255 255 / 0.10) 0 6px,
-    transparent 6px 14px
-  );
+  background-color: var(--accent-wash);
+  background-image: linear-gradient(90deg,
+    rgb(47 111 235 / 0.05) 0%,
+    rgb(47 111 235 / 0.12) 50%,
+    rgb(47 111 235 / 0.05) 100%);
+  color: var(--ink-1);
 }
 
-/* Interactive card lift — pair with `border-2 border-ink-0` cards. */
+/* Interactive card lift — pair with hairline-bordered cards. */
 @utility card-lift {
   transition:
-    transform 120ms ease-out,
-    box-shadow 120ms ease-out;
+    transform 160ms var(--ease-out-fast),
+    box-shadow 160ms var(--ease-out-fast),
+    border-color 160ms var(--ease-out-fast);
 }
 @utility card-lift-hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-pixel-md);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-lift);
+  border-color: color-mix(in srgb, var(--accent) 20%, var(--hairline));
 }
 
-/* Solid-press feedback for primary action buttons — slight inward
- * scale + shadow collapse, mimicking an inked stamp landing. */
+/* "ink-stamp" name kept for back-compat; rendered as a soft press
+ * (slight scale-down + shadow collapse) rather than the original
+ * translate-and-flatten editorial stamp. */
 @utility ink-stamp {
-  transition: transform 90ms ease, box-shadow 90ms ease;
+  transition: transform 120ms var(--ease-out-fast),
+              box-shadow 120ms var(--ease-out-fast),
+              filter 120ms var(--ease-out-fast);
 }
 @utility ink-stamp-active {
-  transform: translate(2px, 2px);
-  box-shadow: 0 0 0 var(--ink-0);
+  transform: scale(0.98);
+  box-shadow: var(--shadow-1);
+  filter: brightness(0.96);
 }
 
-/* Spring press for buttons — quick compress + overshoot release. */
+/* Spring press for buttons — quick compress + soft release. */
 @utility btn-spring {
-  transition: transform 90ms ease-out, box-shadow 90ms ease-out;
+  transition: transform 120ms var(--ease-out-fast),
+              box-shadow 120ms var(--ease-out-fast),
+              background-color 120ms var(--ease-out-fast);
 }
 @utility btn-spring-active {
-  transform: scale(0.94);
-  box-shadow: none;
+  transform: scale(0.97);
+  box-shadow: var(--shadow-1);
 }
 
 @keyframes status-pulse {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.35; }
+  50% { opacity: 0.45; }
 }
 @utility animate-status-pulse {
-  animation: status-pulse 1.4s ease-in-out infinite;
+  animation: status-pulse 1.6s var(--ease-out-fast) infinite;
 }
 
-/* Pixel blink for skeleton states — discrete flash instead of smooth shimmer. */
-@keyframes pixel-blink {
-  0%, 49% { opacity: 1; }
-  50%, 100% { opacity: 0.35; }
+/* Soft shimmer for skeleton states — smooth gradient sweep replaces
+ * the original discrete pixel blink. */
+@keyframes soft-shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
 }
 @utility skeleton-pixel {
-  animation: pixel-blink 0.8s steps(1, end) infinite;
+  background: linear-gradient(
+    90deg,
+    var(--paper-1) 0%,
+    var(--paper-2) 50%,
+    var(--paper-1) 100%
+  );
+  background-size: 200% 100%;
+  animation: soft-shimmer 1.4s var(--ease-out-fast) infinite;
 }
 
 /* Badge spring-in */
 @keyframes badge-spring {
   from { opacity: 0; transform: scale(0); }
-  60%  { transform: scale(1.1); }
+  60%  { transform: scale(1.08); }
   to   { opacity: 1; transform: scale(1); }
 }
 @utility badge-enter {
   animation: badge-spring 200ms var(--ease-spring) forwards;
 }
 
-/* Pixel section label — game-UI zone header style. */
+/* Section label — quiet uppercase tracking, Notion-style. */
 @utility pixel-label {
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  font-weight: 700;
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--ink-3);
+  letter-spacing: 0.08em;
+  color: var(--ink-2);
 }
 
 html,
 body {
-  background: var(--paper-1);
+  background: transparent;
   color: var(--ink-0);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+html {
+  /* Fallback sky-blue if the shell hasn't mounted yet */
+  background: #b9d7ee;
 }
 body {
   font-family: var(--font-body);
   font-size: var(--text-base);
-  line-height: 1.5;
+  line-height: 1.55;
 }
 
-/* Tiptap Placeholder extension — render placeholder text in empty editor.
- * S2 Composer uses this to show "输入消息，@ 一个 agent；Ctrl+Enter 发送"
- * when the editor is empty. */
+/* Selection color — soft blue tint */
+::selection {
+  background: var(--accent-wash-2);
+  color: var(--ink-0);
+}
+
+/* Native scrollbars (WebKit) — thin, light, Notion/Apple style */
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+*::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--ink-3) 50%, transparent);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--ink-2) 60%, transparent);
+  background-clip: padding-box;
+  border: 2px solid transparent;
+}
+
+/* Tiptap Placeholder extension. */
 .ProseMirror p.is-editor-empty:first-child::before {
   content: attr(data-placeholder);
   float: left;
-  color: var(--ink-3, oklch(60% 0.02 300));
+  color: var(--ink-3);
   pointer-events: none;
   height: 0;
 }
 
-/* Chat structural indent — avatar 36px + gap-3 12px = 48px = --sp-12.
- * Used by ToolPair, PermissionRequestCard, OrphanToolResult to align
- * card bodies with message text. Single definition so avatar-size
- * changes only need updating here. */
+/* Chat structural indent — avatar 36px + gap-3 12px = 48px = --sp-12. */
 @utility chat-indent {
   margin-left: var(--sp-12);
 }
 
-/* Composer focus ring — soft glow on the wrapper div when the Tiptap
- * editor or send button has focus. */
+/* Composer focus ring — soft blue halo on focus-within. */
 @utility composer-focus-ring {
-  transition: box-shadow 100ms ease;
+  transition: box-shadow 140ms var(--ease-out-fast),
+              border-color 140ms var(--ease-out-fast);
 }
 .composer-focus-ring:focus-within {
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ink-0) 12%, transparent);
+  background: var(--paper-0);
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--hairline));
+  box-shadow:
+    0 1px 0 inset rgba(255, 255, 255, 0.6),
+    0 0 0 4px color-mix(in srgb, var(--accent) 12%, transparent),
+    0 4px 14px color-mix(in srgb, var(--accent) 10%, transparent);
 }
 
 /* MentionList dropdown entry animation. */
 @keyframes mention-in {
-  from { opacity: 0; transform: translateY(-4px) scale(0.97); }
+  from { opacity: 0; transform: translateY(-4px) scale(0.98); }
   to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 @utility mention-enter {
-  animation: mention-in 100ms ease-out forwards;
+  animation: mention-in 120ms var(--ease-out-fast) forwards;
   transform-origin: top left;
 }
 
-/* New chat message entry animation — slide up from 6px below. Only applied
- * to messages appended at the bottom while the user is already at the bottom
- * of the scroll; not applied to initial page load. */
+/* New chat message entry animation. */
 @keyframes msg-in {
-  from { opacity: 0; transform: translateY(6px) scale(0.98); }
-  to   { opacity: 1; transform: translateY(0) scale(1); }
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 @utility msg-enter {
-  animation: msg-in 180ms var(--ease-out-fast) forwards;
+  animation: msg-in 220ms var(--ease-out-fast) forwards;
 }
+
+/* Inputs / buttons baseline — give native form controls the same
+ * blue focus ring as the composer so the whole app feels coherent. */
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+button:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+  border-color: color-mix(in srgb, var(--accent) 50%, var(--hairline));
+}
+
+/* ================================================================
+   AERO GLASS UTILITIES — Vista-style frosted surfaces.
+   ================================================================ */
+
+/* Translucent frosted panel — the "Aero glass" surface used by every
+ * floating island. Layers: half-opaque white tint + heavy backdrop
+ * blur + a 1px top highlight (inset white) + a 1px bottom shadow line
+ * (inset dark) + outer subtle drop shadow + 1px hairline edge. */
+@utility aero-glass {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(218, 236, 250, 0.48) 0%,
+      rgba(185, 215, 240, 0.34) 50%,
+      rgba(160, 200, 232, 0.30) 100%
+    );
+  backdrop-filter: blur(28px) saturate(1.6);
+  -webkit-backdrop-filter: blur(28px) saturate(1.6);
+  border: 1px solid rgba(155, 200, 235, 0.55);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.72),
+    inset 0 -1px 0 rgba(20, 62, 107, 0.18),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.22),
+    0 1px 2px rgba(20, 62, 107, 0.20),
+    0 14px 36px rgba(20, 62, 107, 0.22);
+}
+
+/* Subtler glass — for nested panels (task list, right rail) that sit
+ * inside an already-glassy parent. */
+@utility aero-glass-soft {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(95, 145, 195, 0.45) 0%,
+      rgba(70, 120, 175, 0.42) 50%,
+      rgba(60, 110, 165, 0.40) 100%
+    );
+  backdrop-filter: blur(20px) saturate(1.5);
+  -webkit-backdrop-filter: blur(20px) saturate(1.5);
+  border: 1px solid rgba(155, 200, 235, 0.45);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.42),
+    inset 0 -1px 0 rgba(20, 62, 107, 0.22),
+    0 2px 6px rgba(20, 62, 107, 0.15);
+}
+
+/* Blue glass for bubbles / active surfaces */
+@utility aero-glass-blue {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(127, 195, 242, 0.85) 0%,
+      rgba(91, 155, 213, 0.95) 50%,
+      rgba(61, 125, 188, 0.95) 100%
+    );
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    inset 0 -1px 0 rgba(30, 72, 119, 0.5),
+    0 1px 2px rgba(30, 72, 119, 0.25),
+    0 8px 20px rgba(91, 155, 213, 0.32);
+  color: #fff;
+}
+
+/* Classic Aero button — three-band gradient with the iconic 50%
+ * mirror line that splits "lit glass top" from "darker glass bottom".
+ * Use on primary buttons. */
+@utility aero-button {
+  background:
+    linear-gradient(
+      180deg,
+      #d4e8f6 0%,
+      #a5cce8 49.5%,
+      #5b9bd5 50.5%,
+      #3d7dbc 100%
+    );
+  color: #ffffff;
+  text-shadow: 0 -1px 0 rgba(30, 72, 119, 0.45);
+  border: 1px solid #1e4877;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.7),
+    inset 0 -1px 0 rgba(30, 72, 119, 0.6),
+    0 1px 2px rgba(30, 72, 119, 0.25),
+    0 0 0 1px rgba(255, 255, 255, 0.5);
+  transition: filter 120ms ease, box-shadow 120ms ease, transform 80ms ease;
+}
+@utility aero-button-hover {
+  filter: brightness(1.06) saturate(1.1);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.85),
+    inset 0 -1px 0 rgba(30, 72, 119, 0.6),
+    0 1px 2px rgba(30, 72, 119, 0.25),
+    0 0 0 1px rgba(255, 255, 255, 0.55),
+    0 0 14px rgba(127, 195, 242, 0.55);
+}
+/* Selected item — soft glass blue pill, mirror line. Used by sidebar
+ * nav-item / proj-item active state. */
+@utility aero-active {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(180, 220, 245, 0.85) 0%,
+      rgba(140, 195, 230, 0.85) 49.5%,
+      rgba(100, 165, 215, 0.85) 50.5%,
+      rgba(80, 145, 200, 0.85) 100%
+    );
+  border-color: rgba(30, 72, 119, 0.45);
+  color: #ffffff;
+  text-shadow: 0 -1px 0 rgba(30, 72, 119, 0.3);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.65),
+    inset 0 -1px 0 rgba(30, 72, 119, 0.35),
+    0 1px 2px rgba(30, 72, 119, 0.18),
+    0 0 0 1px rgba(255, 255, 255, 0.4);
+}
+
+@utility aero-button-active {
+  background:
+    linear-gradient(
+      180deg,
+      #3d7dbc 0%,
+      #5b9bd5 49.5%,
+      #a5cce8 50.5%,
+      #d4e8f6 100%
+    );
+  filter: brightness(0.96);
+  box-shadow:
+    inset 0 1px 2px rgba(30, 72, 119, 0.4),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.4);
+}
+
+/* Vista's signature "fancy header glow" — a subtle radial light source
+ * coming from above-left. Apply on the page-scope wrapper. */
+@utility aero-glow {
+  background:
+    radial-gradient(
+      circle at 25% -10%,
+      rgba(159, 200, 232, 0.75) 0%,
+      rgba(159, 200, 232, 0) 45%
+    ),
+    radial-gradient(
+      circle at 80% 110%,
+      rgba(127, 195, 242, 0.4) 0%,
+      rgba(127, 195, 242, 0) 50%
+    );
+}
+
+/* ================================================================
+   NOTION/APPLE COMPAT LAYER
+   The previous design system used "editorial heavy stamp" semantics
+   on a handful of utility classes that are baked into ~50 component
+   files. Rather than rewriting every JSX file, we re-skin those
+   classes here so the same markup renders as a soft white + blue UI.
+   - border-ink-0  → soft hairline (1px, cool gray)
+   - bg-ink-0     → soft-blue accent surface (primary action / approval)
+   - text-paper-0 → white-on-blue text for action surfaces
+   ================================================================ */
+
+/* 1) Heavy "stamp" borders → soft hairline.
+      Tailwind compiles `border-ink-0` to { border-color: var(--color-ink-0) }.
+      We override the color on that exact class. */
+.border-ink-0 {
+  border-color: var(--hairline) !important;
+}
+/* Subtle emphasis hover variant — used widely; keep it readable but quiet */
+.hover\:border-ink-0:hover,
+.hover\:border-ink-0\/20:hover {
+  border-color: color-mix(in srgb, var(--accent) 25%, var(--hairline)) !important;
+}
+
+/* 2) "Dark surface" usages — primary buttons, approval headers,
+      avatar fills — become the soft blue accent. */
+.bg-ink-0 {
+  background-color: var(--accent) !important;
+  color: var(--accent-fg);
+}
+.hover\:bg-ink-0:hover {
+  background-color: color-mix(in srgb, var(--accent) 88%, black) !important;
+}
+
+/* 3) Ring/outline overrides — the previous focus ring was ring-ink-0
+      (a hard black ring). Match the soft-blue focus convention. */
+.ring-ink-0 {
+  --tw-ring-color: var(--accent) !important;
+}
+.focus-visible\:ring-ink-0:focus-visible {
+  --tw-ring-color: var(--accent) !important;
+}
+
+/* 4) "Pending stripes" / waiting backgrounds used `bg-ink-0` text on
+      dark; on the new blue surface white text still reads correctly,
+      but the diagonal-stripe utility was already retuned above. */
+
+/* 5) Decorative dividers — many surfaces use `bg-ink-0` for a 1px
+      separator strip. Since bg-ink-0 is now blue, that would look
+      odd as a divider. Targeted carve-out: when used as a separator
+      (height 1px or 2px element with no children), render as hairline. */
+.bg-ink-0[class*="h-px"],
+.bg-ink-0[class*="h-[1px]"],
+.bg-ink-0[class*="h-[2px]"] {
+  background-color: var(--hairline) !important;
+  color: inherit;
+}
+
+/* 6) Text on "primary" surfaces. text-paper-0 was the inverse text
+      color (light on dark). On the new blue surface it should stay
+      white — already correct. text-text-surface-action also resolves
+      to white via the retuned token. No JSX change needed. */
+
+/* 7) Soft global card surface defaults — any element with `border`
+      + `bg-paper-0` gets the Notion/Apple subtle elevation. */
+.bg-paper-0.border,
+.bg-paper-0.border-hairline {
+  box-shadow: var(--shadow-1);
+}
+
+/* 8) Sidebar — kept transparent so the .aero-glass utility shows
+      through. We no longer override its background here. */
+

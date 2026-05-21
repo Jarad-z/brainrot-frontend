@@ -50,7 +50,7 @@ export function WorkspaceSwitcherDropdown() {
       />
       {open ? (
         <div
-          className="absolute left-0 right-0 top-full mt-1 z-30 bg-paper-0 border-[1.5px] border-hairline rounded-md shadow-lg max-h-72 overflow-y-auto"
+          className="absolute left-0 right-0 top-full mt-1 z-30 aero-glass rounded-lg max-h-72 overflow-y-auto"
           role="listbox"
           aria-label="Available workspaces"
         >
@@ -67,10 +67,12 @@ export function WorkspaceSwitcherDropdown() {
                   setOpen(false);
                   if (ws.id !== currentWsId) switchTo(ws.id);
                 }}
-                className="w-full text-left px-3 py-2 text-sm hover:bg-paper-2 flex items-center gap-2"
+                className="w-full text-left px-3 py-2 text-[13px] hover:bg-white/45 flex items-center gap-2 transition-colors"
               >
                 <span className="flex-1 truncate">{ws.name}</span>
-                {ws.id === currentWsId ? <span aria-hidden>✓</span> : null}
+                {ws.id === currentWsId ? (
+                  <span aria-hidden className="text-accent">✓</span>
+                ) : null}
               </button>
             ))
           )}
@@ -80,7 +82,7 @@ export function WorkspaceSwitcherDropdown() {
               setOpen(false);
               setCreateOpen(true);
             }}
-            className="w-full text-left px-3 py-2 text-sm font-semibold border-t-[1.5px] border-hairline hover:bg-paper-2"
+            className="w-full text-left px-3 py-2 text-[13px] font-semibold border-t border-white/40 hover:bg-white/45 transition-colors"
           >
             + 新建工作区
           </button>

@@ -15,31 +15,40 @@ export function TaskListPane({ projectId, wsId, activeTaskId }: TaskListPaneProp
   const { data: project } = useProject(projectId);
 
   return (
-    <aside className="border-r-[1.5px] border-hairline bg-paper-0 flex flex-col min-h-0">
-      <header className="px-4 py-3 border-b-[1.5px] border-hairline flex items-center gap-2">
+    <aside className="aero-glass-soft rounded-xl flex flex-col min-h-0 overflow-hidden">
+      <header className="px-3.5 pt-3.5 pb-2.5 flex items-center gap-2">
         <Link
           href={`/w/${wsId}/p/${projectId}`}
-          className="text-ink-2 hover:text-ink-0 text-sm"
+          className="grid place-items-center w-6 h-6 rounded-md text-ink-2 hover:bg-paper-2 hover:text-ink-0 transition-colors text-sm shrink-0"
           aria-label="返回项目板"
         >
           ←
         </Link>
         <div className="flex-1 min-w-0">
-          <div className="font-extrabold text-sm truncate">{project?.name ?? "…"}</div>
-          <div className="text-xs text-ink-2">{tasks.length} 个任务</div>
+          <div className="font-semibold text-[13px] text-ink-0 truncate leading-tight">
+            {project?.name ?? "…"}
+          </div>
+          <div className="text-[11px] text-ink-3 mt-0.5">{tasks.length} 个任务</div>
         </div>
       </header>
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto px-2 pb-2">
         {isPending && (
-          <div className="p-4 space-y-3">
+          <div className="px-2 space-y-2 pt-2">
             {Array.from({ length: 5 }).map((_, i) => (
-              <div key={i} className="h-16 bg-paper-2 rounded-sm animate-pulse" />
+              <div key={i} className="h-14 bg-paper-2/60 rounded-xl animate-pulse" />
             ))}
           </div>
         )}
-        {!isPending && tasks.map((t) => (
-          <TaskRow key={t.id} task={t} wsId={wsId} projectId={projectId} active={t.id === activeTaskId} />
-        ))}
+        {!isPending &&
+          tasks.map((t) => (
+            <TaskRow
+              key={t.id}
+              task={t}
+              wsId={wsId}
+              projectId={projectId}
+              active={t.id === activeTaskId}
+            />
+          ))}
       </div>
     </aside>
   );

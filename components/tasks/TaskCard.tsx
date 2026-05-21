@@ -34,21 +34,22 @@ export function TaskCard({ task, wsId, projectId }: TaskCardProps) {
   const setStatus = useSetTaskStatus(projectId);
 
   return (
-    <div className="relative">
+    <div className="relative h-full">
       <Link
         href={`/w/${wsId}/p/${projectId}/t/${task.id}`}
-        className="block focus:outline-none focus-visible:ring-2 focus-visible:ring-ink-0 rounded-md"
+        className="block h-full focus:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-xl"
       >
-        <Card className="p-4 cursor-pointer h-full hover:bg-paper-1">
-          <h4 className="text-sm font-extrabold text-ink-0 mb-1 line-clamp-2 font-tight pr-7">
+        <Card className="!p-4 cursor-pointer h-full flex flex-col hover:brightness-105 transition-all">
+          <h4 className="text-[14px] font-semibold text-ink-0 mb-1 line-clamp-2 pr-7 leading-snug">
             {task.title}
           </h4>
-          {task.summary && (
-            <p className="text-xs text-ink-2 line-clamp-2 mb-3">{task.summary}</p>
-          )}
+          {/* Reserve summary slot so cards with/without summary line up */}
+          <p className="text-[12px] text-ink-2 line-clamp-2 mb-3 min-h-[2.4em] leading-[1.4]">
+            {task.summary || ""}
+          </p>
           <div className="flex items-center justify-between mt-auto">
             <TaskStatusBadge status={task.status} />
-            <span className="text-xs text-ink-2">{relativeTime(task.created_at)}</span>
+            <span className="text-[11px] text-ink-3">{relativeTime(task.created_at)}</span>
           </div>
         </Card>
       </Link>
