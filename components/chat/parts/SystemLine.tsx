@@ -26,5 +26,12 @@ function renderPayload(payload: unknown): string {
 
 export function SystemLine({ msg }: SystemLineProps) {
   const text = msg.parsed.type === "system" ? renderPayload(msg.parsed.payload) : "";
-  return <div className="text-xs text-ink-2 text-center py-1">{text}</div>;
+  if (!text) return null;
+  return (
+    <div className="flex items-center gap-3 py-2 my-1 text-[11px] text-ink-3">
+      <span className="flex-1 h-px bg-hairline" aria-hidden />
+      <span>{text}</span>
+      <span className="flex-1 h-px bg-hairline" aria-hidden />
+    </div>
+  );
 }

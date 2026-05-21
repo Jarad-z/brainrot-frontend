@@ -96,7 +96,7 @@ export const MentionList = forwardRef<MentionListHandle, MentionListProps>(
           minWidth: 240,
           zIndex: 100,
         }}
-        className="bg-paper-0 border-[1.5px] border-ink-0 rounded-md shadow-[var(--shadow-current)] overflow-hidden"
+        className="mention-enter bg-paper-0 border-[1.5px] border-ink-0 rounded-md shadow-[var(--shadow-current)] overflow-hidden"
       >
         {candidates.length === 0 ? (
           <div className="px-3 py-2 text-sm text-ink-2">

@@ -12,7 +12,7 @@ export function BrandMark({ logo, size = 36, className }: BrandMarkProps) {
   return (
     <span
       className={cn(
-        "grid place-items-center bg-accent text-accent-fg font-bold rounded-lg",
+        "grid place-items-center bg-accent text-accent-fg font-bold rounded-xl",
         "border-[1.5px] border-ink-0 shadow-[var(--shadow-current)]",
         className,
       )}

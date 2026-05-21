@@ -44,7 +44,7 @@ export function PermissionRequestCard({ msg, taskId }: PermissionRequestCardProp
           ? "已拒绝"
           : "已批准（带修改）";
     return (
-      <div className="ml-12 my-2 px-3 py-2 bg-paper-1 border-[1.5px] border-hairline rounded-md flex items-center justify-between text-sm">
+      <div className="chat-indent my-2 px-3 py-2 bg-paper-1 border-[1.5px] border-hairline rounded-md flex items-center justify-between text-sm">
         <span>
           <strong>{tool_name}</strong> · {text}
         </span>
@@ -55,7 +55,7 @@ export function PermissionRequestCard({ msg, taskId }: PermissionRequestCardProp
 
   if (expired) {
     return (
-      <div className="ml-12 my-2 px-3 py-2 bg-paper-1 border-[1.5px] border-hairline rounded-md opacity-60 flex items-center justify-between text-sm">
+      <div className="chat-indent my-2 px-3 py-2 bg-paper-1 border-[1.5px] border-hairline rounded-md opacity-60 flex items-center justify-between text-sm">
         <span>
           <strong>{tool_name}</strong> · 已超时
         </span>
@@ -81,7 +81,7 @@ export function PermissionRequestCard({ msg, taskId }: PermissionRequestCardProp
       : "";
 
   return (
-    <div className="ml-12 my-2 border-[1.5px] border-ink-0 rounded-md overflow-hidden shadow-[var(--shadow-current)] bg-paper-0">
+    <div className="chat-indent my-2 border-[1.5px] border-ink-0 rounded-md overflow-hidden shadow-[var(--shadow-current)] bg-paper-0">
       <div className="flex items-center justify-between px-3 py-1.5 bg-role-approval text-paper-0">
         <span className="font-bold">{tool_name} 请求批准</span>
         <span

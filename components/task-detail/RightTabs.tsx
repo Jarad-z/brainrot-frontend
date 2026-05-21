@@ -19,7 +19,7 @@ export function RightTabs({ active, onChange, approvalsCount }: RightTabsProps) 
           key={t.k}
           onClick={() => onChange(t.k)}
           data-active={active === t.k}
-          className={`flex-1 px-3 py-2.5 text-sm font-semibold ${active === t.k ? "border-b-2 border-ink-0 text-ink-0" : "text-ink-2"}`}
+          className={`flex-1 px-3 py-3 text-sm font-semibold transition-colors ${active === t.k ? "border-b-2 border-ink-0 text-ink-0" : "text-ink-2 hover:text-ink-1"}`}
         >
           {t.label}
           {t.k === "approvals" && t.count !== undefined && t.count > 0 && (

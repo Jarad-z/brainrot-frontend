@@ -21,8 +21,11 @@ export function TaskRow({ task, wsId, projectId, active }: TaskRowProps) {
     <Link
       href={`/w/${wsId}/p/${projectId}/t/${task.id}`}
       data-active={active}
-      className={`block px-4 py-3 border-b-[1.5px] border-hairline hover:bg-paper-2 ${active ? "bg-paper-1" : ""}`}
+      className={`relative block pl-5 pr-4 py-3.5 border-b-[1.5px] border-hairline hover:bg-paper-2 transition-colors ${active ? "bg-paper-1" : ""}`}
     >
+      {active && (
+        <span className="absolute left-0 top-2 bottom-2 w-[3px] rounded-r-sm bg-ink-0" aria-hidden />
+      )}
       <div className="flex items-center justify-between gap-2 mb-1">
         <span className="font-semibold text-sm text-ink-0 truncate flex-1">{task.title}</span>
         <span className="font-mono text-[11px] text-ink-2">{relativeTime(task.updated_at)}</span>
@@ -34,7 +37,7 @@ export function TaskRow({ task, wsId, projectId, active }: TaskRowProps) {
           <div className="flex -space-x-1.5">
             {task.agents.slice(0, 3).map((id) => {
               const a = agentsMap.get(id);
-              return a ? <Avatar key={id} name={a.name} size={18} /> : null;
+              return a ? <Avatar key={id} name={a.name} size={20} /> : null;
             })}
           </div>
         )}

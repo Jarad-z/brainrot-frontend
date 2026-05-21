@@ -20,7 +20,7 @@ const labels: Record<Status, string> = {
 };
 
 const chipBase =
-  "inline-flex items-center gap-1.5 px-2 py-0.5 rounded-sm text-xs font-bold whitespace-nowrap";
+  "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold whitespace-nowrap";
 
 const chipVariant: Record<Status, string> = {
   open: "bg-paper-0 text-ink-0 border-[1.5px] border-ink-0",

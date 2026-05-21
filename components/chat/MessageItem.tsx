@@ -1,3 +1,4 @@
+import type React from "react";
 import type { ClientMessage } from "@/lib/api/types";
 import { UserMessage } from "./parts/UserMessage";
 import { AssistantMessage } from "./parts/AssistantMessage";
@@ -18,31 +19,46 @@ interface MessageItemProps {
   pairing: { result?: ClientMessage; orphan?: boolean };
   taskId: string;
   authors: AuthorMaps;
+  isNew?: boolean;
 }
 
-export function MessageItem({ msg, pairing, taskId, authors }: MessageItemProps) {
+export function MessageItem({ msg, pairing, taskId, authors, isNew }: MessageItemProps) {
+  const animClass = isNew ? "msg-enter" : undefined;
+
+  let inner: React.ReactNode;
   switch (msg.parsed.type) {
     case "user": {
       const u = msg.author_user_id ? authors.users[msg.author_user_id] : undefined;
-      return <UserMessage msg={msg} authorName={u?.name} authorHandle={u?.handle} />;
+      inner = <UserMessage msg={msg} authorName={u?.name} authorHandle={u?.handle} />;
+      break;
     }
     case "assistant_text":
     case "thinking": {
       const a = msg.author_agent_id ? authors.agents[msg.author_agent_id] : undefined;
       const agent = a ?? { name: "agent", handle: "agent" };
-      return <AssistantMessage msg={msg} taskId={taskId} agent={agent} />;
+      inner = <AssistantMessage msg={msg} taskId={taskId} agent={agent} />;
+      break;
     }
     case "tool_use":
-      return <ToolPair useMsg={msg} resultMsg={pairing.result} taskId={taskId} />;
+      inner = <ToolPair useMsg={msg} resultMsg={pairing.result} taskId={taskId} />;
+      break;
     case "tool_result":
-      return pairing.orphan ? <OrphanToolResult msg={msg} /> : null;
+      inner = pairing.orphan ? <OrphanToolResult msg={msg} /> : null;
+      break;
     case "permission_request":
-      return <PermissionRequestCard msg={msg} taskId={taskId} />;
+      inner = <PermissionRequestCard msg={msg} taskId={taskId} />;
+      break;
     case "result":
-      return <ResultBanner msg={msg} />;
+      inner = <ResultBanner msg={msg} />;
+      break;
     case "system":
-      return <SystemLine msg={msg} />;
+      inner = <SystemLine msg={msg} />;
+      break;
     case "rate_limit_event":
-      return <RateLimitBanner msg={msg} />;
+      inner = <RateLimitBanner msg={msg} />;
+      break;
   }
+
+  if (!inner) return null;
+  return <div className={animClass}>{inner}</div>;
 }

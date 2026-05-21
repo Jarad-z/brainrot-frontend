@@ -25,7 +25,7 @@ export function Avatar({
   color = "var(--ink-2)",
   size = 36,
   online,
-  radius = 10,
+  radius = 12,
   className,
 }: AvatarProps) {
   return (
@@ -34,13 +34,13 @@ export function Avatar({
       style={{ width: size, height: size }}
     >
       <span
-        className="grid place-items-center font-bold text-paper-0 border-[1.5px] border-ink-0 shadow-[3px_3px_0_var(--ink-0)]"
+        className="grid place-items-center font-bold text-paper-0 border-[1.5px] border-ink-0 shadow-[2px_2px_0_var(--ink-0)]"
         style={{
           width: size,
           height: size,
           background: color,
           borderRadius: radius,
-          fontSize: Math.round(size * 0.36),
+          fontSize: Math.round(size * 0.34),
         }}
       >
         {initials(name)}

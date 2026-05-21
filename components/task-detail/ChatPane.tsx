@@ -20,7 +20,7 @@ export function ChatPane({ wsId, taskId, projectId, task }: ChatPaneProps) {
         <MessageList taskId={taskId} wsId={wsId} />
       </div>
       <ThinkingBar taskId={taskId} wsId={wsId} />
-      <div className="border-t-[1.5px] border-hairline bg-paper-0 p-4">
+      <div className="border-t-[1.5px] border-hairline bg-paper-0 px-6 py-4">
         <Composer wsId={wsId} taskId={taskId} projectId={projectId} />
       </div>
     </section>
