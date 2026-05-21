@@ -13,7 +13,7 @@ export function StatCard({
   label,
   value,
   foot,
-  hot,
+  hot: _hot,
   className,
   ...rest
 }: StatCardProps) {
