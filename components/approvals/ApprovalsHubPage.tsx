@@ -90,8 +90,8 @@ export function ApprovalsHubPage({ wsId }: ApprovalsHubPageProps) {
       {visible.length === 0 ? (
         <EmptyState
           glyph="✓"
-          title="全部处理完了"
-          hint="队列里没有待你决定的工具调用，agent 安静着。"
+          title="全部审批已处理"
+          hint="agent 们都在待命，要不要派点活？"
         />
       ) : (
         <div className="max-w-3xl">

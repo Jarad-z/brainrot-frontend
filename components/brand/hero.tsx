@@ -27,8 +27,7 @@ export function HeroTitle({ className, children, ...rest }: HeroTitleProps) {
   return (
     <h1
       className={cn(
-        "text-[clamp(56px,7.6vw,96px)] font-extrabold mb-4 text-ink-0",
-        "hero-title",
+        "text-[22px] font-medium mb-1 text-ink-0 leading-snug",
         className,
       )}
       {...rest}
@@ -43,7 +42,7 @@ export type HeroPopProps = React.HTMLAttributes<HTMLSpanElement>;
 export function HeroPop({ className, children, ...rest }: HeroPopProps) {
   return (
     <span
-      className={cn("relative inline-block pr-[0.05em] text-accent", className)}
+      className={cn("relative inline-block pr-[0.05em] text-ink-0", className)}
       {...rest}
     >
       {children}
@@ -57,7 +56,7 @@ export function HeroSub({ className, children, ...rest }: HeroSubProps) {
   return (
     <p
       className={cn(
-        "text-[16.5px] text-ink-1 max-w-[56ch] leading-[1.55] mb-5 font-medium",
+        "text-sm text-ink-2 leading-[1.6] mb-4",
         className,
       )}
       {...rest}
@@ -67,19 +66,7 @@ export function HeroSub({ className, children, ...rest }: HeroSubProps) {
   );
 }
 
+/** @deprecated Decorative arrow removed in redesign. Keep for backwards compat. */
 export function HeroArrow() {
-  return (
-    <svg
-      viewBox="0 0 110 78"
-      className="absolute -bottom-10 -right-20 w-[110px] h-[78px] text-ink-0 rotate-[8deg] pointer-events-none hidden xl:block"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M5 70 C 40 30, 60 20, 100 25" />
-      <path d="M88 12 L100 25 L92 38" />
-    </svg>
-  );
+  return null;
 }
