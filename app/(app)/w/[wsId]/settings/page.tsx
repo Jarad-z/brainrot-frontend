@@ -55,20 +55,16 @@ export default function WorkspaceSettingsPage() {
           <MembersList wsId={wsId} />
         </Card>
 
-        <Card
-          chunky
-          className="p-5"
-          style={{ borderColor: "var(--state-failed)" }}
-        >
-          <h2 className="font-mono text-[11px] uppercase tracking-[0.1em] text-state-failed font-bold mb-3">
+        <Card chunky className="p-5">
+          <h2 className="text-[11px] font-medium text-ink-2 mb-4">
             {m.dangerSection}
           </h2>
-          <div className="flex items-center gap-3 flex-wrap">
+          <div className="flex items-center gap-3 flex-wrap pt-2 border-t border-hairline">
             <button
               type="button"
               disabled
               title={m.dangerArchiveSoon}
-              className="px-3 py-1.5 border-[1.5px] border-state-failed text-state-failed rounded-sm font-semibold text-sm opacity-50"
+              className="px-3 py-1.5 border border-hairline text-ink-2 rounded-lg text-sm font-medium opacity-50"
             >
               {m.dangerArchive}
             </button>

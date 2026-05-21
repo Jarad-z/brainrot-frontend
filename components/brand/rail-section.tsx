@@ -8,8 +8,8 @@ export function RailSection({ className, children, ...rest }: RailSectionProps) 
   return (
     <section
       className={cn(
-        "overflow-hidden rounded-2xl bg-paper-0",
-        "border-[1.5px] border-ink-0 shadow-[var(--shadow-current)]",
+        "overflow-hidden rounded-xl bg-bg-primary",
+        "border border-hairline",
         className,
       )}
       {...rest}
@@ -33,9 +33,9 @@ export function RailHead({ dot, className, children, ...rest }: RailHeadProps) {
       {...rest}
     >
       {dot && (
-        <span className="w-2.5 h-2.5 rounded-full bg-accent border-[1.5px] border-ink-0 shrink-0" />
+        <span className="w-1.5 h-1.5 rounded-full bg-state-running shrink-0" />
       )}
-      <span className="font-extrabold text-[15px] whitespace-nowrap">
+      <span className="text-[13px] font-medium text-ink-0 whitespace-nowrap">
         {children}
       </span>
     </div>

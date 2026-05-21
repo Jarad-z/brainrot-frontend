@@ -4,25 +4,26 @@ import { forwardRef } from "react";
 import { cn } from "@/lib/utils";
 
 const base =
-  "inline-flex items-center gap-2 rounded-md text-sm font-bold whitespace-nowrap " +
-  "border-2 btn-spring " +
-  "active:scale-[0.94] active:shadow-none " +
-  "disabled:opacity-50 disabled:pointer-events-none disabled:shadow-none " +
+  "inline-flex items-center gap-2 rounded-lg text-sm font-medium whitespace-nowrap " +
+  "border btn-spring transition-colors " +
+  "active:scale-[0.97] " +
+  "disabled:opacity-40 disabled:pointer-events-none " +
   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink-0 focus-visible:ring-offset-2 focus-visible:ring-offset-paper-1 " +
   "[&_svg]:size-4 [&_svg]:shrink-0";
 
 const variants = {
   primary:
-    "bg-ink-0 text-paper-0 border-ink-0 shadow-[var(--shadow-current)] hover:brightness-95",
-  ghost: "bg-transparent text-ink-0 border-hairline hover:bg-paper-2",
+    "bg-bg-surface-action text-text-surface-action border-bg-surface-action hover:opacity-90",
+  ghost:
+    "bg-transparent text-ink-0 border-hairline hover:bg-bg-secondary hover:border-ink-0/20",
   danger:
-    "bg-paper-0 text-ink-0 border-ink-0 shadow-[var(--shadow-current)] hover:bg-paper-2",
+    "bg-transparent text-danger border-danger hover:bg-danger/5",
 } as const;
 
 const sizes = {
-  default: "px-3.5 py-2.5",
+  default: "px-3.5 py-2",
   sm: "px-2.5 py-1.5 text-xs",
-  big: "px-5 py-3 text-base rounded-full border-2",
+  big: "px-5 py-2.5 text-base",
   icon: "p-0 w-9 h-9 justify-center",
 } as const;
 

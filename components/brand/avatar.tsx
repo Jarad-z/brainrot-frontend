@@ -2,6 +2,25 @@
 
 import { cn } from "@/lib/utils";
 
+/** Deterministic agent color from handle — muted palette so colors read as
+ *  identity markers, not status signals. */
+const AGENT_COLORS = [
+  "#534AB7", // soft violet (writer)
+  "#2E7D8C", // teal
+  "#4A7A3A", // moss green
+  "#8C5A2E", // warm brown
+  "#6B3B8C", // plum
+  "#2E5C8C", // navy
+];
+
+export function agentColor(handle: string): string {
+  let hash = 0;
+  for (let i = 0; i < handle.length; i++) {
+    hash = (hash * 31 + handle.charCodeAt(i)) | 0;
+  }
+  return AGENT_COLORS[Math.abs(hash) % AGENT_COLORS.length]!;
+}
+
 function initials(name: string): string {
   return name
     .split(/\s+/)
@@ -34,13 +53,13 @@ export function Avatar({
       style={{ width: size, height: size }}
     >
       <span
-        className="grid place-items-center font-bold text-paper-0 border-[1.5px] border-ink-0 shadow-[2px_2px_0_var(--ink-0)]"
+        className="grid place-items-center font-medium text-paper-0"
         style={{
           width: size,
           height: size,
           background: color,
           borderRadius: radius,
-          fontSize: Math.round(size * 0.34),
+          fontSize: Math.round(size * 0.36),
         }}
       >
         {initials(name)}

@@ -138,11 +138,11 @@ export function Composer({ wsId, taskId, projectId }: ComposerProps) {
   }
 
   return (
-    <div className="composer-wrap composer-focus-ring border-2 border-ink-0 rounded-lg bg-paper-0 p-4 shadow-[var(--shadow-2)] flex flex-col gap-3">
+    <div className="composer-wrap composer-focus-ring border border-hairline rounded-xl bg-bg-primary p-3 flex flex-col gap-2 hover:border-ink-0/30 transition-colors">
       <EditorContent editor={editor} />
-      <div className="flex items-center justify-between text-xs text-ink-2">
-        <span>Ctrl+Enter 发送</span>
-        <Button onClick={send} disabled={!editor || editor.isEmpty || sendMutation.isPending}>
+      <div className="flex items-center justify-end gap-3">
+        <span className="text-[11px] text-ink-3 select-none">Ctrl+Enter</span>
+        <Button size="sm" onClick={send} disabled={!editor || editor.isEmpty || sendMutation.isPending}>
           {sendMutation.isPending ? (
             <>
               <Loader2 className="animate-spin" aria-hidden />

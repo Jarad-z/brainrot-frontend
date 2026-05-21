@@ -57,4 +57,24 @@
   --swatch-teal-stripe: oklch(55% 0.07 200);
   --swatch-teal-border: oklch(40% 0.06 200);
   --swatch-teal-text: oklch(32% 0.05 200);
+
+  /* ----------------------------------------------------------------
+     Linear-style semantic aliases — all components must reference
+     these names; never write raw paper/ink/hex values in components.
+     Red (accent-poppy) is restricted to: danger actions + 1-2 brand
+     accent dots. Primary actions use bg-surface-action (dark).
+     ---------------------------------------------------------------- */
+  --bg-primary: var(--paper-0);
+  --bg-secondary: var(--paper-1);
+  --bg-tertiary: var(--paper-2);
+  --text-primary: var(--ink-0);
+  --text-secondary: var(--ink-1);
+  --text-tertiary: var(--ink-2);
+
+  /* Surface for primary action buttons: dark background, light text */
+  --bg-surface-action: var(--ink-0);
+  --text-surface-action: var(--paper-0);
+
+  /* Danger: red reserved ONLY for destructive / irreversible actions */
+  --danger: var(--state-failed, #c25036);
 }

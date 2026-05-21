@@ -1,5 +1,4 @@
 import type { ReactNode } from "react";
-import { Card } from "@/components/brand/card";
 
 interface EmptyStateProps {
   title: string;
@@ -10,22 +9,21 @@ interface EmptyStateProps {
 
 export function EmptyState({ title, description, icon, action }: EmptyStateProps) {
   return (
-    <Card
-      chunky
-      className="relative overflow-hidden flex flex-col items-center justify-center text-center p-10 max-w-[420px] mx-auto"
-    >
-      <span
-        aria-hidden
-        className="absolute inset-x-0 top-0 h-1.5 pending-stripes opacity-80"
-      />
-      {icon && <div className="mb-3 text-ink-0 text-[56px] leading-none">{icon}</div>}
-      <h3 className="editorial-title text-[clamp(22px,2.4vw,32px)] text-ink-0 m-0">
+    <div className="flex flex-col items-center justify-center text-center py-16 px-8 max-w-[420px] mx-auto">
+      {icon && (
+        <div className="mb-4 w-12 h-12 rounded-full bg-bg-secondary flex items-center justify-center text-ink-2 text-[22px] leading-none">
+          {icon}
+        </div>
+      )}
+      <h3 className="text-[16px] font-medium text-ink-0 m-0 mb-1.5">
         {title}
       </h3>
       {description && (
-        <p className="editorial-deck text-sm mt-3 max-w-[36ch]">{description}</p>
+        <p className="text-sm text-ink-2 leading-relaxed mt-0 max-w-[36ch]">
+          {description}
+        </p>
       )}
-      {action && <div className="mt-4">{action}</div>}
-    </Card>
+      {action && <div className="mt-5">{action}</div>}
+    </div>
   );
 }

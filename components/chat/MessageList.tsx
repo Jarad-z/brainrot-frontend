@@ -20,6 +20,12 @@ const SYSTEM_NOISE_SUBTYPES = new Set([
   "notification",
 ]);
 
+function authorKey(m: ClientMessage): string {
+  if (m.author_agent_id) return `agent:${m.author_agent_id}`;
+  if (m.author_user_id) return `user:${m.author_user_id}`;
+  return `sys:${m.parsed.type}`;
+}
+
 function isSystemNoise(msg: ClientMessage): boolean {
   if (msg.parsed.type !== "system") return false;
   const payload = msg.parsed.payload;
@@ -55,6 +61,11 @@ export function MessageList({ taskId, wsId }: MessageListProps) {
   const visible = useMemo(
     () => messages.filter((m) => !pairing.consumed.has(m.id) && !isSystemNoise(m)),
     [messages, pairing.consumed],
+  );
+
+  const isFirstInGroup = useMemo(
+    () => visible.map((m, i) => i === 0 || authorKey(visible[i - 1]!) !== authorKey(m)),
+    [visible],
   );
 
   const prevCountRef = useRef(visible.length);
@@ -142,6 +153,7 @@ export function MessageList({ taskId, wsId }: MessageListProps) {
                   taskId={taskId}
                   authors={authors}
                   isNew={scrollAnchor === "bottom" && vi.index >= newFromIndex}
+                  isFirstInGroup={isFirstInGroup[vi.index] ?? true}
                 />
               </div>
             );

@@ -65,7 +65,7 @@ export function LeaveWorkspaceButton({ wsId, wsName }: Props) {
           type="button"
           onClick={() => setConfirmOpen(true)}
           disabled={leave.isPending}
-          className="px-3 py-1.5 border-[1.5px] border-state-failed text-state-failed rounded-sm font-semibold text-sm disabled:opacity-50"
+          className="px-3 py-1.5 border border-danger text-danger rounded-lg font-medium text-sm disabled:opacity-50 hover:bg-danger/5 transition-colors"
         >
           {m.leaveWs}
         </button>
@@ -89,7 +89,7 @@ export function LeaveWorkspaceButton({ wsId, wsName }: Props) {
             <button
               type="button"
               onClick={() => setLastOwnerOpen(false)}
-              className="px-3 py-1.5 bg-ink-0 text-paper-0 border-[1.5px] border-ink-0 rounded-sm font-semibold text-sm"
+              className="px-3 py-1.5 bg-bg-surface-action text-text-surface-action border border-bg-surface-action rounded-lg font-medium text-sm"
             >
               {m.leaveWsLastOwnerClose}
             </button>

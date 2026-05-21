@@ -40,6 +40,17 @@
   --color-status-archived-fg: var(--status-archived-fg);
   --color-countdown-urgent: var(--countdown-urgent);
 
+  /* Semantic surface/text aliases */
+  --color-bg-primary: var(--bg-primary);
+  --color-bg-secondary: var(--bg-secondary);
+  --color-bg-tertiary: var(--bg-tertiary);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-tertiary: var(--text-tertiary);
+  --color-bg-surface-action: var(--bg-surface-action);
+  --color-text-surface-action: var(--text-surface-action);
+  --color-danger: var(--danger);
+
   --text-xs: var(--text-xs);
   --text-sm: var(--text-sm);
   --text-base: var(--text-base);

@@ -45,8 +45,8 @@ export function PageTitle({
       className={cn(
         "m-0 text-pretty",
         editorial
-          ? "editorial-title text-[clamp(40px,5vw,64px)] text-ink-0"
-          : "text-3xl font-extrabold text-ink-0 page-title",
+          ? "text-[18px] font-medium text-ink-0 leading-snug"
+          : "text-[18px] font-medium text-ink-0 leading-snug",
         className,
       )}
       {...rest}
@@ -71,7 +71,7 @@ export function PageSub({
       className={cn(
         "m-0",
         editorial
-          ? "editorial-deck mt-2"
+          ? "text-sm text-ink-2 mt-1 leading-relaxed"
           : "text-sm text-ink-2 font-medium",
         className,
       )}

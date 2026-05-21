@@ -1,6 +1,6 @@
 /* eslint-disable camelcase -- snake_case identifiers come from backend wire format */
 "use client";
-import { Wrench, ChevronDown, ChevronRight, CheckCircle2, XCircle } from "lucide-react";
+import { ChevronDown, ChevronRight, CheckCircle2, XCircle } from "lucide-react";
 import type { ClientMessage } from "@/lib/api/types";
 import { useChatUIStore } from "@/lib/store/chat-ui";
 
@@ -35,31 +35,44 @@ export function ToolPair({ useMsg, resultMsg, taskId }: ToolPairProps) {
     }
   })();
 
+  const succeeded = resultMsg && !isError;
+
   return (
-    <div className="chat-indent my-2">
-      <div className="tool-card border-2 border-ink-0 bg-paper-2 rounded-lg overflow-hidden shadow-[2px_2px_0_var(--ink-0)]">
-        {/* header */}
-        <div
-          className="tool-head relative flex items-center gap-2 pl-4 pr-3 py-2 cursor-pointer text-sm hover:bg-paper-1 transition-colors"
+    <div className="chat-indent my-1.5">
+      {/* System track — monospace, light gray, mid-weight signal */}
+      <div className="border border-hairline rounded-lg overflow-hidden bg-bg-secondary">
+        {/* Header row */}
+        <button
+          type="button"
+          className="w-full flex items-center gap-2 pl-3 pr-2.5 py-1.5 text-left hover:bg-bg-tertiary transition-colors"
           onClick={() => toggle(taskId, useMsg.id)}
         >
-          <span className="absolute left-0 top-1.5 bottom-1.5 w-[3px] rounded-r-sm bg-ink-2" aria-hidden />
-          <Wrench size={13} className="shrink-0 text-ink-2" />
-          <span className="font-bold text-ink-0">{tool_name}</span>
-          {typeof inp.file_path === "string" && (
-            <span className="font-mono text-xs text-ink-2 truncate min-w-0">· {inp.file_path}</span>
-          )}
-          <span className="ml-auto shrink-0 text-ink-2">
-            {expanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+          <span className="font-mono text-[12px] text-ink-1 font-medium shrink-0">
+            {tool_name}
           </span>
-        </div>
+          {typeof inp.file_path === "string" && (
+            <span className="font-mono text-[11px] text-ink-3 truncate min-w-0">
+              · {inp.file_path}
+            </span>
+          )}
+          <span className="ml-auto flex items-center gap-1.5 shrink-0">
+            {succeeded && <CheckCircle2 size={12} className="text-accent-moss" />}
+            {isError && <XCircle size={12} className="text-state-failed" />}
+            {!resultMsg && (
+              <span className="w-1.5 h-1.5 rounded-full bg-state-running animate-status-pulse" />
+            )}
+            <span className="text-ink-3">
+              {expanded ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
+            </span>
+          </span>
+        </button>
 
-        {/* expanded body */}
+        {/* Expanded input body */}
         {expanded && (
-          <div className="tool-body px-4 py-3 text-xs font-mono bg-paper-1 border-t-2 border-hairline leading-relaxed">
+          <div className="px-3 py-2 text-[11px] font-mono bg-bg-tertiary border-t border-hairline leading-relaxed text-ink-1">
             {Object.entries(inp).map(([k, v]) => (
               <div key={k} className="flex gap-2">
-                <span className="text-ink-2 shrink-0">{k}:</span>
+                <span className="text-ink-3 shrink-0">{k}:</span>
                 <span className="break-all text-ink-0">
                   {typeof v === "object" ? JSON.stringify(v) : String(v)}
                 </span>
@@ -68,24 +81,18 @@ export function ToolPair({ useMsg, resultMsg, taskId }: ToolPairProps) {
           </div>
         )}
 
-        {/* result row */}
+        {/* Result row */}
         {resultMsg && resultContent !== null && (
-          <div className={`relative flex items-center gap-2 pl-4 pr-3 py-1.5 text-xs border-t-[1.5px] border-hairline ${
-            isError ? "bg-state-failed/8 text-state-failed" : "bg-paper-1 text-ink-1"
+          <div className={`flex items-center gap-2 pl-3 pr-2.5 py-1 text-[11px] font-mono border-t border-hairline ${
+            isError ? "text-state-failed bg-state-failed/5" : "text-ink-2 bg-bg-secondary"
           }`}>
-            <span className={`absolute left-0 top-0 bottom-0 w-[3px] ${isError ? "bg-accent-poppy" : "bg-accent-moss"}`} aria-hidden />
-            {isError
-              ? <XCircle size={13} className="shrink-0 text-state-failed" />
-              : <CheckCircle2 size={13} className="shrink-0 text-accent-moss" />
-            }
-            <span className="truncate font-mono">{resultContent.slice(0, 200)}</span>
+            <span className="truncate">{resultContent.slice(0, 200)}</span>
           </div>
         )}
 
-        {/* running indicator */}
+        {/* Running indicator */}
         {!resultMsg && (
-          <div className="flex items-center gap-2 px-4 py-1.5 text-xs text-ink-2 border-t-2 border-hairline font-mono">
-            <span className="w-2 h-2 rounded-none bg-state-running skeleton-pixel shrink-0" />
+          <div className="flex items-center gap-2 px-3 py-1 text-[11px] text-ink-3 border-t border-hairline font-mono">
             运行中…
           </div>
         )}
