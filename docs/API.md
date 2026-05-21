@@ -153,6 +153,18 @@ DELETE /api/v1/workspaces/{ws_id}/members/{user_id}
 
 - `204`，`403` 不是 owner。
 
+### 自助离开工作区
+
+```
+DELETE /api/v1/workspaces/{ws_id}/members/me
+```
+
+- `204` 成功 — 调用者从该工作区移除自己。任意成员（owner / editor / viewer）可调，无需 owner 介入。
+- `403` 调用者不是该工作区成员。
+- `409` 调用者是该工作区**唯一 owner** — 拒绝以避免工作区无主；先让 owner 把另一名成员升级为 owner 再走此接口。
+
+路径里的 `me` 是字面量（不是调用者的 UUID）。owner 删除**其他**成员仍走 `DELETE /workspaces/{ws_id}/members/{user_id}`。
+
 ### 改工作区名称 / slug
 
 ```
@@ -444,6 +456,20 @@ GET /api/v1/tasks/{task_id}/artifacts
 - `200` → `Artifact[]`，按 `created_at DESC`；`excluded=true` 的不返回。
 - `403` 不是任务所属工作区成员。
 
+### 切换 artifact 排除状态
+
+```
+PATCH /api/v1/artifacts/{artifact_id}
+{ "excluded": true }
+```
+
+- `204` 成功。
+- `400` 请求体缺 `excluded` 字段 / 非法 JSON。
+- `403` 调用者是 viewer（仅 owner / editor 可改）。
+- `404` artifact 不存在。
+
+被标 `excluded=true` 的 artifact 不会出现在 `GET /tasks/{task_id}/artifacts` 列表里；再 PATCH 回 `false` 即可恢复。
+
 ### 列出任务的 run 历史
 
 ```
@@ -680,6 +706,8 @@ Cookie: brainrot_session=...
 | `GET /tasks/{id}/approvals` | 任意 ws 成员 | `403` | |
 | `GET /tasks/{id}/runs` | 任意 ws 成员 | `403` | run 历史，不含 agent_snapshot |
 | `POST /approvals/{id}/decide` | `owner` / `editor` | `403` | |
+| `PATCH /artifacts/{id}` | `owner` / `editor` | `403` | viewer 不可改 excluded；未知 id → `404` |
+| `DELETE /workspaces/{id}/members/me` | 任意成员（自助离开） | `403` / `409` | `403` 非成员；`409` 调用者是唯一 owner |
 
 ## 错误模型
 
@@ -746,6 +774,7 @@ POST   /api/v1/workspaces/{ws_id}/members
 GET    /api/v1/workspaces/{ws_id}/members
 PATCH  /api/v1/workspaces/{ws_id}/members/{user_id}
 DELETE /api/v1/workspaces/{ws_id}/members/{user_id}
+DELETE /api/v1/workspaces/{ws_id}/members/me
 POST   /api/v1/workspaces/{ws_id}/invitations
 POST   /api/v1/workspaces/{ws_id}/install-tokens
 GET    /api/v1/workspaces/{ws_id}/runtimes
@@ -769,6 +798,7 @@ POST   /api/v1/tasks/{task_id}/cancel-run
 GET    /api/v1/tasks/{task_id}/messages
 POST   /api/v1/tasks/{task_id}/messages
 GET    /api/v1/tasks/{task_id}/artifacts
+PATCH  /api/v1/artifacts/{artifact_id}
 GET    /api/v1/tasks/{task_id}/approvals
 GET    /api/v1/tasks/{task_id}/runs
 

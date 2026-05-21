@@ -76,6 +76,23 @@
     creating: "创建中…",
     forbidden: "需要 editor 或 owner 权限",
   },
+  taskCard: {
+    menu: "更多操作",
+    setStatus: "更改状态",
+    statusLabel: {
+      open: "待办",
+      in_progress: "进行中",
+      done: "完成",
+      blocked: "阻塞",
+    } as const,
+    archive: "归档任务",
+    archiveConfirmTitle: "归档任务？",
+    archiveConfirmBody: (title: string) =>
+      `归档后「${title}」将从列表中隐藏，历史消息与产出仍会保留。`,
+    archiveConfirm: "归档",
+    archiveFailed: "归档失败",
+    statusFailed: "更新状态失败",
+  },
   agents: {
     listTitle: "Agents",
     newCta: "+ 新建 agent",

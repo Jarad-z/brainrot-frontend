@@ -443,11 +443,14 @@ class WSClient {
 
 ## 9. 关键交互细节（容易做错的）
 
-1. **Base64 内容**：`Message.content`、`Message.metadata`、`Agent.custom_env/custom_args/mcp_config`、`ApprovalRequest.tool_input` 全是 base64 JSON。在 `lib/codec.ts` 统一 `decodeJSON<T>(b64)`，**绝不在组件里 inline `atob`**。
+1. **Base64 内容（响应方向）**：`Message.content`、`Message.metadata`、`Agent.custom_env/custom_args/mcp_config`、REST `ApprovalRequest.tool_input` 全是 base64 JSON。在 `lib/codec.ts` 统一 `decodeJSON<T>(b64)`，**绝不在组件里 inline `atob`**。
+   - ⚠️ **请求方向不对称**：`POST /workspaces/{ws_id}/agents` body 里 `custom_env` / `custom_args` / `mcp_config` 是**裸 JSON**（对象/数组），不要 base64 编码。
+   - ⚠️ **WS 例外**：`approval.requested` WS 事件里的 `tool_input` 已是**解码后的 JSON 对象**——直接用，不要再 `atob`。REST 的 `ApprovalRequest.tool_input` 仍是 base64。
 2. **EnqueuedRun 是 PascalCase**：`{RunID, AgentID, RuntimeID}`，而其他对象是 snake_case。类型定义里别搞混。
-3. **没有"列工作区""列 runtime"接口**：v1 这两个接口暂缺。前端启动时如果没有 `wsId`，先尝试从 localStorage 拿最近选择，没有就引导用户新建。Runtime 列表靠 `runtime.online/offline` WS 事件维护（注意：刷新页面后初始集合为空，需要后端补 `GET /workspaces/{wsId}/runtimes` 才能有正确初值——前端可以先按"未知 → 收到 online 才显示在线"渲染，并在 README 里标 TODO）。
+3. **首屏初始化**：`GET /api/v1/workspaces` 拿工作区集合（空数组就引导新建），`GET /api/v1/workspaces/{ws_id}/runtimes` 拿 daemon 初始集合；之后用 `runtime.online/offline` WS 事件维护增量。前端可把上次选过的 `wsId` 缓存到 localStorage，下次启动 hydrate 默认值。
 4. **审批超时**：每条 pending 审批有 `expires_at`，UI 倒计时显示；客户端时钟和服务器有偏差时**以 `expires_at` 为准**（不要本地累加）。
-5. **取消 run**：`POST /tasks/{id}/cancel-run` 只取消**当前活跃 run**，排队中的下一个会自然顶上来——UI 要提示用户"这只取消当前 run，排队的 @writer 还会跑"。
+5. **取消 run**：`POST /tasks/{id}/cancel-run` 把**当前活跃 run** 置为 `canceled`（活跃 = `pending`/`claimed`/`running`/`awaiting_approval`），并通过 WS 通知 daemon 中止本地进程。**同一事务内**还会把这张 card 上所有 `metadata.queued=true` 的用户消息清掉 `queued` 标记——避免未来一次 run 完成时 `promoteQueued` 把这些旧消息"复活"成新 run。⚠️ 后端**不会**自动晋升被取消那一轮背后的排队消息（见 API.md "cancel-run 语义"）；UI 不要承诺"队列会接着跑"，要让排队的 @agent 再跑得让用户重新 @mention。
+   - **幂等返回 400**：重复调用 / race 下后端会因 `pgx.ErrNoRows` 返回 `400`（没有活跃 run 可取消）。前端应当作"已被取消过"静默处理，**不要**弹红色错误 toast。
 6. **同 agent 排队**：判断"是否排队"的**唯一可靠信号**是发送响应里 `message.metadata`（base64 解码后）含 `queued: true`——这表示此用户消息因目标 agent 已有 active run 被延后；它会在当前 run 结束后被自动晋升触发。`runs` 字段总是会带上被 mention 的 agent，**不能用 runs 长度判断**。
 7. **资产上传**：`multipart/form-data`，单文件 100MB 上限；超限后端返 413，UI 要在选文件时本地预检。
 8. **登出**：`POST /auth/logout` 后**清空所有 TanStack Query 缓存**（`queryClient.clear()`）+ 关闭 WS + Zustand reset。否则下个用户登录后会闪一下前一个用户的数据。
@@ -557,7 +560,8 @@ class WSClient {
 
 ## 16. 待办 / 开放问题
 
-- [ ] 后端补 `GET /api/v1/workspaces`（列我能进的工作区）和 `GET /api/v1/workspaces/{wsId}/runtimes`（列 daemon）。当前两者都缺；前者影响首屏导航，后者影响 runtime 在线集合初始化。`GET /api/v1/workspaces/{wsId}/agents` 已存在（API.md 漏写了，**实际可用**），前端 agent 直接调即可。
+- [x] ~~后端补 `GET /api/v1/workspaces`（列我能进的工作区）~~ — 已加，返回 `Workspace[]`，按 `created_at DESC`，新用户返回 `[]`。前端登录后用它决定默认 `wsId`；空就跳新建工作区流程。
+- [x] ~~后端补 `GET /api/v1/workspaces/{wsId}/runtimes`（列 daemon）~~ — 已加，按 `created_at DESC` 返回非 revoked 的 `AgentRuntime[]`；前端首屏拿这个做初始集合，再用 `runtime.online/offline` WS 事件维护增量。
 - [ ] 是否支持消息编辑/删除？v1 看起来只追加，前端先不做。
 - [ ] @ 多个 agent 时的视觉：所有 run 都在同一条流里，需要不需要按 agent 分列？v1 建议**不分列**，混合按时间渲染，只在头像/名字上区分；后期再看用户反馈。
 - [ ] 移动端是否进 v1？建议 v1 只做桌面响应到 768px 不崩；< 768px 显示"建议桌面使用"。

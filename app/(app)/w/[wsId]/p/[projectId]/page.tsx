@@ -25,7 +25,8 @@ export default function ProjectHomePage({ params }: PageProps) {
   const { wsId, projectId } = use(params);
   const [createOpen, setCreateOpen] = useState(false);
   const { data: project } = useProject(projectId);
-  const { data: tasks, isPending } = useTasks(projectId);
+  const { data: allTasks, isPending } = useTasks(projectId);
+  const tasks = allTasks?.filter((t) => t.status !== "archived");
 
   return (
     <>
