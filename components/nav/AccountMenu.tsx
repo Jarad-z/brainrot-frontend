@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { auth } from "@/lib/api/auth";
+import { getDesktopBridge } from "@/lib/desktop";
 import { useAppStore } from "@/lib/store";
 import { messages } from "@/lib/messages";
 import { Avatar } from "@/components/brand/avatar";
@@ -28,6 +29,17 @@ export function AccountMenu({ user }: AccountMenuProps) {
       await auth.logout();
     } catch {
       // ignore; proceed to clean local state regardless
+    }
+    // Inside Electron: kill all per-workspace daemons so they don't keep a
+    // dead session's runtime online. Configs stay on disk so the next login
+    // skips re-registration.
+    const bridge = getDesktopBridge();
+    if (bridge) {
+      try {
+        await bridge.stopAll();
+      } catch {
+        // best-effort
+      }
     }
     queryClient.clear();
     useAppStore.getState().reset();
