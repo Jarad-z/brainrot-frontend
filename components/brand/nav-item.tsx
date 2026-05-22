@@ -3,21 +3,27 @@
 import { forwardRef } from "react";
 import { cn } from "@/lib/utils";
 
+export type NavSwatch = "bondi" | "tangerine" | "grape" | "lime" | "strawberry" | "teal";
+
 export interface NavItemProps extends React.HTMLAttributes<HTMLDivElement> {
   active?: boolean;
   disabled?: boolean;
   count?: number;
   icon?: React.ReactNode;
+  /** Candy-orb color shown in front of the label under the y2k theme.
+   *  Invisible in aero theme so existing layouts are unchanged. */
+  swatch?: NavSwatch;
 }
 
 export const NavItem = forwardRef<HTMLDivElement, NavItemProps>(
-  ({ active, disabled, count, icon, children, className, ...rest }, ref) => (
+  ({ active, disabled, count, icon, swatch, children, className, ...rest }, ref) => (
     <div
       ref={ref}
       data-active={active || undefined}
       data-disabled={disabled || undefined}
+      data-nav-swatch={swatch}
       className={cn(
-        "group relative mx-2 my-0.5 px-3 py-1.5 rounded-md flex items-center gap-2.5",
+        "nav-item group relative mx-2 my-0.5 px-3 py-1.5 rounded-md flex items-center gap-2.5",
         "text-[13px] font-medium text-ink-1 cursor-pointer select-none whitespace-nowrap",
         "transition-all border border-transparent",
         active && "aero-active text-white font-semibold",

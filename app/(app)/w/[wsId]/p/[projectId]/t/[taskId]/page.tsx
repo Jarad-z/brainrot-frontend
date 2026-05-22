@@ -27,7 +27,10 @@ export default function TaskDetailPage({ params }: PageProps) {
   }, [task, found, refetchTask]);
 
   return (
-    <div className="h-full grid grid-cols-[210px_minmax(0,1fr)_280px] gap-2 p-2 min-h-0 overflow-hidden">
+    <div
+      data-task-page
+      className="h-full grid grid-cols-[210px_minmax(0,1fr)_280px] gap-2 p-2 min-h-0 overflow-hidden"
+    >
       <TaskListPane projectId={projectId} wsId={wsId} activeTaskId={taskId} />
       <ChatPane wsId={wsId} taskId={taskId} projectId={projectId} task={task ?? found} />
       <RightPanel taskId={taskId} projectId={projectId} />

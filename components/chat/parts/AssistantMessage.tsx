@@ -42,6 +42,7 @@ export function AssistantMessage({
       <div className="shrink-0" style={{ width: avatarSize }}>
         {isFirstInGroup && (
           <span
+            data-chat="avatar"
             className="grid place-items-center text-white font-semibold"
             style={{
               width: avatarSize,
@@ -76,6 +77,7 @@ export function AssistantMessage({
 
         {msg.parsed.type === "assistant_text" && (
           <div
+            data-bubble="assistant"
             className="px-3.5 py-2 text-[14px] text-ink-0 leading-[1.65] whitespace-pre-wrap break-words"
             style={{
               background:
@@ -95,6 +97,7 @@ export function AssistantMessage({
         {msg.parsed.type === "thinking" && (
           <button
             type="button"
+            data-bubble="thinking"
             onClick={() => toggle(taskId, msg.id)}
             className="group inline-flex items-start gap-1.5 text-left w-full px-3 py-1.5 rounded-xl text-[12.5px] transition-colors bg-white/30 hover:bg-white/45 border border-white/40"
             aria-expanded={expanded}
@@ -106,8 +109,8 @@ export function AssistantMessage({
                 <ChevronRight size={12} />
               )}
             </span>
-            <span className="text-[11px] text-ink-3 mt-[2px] shrink-0">思考</span>
-            <span className="flex-1 min-w-0 italic whitespace-pre-wrap break-words text-ink-2">
+            <span data-thinking-label className="text-[11px] text-ink-3 mt-[2px] shrink-0">思考</span>
+            <span data-thinking-text className="flex-1 min-w-0 italic whitespace-pre-wrap break-words text-ink-2">
               {expanded
                 ? msg.parsed.payload.text
                 : `${msg.parsed.payload.text.slice(0, 100)}${

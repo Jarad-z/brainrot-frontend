@@ -40,26 +40,53 @@ export function ToolPair({ useMsg, resultMsg, taskId }: ToolPairProps) {
   return (
     <div className="chat-indent my-1.5">
       {/* System track — monospace, light gray, mid-weight signal */}
-      <div className="border border-hairline rounded-lg overflow-hidden bg-bg-secondary">
+      <div
+        data-tool-card
+        className="border border-hairline rounded-lg overflow-hidden bg-bg-secondary"
+      >
         {/* Header row */}
         <button
           type="button"
-          className="w-full flex items-center gap-2 pl-3 pr-2.5 py-1.5 text-left hover:bg-bg-tertiary transition-colors"
+          data-tool-header
+          className="w-full flex items-center gap-2 pl-3 pr-2.5 py-1.5 text-left hover:bg-bg-tertiary transition-colors min-w-0"
           onClick={() => toggle(taskId, useMsg.id)}
         >
-          <span className="font-mono text-[12px] text-ink-1 font-medium shrink-0">
+          <span data-tool-name className="font-mono text-[12px] text-ink-1 font-medium shrink-0">
             {tool_name}
           </span>
           {typeof inp.file_path === "string" && (
-            <span className="font-mono text-[11px] text-ink-3 truncate min-w-0">
+            <span data-tool-path className="font-mono text-[11px] text-ink-3 truncate min-w-0 flex-1">
               · {inp.file_path}
             </span>
           )}
           <span className="ml-auto flex items-center gap-1.5 shrink-0">
-            {succeeded && <CheckCircle2 size={12} className="text-accent-moss" />}
-            {isError && <XCircle size={12} className="text-state-failed" />}
+            {succeeded && (
+              <span
+                data-tool-status="ok"
+                aria-label="成功"
+                title="成功"
+                className="inline-block"
+              >
+                <CheckCircle2 size={12} className="text-accent-moss" />
+              </span>
+            )}
+            {isError && (
+              <span
+                data-tool-status="err"
+                aria-label="失败"
+                title="失败"
+                className="inline-block"
+              >
+                <XCircle size={12} className="text-state-failed" />
+              </span>
+            )}
             {!resultMsg && (
-              <span className="w-1.5 h-1.5 rounded-full bg-state-running animate-status-pulse" />
+              <span
+                data-tool-status="run"
+                aria-label="运行中"
+                title="运行中"
+                className="w-1.5 h-1.5 rounded-full bg-state-running animate-status-pulse"
+              />
             )}
             <span className="text-ink-3">
               {expanded ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
@@ -83,10 +110,13 @@ export function ToolPair({ useMsg, resultMsg, taskId }: ToolPairProps) {
 
         {/* Result row */}
         {resultMsg && resultContent !== null && (
-          <div className={`flex items-center gap-2 pl-3 pr-2.5 py-1 text-[11px] font-mono border-t border-hairline ${
-            isError ? "text-state-failed bg-state-failed/5" : "text-ink-2 bg-bg-secondary"
-          }`}>
-            <span className="truncate">{resultContent.slice(0, 200)}</span>
+          <div
+            data-tool-result
+            className={`flex items-center gap-2 pl-3 pr-2.5 py-1 text-[11px] font-mono border-t border-hairline ${
+              isError ? "text-state-failed bg-state-failed/5" : "text-ink-2 bg-bg-secondary"
+            }`}
+          >
+            <span className="truncate min-w-0">{resultContent.slice(0, 200)}</span>
           </div>
         )}
 

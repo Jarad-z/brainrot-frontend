@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<title>Brainrot · iMac G3 / Aqua · Y2K Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=VT323&family=Press+Start+2P&family=Lucida+Sans:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  /* =========================================================
+     BRAINROT · iMac G3 / Aqua Y2K (1998–2003)
+     ---------------------------------------------------------
+     Anchors: iMac G3 Bondi Blue, Aqua OS X 10.0–10.4,
+     Apple Pinstripe, three-light traffic controls,
+     candy translucent ABS plastic, Chicago/Charcoal display.
+     ========================================================= */
+
+  :root {
+    /* ─── Candy plastic palette ─── */
+    --bondi:        #0aa7c4;     /* original iMac Bondi Blue */
+    --bondi-deep:   #006e87;
+    --bondi-glow:   #5fd6ec;
+    --tangerine:    #ff8a1f;
+    --grape:        #8466c6;
+    --lime:         #b6d24c;
+    --strawberry:   #ff5d8f;
+    --blueberry:    #4a90e2;
+    --snow:         #ffffff;
+
+    /* ─── Aqua accents ─── */
+    --aqua-blue:    #2a78d8;
+    --aqua-blue-2:  #75aefb;
+    --aqua-white:   #f4faff;
+
+    /* ─── Traffic lights ─── */
+    --light-red:    #ff5f57;
+    --light-yellow: #febc2e;
+    --light-green:  #28c840;
+
+    /* ─── Ink ─── */
+    --ink:          #102030;
+    --ink-2:        #2e4459;
+    --ink-3:        #6a8294;
+
+    /* ─── Hairlines ─── */
+    --hair:         rgba(8, 30, 50, 0.18);
+    --hair-soft:    rgba(8, 30, 50, 0.08);
+
+    /* ─── Display ─── */
+    --font-display: "Chicago", "Charcoal", "Lucida Sans", "Trebuchet MS", system-ui;
+    --font-body:    "Lucida Sans", "Lucida Grande", "Trebuchet MS", "Helvetica Neue", system-ui;
+    --font-pixel:   "VT323", "MS Sans Serif", monospace;
+    --font-tiny:    "Press Start 2P", "VT323", monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    font-family: var(--font-body);
+    color: var(--ink);
+    /* The "desktop" itself: a Y2K gradient sky with grape→bondi→lime swirl */
+    background:
+      radial-gradient(120% 80% at 12% -10%, rgba(255, 138, 31, 0.45) 0%, transparent 55%),
+      radial-gradient(110% 70% at 100% 30%, rgba(132, 102, 198, 0.55) 0%, transparent 60%),
+      radial-gradient(120% 80% at 50% 120%, rgba(182, 210, 76, 0.55) 0%, transparent 55%),
+      radial-gradient(140% 100% at 50% 50%, #5fd6ec 0%, #0aa7c4 55%, #006e87 100%);
+    background-attachment: fixed;
+    min-height: 100vh;
+    padding: 32px;
+    overflow-x: hidden;
+  }
+
+  /* CRT-ish scanline overlay across the whole desktop. Very subtle. */
+  body::after {
+    content: "";
+    position: fixed; inset: 0;
+    background-image: repeating-linear-gradient(
+      0deg,
+      rgba(255,255,255,0.025) 0px,
+      rgba(255,255,255,0.025) 1px,
+      transparent 1px,
+      transparent 3px
+    );
+    pointer-events: none;
+    mix-blend-mode: overlay;
+    z-index: 9999;
+  }
+
+  /* ===========================================================
+     CANDY PLASTIC SURFACE — the workhorse class.
+     Models a translucent ABS shell: top half is brighter (light
+     refracting through plastic), bottom has a soft inner shadow,
+     and there's a hard 1px white "edge" + 1px deep bondi "trough"
+     so it reads as a real molded part, not a CSS card.
+     =========================================================== */
+  .plastic {
+    position: relative;
+    border-radius: 22px;
+    background:
+      linear-gradient(180deg,
+        rgba(255,255,255,0.55) 0%,
+        rgba(255,255,255,0.18) 38%,
+        rgba(255,255,255,0.08) 60%,
+        rgba(8, 60, 90, 0.12) 100%),
+      linear-gradient(180deg, #d8f1f8 0%, #abe1ee 100%);
+    box-shadow:
+      /* outer drop — the unit casts onto the desk */
+      0 22px 40px -18px rgba(0, 60, 90, 0.55),
+      0 8px 14px -6px rgba(0, 60, 90, 0.35),
+      /* the white plastic edge on top */
+      inset 0 1px 0 rgba(255,255,255,0.95),
+      /* the bondi trough at bottom */
+      inset 0 -1px 0 rgba(0, 80, 110, 0.35),
+      /* outer ring (the molded seam) */
+      0 0 0 1px rgba(255,255,255,0.6),
+      0 0 0 2px rgba(0, 60, 90, 0.22);
+  }
+
+  /* The signature top-half "wet" highlight that says "I am a piece
+     of injection-molded plastic, not a glass div" */
+  .plastic::before {
+    content: "";
+    position: absolute;
+    inset: 4px 4px auto 4px;
+    height: 38%;
+    border-radius: 18px 18px 60% 60% / 18px 18px 100% 100%;
+    background: linear-gradient(180deg,
+      rgba(255,255,255,0.85) 0%,
+      rgba(255,255,255,0.35) 60%,
+      rgba(255,255,255,0) 100%);
+    pointer-events: none;
+  }
+
+  /* Color variants — recolor the body tint without losing the highlight */
+  .plastic.tangerine { background:
+      linear-gradient(180deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.12) 38%, rgba(120, 50, 0, 0.18) 100%),
+      linear-gradient(180deg, #ffd3a8 0%, #ff8a1f 100%); }
+  .plastic.grape { background:
+      linear-gradient(180deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.12) 38%, rgba(40, 20, 90, 0.22) 100%),
+      linear-gradient(180deg, #d6c7f3 0%, #8466c6 100%); }
+  .plastic.lime { background:
+      linear-gradient(180deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.12) 38%, rgba(60, 80, 10, 0.18) 100%),
+      linear-gradient(180deg, #e9f3b8 0%, #b6d24c 100%); }
+  .plastic.strawberry { background:
+      linear-gradient(180deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.12) 38%, rgba(120, 10, 50, 0.22) 100%),
+      linear-gradient(180deg, #ffc4d8 0%, #ff5d8f 100%); }
+  .plastic.snow { background:
+      linear-gradient(180deg, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.45) 38%, rgba(0, 60, 90, 0.10) 100%),
+      linear-gradient(180deg, #ffffff 0%, #e6f2fa 100%); }
+
+  /* ===========================================================
+     AQUA BUTTON — pinstripe + lozenge + breathing pulse.
+     Three layers of light: top white highlight, mid pinstripe,
+     bottom soft shadow inside the pill.
+     =========================================================== */
+  .aqua-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: var(--font-display);
+    font-size: 13px;
+    letter-spacing: 0.02em;
+    color: #fff;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.35);
+    padding: 8px 18px;
+    border: none;
+    cursor: pointer;
+    border-radius: 999px;
+    background:
+      /* top white highlight */
+      linear-gradient(180deg,
+        rgba(255,255,255,0.95) 0%,
+        rgba(255,255,255,0.55) 8%,
+        rgba(255,255,255,0.10) 45%,
+        rgba(255,255,255,0) 50%),
+      /* pinstripe */
+      repeating-linear-gradient(90deg,
+        rgba(255,255,255,0.08) 0px,
+        rgba(255,255,255,0.08) 1px,
+        transparent 1px,
+        transparent 3px),
+      /* aqua body */
+      linear-gradient(180deg, #6cb6ff 0%, #2a78d8 50%, #1a5cb0 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.85),
+      inset 0 -2px 4px rgba(0, 20, 60, 0.35),
+      0 6px 12px -4px rgba(10, 60, 120, 0.55),
+      0 0 0 1px rgba(20, 60, 110, 0.6);
+    animation: aqua-pulse 2.4s ease-in-out infinite;
+    transition: transform 80ms ease;
+  }
+  .aqua-btn:hover { animation-duration: 1.2s; }
+  .aqua-btn:active { transform: translateY(1px) scale(0.985); }
+
+  @keyframes aqua-pulse {
+    0%, 100% { filter: brightness(1) saturate(1); }
+    50%      { filter: brightness(1.12) saturate(1.15); }
+  }
+
+  .aqua-btn.graphite {
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.40) 8%, rgba(255,255,255,0.10) 45%, rgba(255,255,255,0) 50%),
+      repeating-linear-gradient(90deg, rgba(255,255,255,0.08) 0px, rgba(255,255,255,0.08) 1px, transparent 1px, transparent 3px),
+      linear-gradient(180deg, #c2cdd6 0%, #6f8090 50%, #475866 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.85),
+      inset 0 -2px 4px rgba(20, 30, 50, 0.45),
+      0 6px 12px -4px rgba(40, 60, 80, 0.55),
+      0 0 0 1px rgba(40, 60, 80, 0.6);
+  }
+
+  /* ===========================================================
+     TRAFFIC LIGHTS — Aqua close/min/zoom
+     =========================================================== */
+  .lights { display: flex; gap: 8px; }
+  .light {
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 25%, #fff 0%, rgba(255,255,255,0.3) 20%, transparent 50%),
+                radial-gradient(circle at 50% 60%, var(--c) 0%, var(--c-deep) 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.6),
+      inset 0 -1px 1px rgba(0,0,0,0.25),
+      0 1px 1px rgba(0,0,0,0.25),
+      0 0 0 1px rgba(0,0,0,0.25);
+  }
+  .light.red    { --c: #ff7a73; --c-deep: #c83830; }
+  .light.yellow { --c: #ffd25a; --c-deep: #c79212; }
+  .light.green  { --c: #58dd66; --c-deep: #1d9c2b; }
+
+  /* ===========================================================
+     LAYOUT — outer iMac-like "window" containing the app
+     =========================================================== */
+  .imac-window {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 18px;
+    border-radius: 32px;
+  }
+
+  /* Window chrome bar */
+  .titlebar {
+    display: flex; align-items: center; gap: 14px;
+    padding: 10px 16px;
+    border-radius: 14px 14px 6px 6px;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.55) 45%, rgba(255,255,255,0.2) 100%),
+      repeating-linear-gradient(180deg, #f0f4f8 0px, #f0f4f8 1px, #dde6ee 1px, #dde6ee 2px);
+    box-shadow:
+      inset 0 1px 0 #fff,
+      inset 0 -1px 0 rgba(0,0,0,0.15),
+      0 1px 0 rgba(0,0,0,0.1);
+    margin-bottom: 14px;
+  }
+  .titlebar .title {
+    font-family: var(--font-display);
+    font-size: 14px;
+    color: var(--ink-2);
+    text-shadow: 0 1px 0 #fff;
+    letter-spacing: 0.02em;
+  }
+
+  /* App grid */
+  .app-grid {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 14px;
+    min-height: 720px;
+  }
+  .app-grid.three { grid-template-columns: 260px 280px 1fr 320px; }
+
+  /* ───────── SIDEBAR ───────── */
+  .sidebar { padding: 18px 14px 22px; }
+  .brand {
+    display: flex; align-items: center; gap: 10px;
+    padding: 6px 8px 14px;
+    border-bottom: 1px dashed var(--hair);
+    margin-bottom: 12px;
+  }
+  .brand-logo {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background:
+      radial-gradient(circle at 30% 28%, #fff 0%, rgba(255,255,255,0.4) 18%, transparent 45%),
+      radial-gradient(circle at 50% 60%, #ffb84a 0%, #ff5d8f 35%, #8466c6 70%, #0aa7c4 100%);
+    box-shadow:
+      inset 0 1px 1px rgba(255,255,255,0.7),
+      inset 0 -2px 4px rgba(0,0,0,0.25),
+      0 2px 4px rgba(0,0,0,0.3);
+    position: relative;
+  }
+  .brand-text {
+    font-family: var(--font-display);
+    font-size: 18px;
+    color: var(--ink);
+    text-shadow: 0 1px 0 rgba(255,255,255,0.8);
+    letter-spacing: 0.01em;
+  }
+  .brand-text small {
+    display: block;
+    font-family: var(--font-pixel);
+    font-size: 11px;
+    color: var(--ink-3);
+    letter-spacing: 0.08em;
+  }
+
+  .nav-section-label {
+    font-family: var(--font-pixel);
+    font-size: 13px;
+    color: var(--ink-3);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    padding: 8px 10px 4px;
+  }
+
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 7px 10px;
+    border-radius: 999px;
+    font-family: var(--font-body);
+    font-size: 13px;
+    color: var(--ink-2);
+    cursor: pointer;
+    margin: 2px 0;
+    position: relative;
+  }
+  .nav-item .dot {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 25%, #fff 0%, rgba(255,255,255,0.4) 25%, transparent 55%),
+                radial-gradient(circle at 50% 60%, var(--dot, #0aa7c4) 0%, color-mix(in srgb, var(--dot, #0aa7c4) 60%, #000) 100%);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.6), 0 1px 1px rgba(0,0,0,0.2);
+    flex-shrink: 0;
+  }
+  .nav-item.active {
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.5) 8%, rgba(108, 182, 255, 0.35) 50%, rgba(42, 120, 216, 0.45) 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.85),
+      inset 0 -2px 3px rgba(0, 30, 80, 0.25),
+      0 0 0 1px rgba(20, 60, 120, 0.5);
+    color: #fff;
+    text-shadow: 0 1px 0 rgba(0,0,0,0.3);
+  }
+  .nav-item.child {
+    margin-left: 12px;
+    font-size: 12px;
+    color: var(--ink-2);
+  }
+
+  /* ───────── MAIN PANEL ───────── */
+  .main {
+    padding: 22px 26px 26px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .greeting {
+    display: flex; align-items: flex-end; gap: 14px;
+    flex-wrap: wrap;
+  }
+  .greeting h1 {
+    font-family: var(--font-display);
+    font-size: 38px;
+    font-weight: 700;
+    color: var(--ink);
+    text-shadow: 0 2px 0 rgba(255,255,255,0.7), 0 -1px 0 rgba(0,0,0,0.06);
+    letter-spacing: 0.005em;
+    line-height: 1;
+  }
+  .greeting .sub {
+    font-family: var(--font-pixel);
+    font-size: 15px;
+    color: var(--ink-3);
+    letter-spacing: 0.04em;
+    padding-bottom: 4px;
+  }
+  .greeting-actions { margin-left: auto; display: flex; gap: 8px; padding-bottom: 4px; }
+
+  /* News banner */
+  .news {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 18px;
+    border-radius: 18px;
+  }
+  .news .badge {
+    font-family: var(--font-tiny);
+    font-size: 9px;
+    padding: 6px 8px;
+    border-radius: 6px;
+    color: #fff;
+    background: linear-gradient(180deg, #ff8a1f 0%, #d95d00 100%);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.5), 0 1px 0 rgba(0,0,0,0.25);
+    letter-spacing: 0.08em;
+  }
+  .news .news-text {
+    font-family: var(--font-body);
+    font-size: 13px;
+    color: var(--ink-2);
+  }
+  .news .news-text strong { color: var(--ink); }
+
+  /* Section heading */
+  .h-section {
+    display: flex; align-items: baseline; gap: 12px;
+    margin-top: 4px;
+  }
+  .h-section h2 {
+    font-family: var(--font-display);
+    font-size: 20px;
+    color: var(--ink);
+    text-shadow: 0 1px 0 rgba(255,255,255,0.7);
+  }
+  .h-section .count {
+    font-family: var(--font-pixel);
+    font-size: 14px;
+    color: var(--ink-3);
+  }
+  .h-section .pinstripe {
+    flex: 1;
+    height: 8px;
+    background: repeating-linear-gradient(0deg, rgba(8,30,50,0.08) 0px, rgba(8,30,50,0.08) 1px, transparent 1px, transparent 2px);
+    border-radius: 2px;
+    margin-bottom: 4px;
+  }
+
+  /* Project cards grid */
+  .project-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+  .project-card {
+    padding: 0;
+    overflow: hidden;
+  }
+  .project-card .card-head {
+    display: flex; align-items: center; gap: 10px;
+    padding: 14px 16px 12px;
+    position: relative;
+  }
+  .project-card .swatch {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background:
+      radial-gradient(circle at 30% 25%, #fff 0%, rgba(255,255,255,0.35) 25%, transparent 55%),
+      radial-gradient(circle at 50% 60%, var(--swatch, #0aa7c4) 0%, color-mix(in srgb, var(--swatch, #0aa7c4) 50%, #000) 100%);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.7), inset 0 -1px 1px rgba(0,0,0,0.2), 0 1px 1px rgba(0,0,0,0.25);
+    flex-shrink: 0;
+  }
+  .project-card .pname {
+    font-family: var(--font-display);
+    font-size: 17px;
+    color: var(--ink);
+  }
+  .project-card .pname small {
+    display: block;
+    font-family: var(--font-pixel);
+    font-size: 12px;
+    color: var(--ink-3);
+    letter-spacing: 0.06em;
+  }
+  .project-card .pmenu { margin-left: auto; color: var(--ink-3); font-family: var(--font-pixel); font-size: 16px; }
+
+  .project-card .stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    padding: 8px 12px 14px;
+    position: relative;
+  }
+  .stat {
+    text-align: center;
+    padding: 4px 6px;
+    position: relative;
+  }
+  .stat + .stat::before {
+    content: ""; position: absolute; left: 0; top: 18%; bottom: 18%;
+    width: 1px; background: linear-gradient(180deg, transparent, rgba(8,30,50,0.18), transparent);
+  }
+  .stat .n {
+    font-family: var(--font-display);
+    font-size: 22px;
+    color: var(--ink);
+    line-height: 1.1;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.7);
+  }
+  .stat .l {
+    font-family: var(--font-pixel);
+    font-size: 12px;
+    color: var(--ink-3);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .project-card .footer {
+    display: flex; align-items: center; gap: 8px;
+    padding: 9px 14px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.4) 0%, rgba(0, 50, 80, 0.10) 100%);
+    border-top: 1px solid rgba(255,255,255,0.6);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.55);
+  }
+  .project-card .footer .more {
+    margin-left: auto;
+    font-family: var(--font-pixel);
+    font-size: 12px;
+    color: var(--ink-3);
+  }
+
+  .mini-tag {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-family: var(--font-pixel);
+    font-size: 12px;
+    padding: 3px 8px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.5);
+    color: var(--ink-2);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.7), 0 0 0 1px rgba(8,30,50,0.12);
+  }
+
+  /* Runtimes panel */
+  .runtimes-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 16px;
+    border-radius: 14px;
+  }
+  .runtimes-row .label {
+    font-family: var(--font-pixel); font-size: 14px; color: var(--ink-3);
+    letter-spacing: 0.08em; text-transform: uppercase;
+  }
+  .runtime-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 12px 5px 8px;
+    border-radius: 999px;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0.3) 8%, rgba(255,255,255,0.05) 50%, rgba(0, 50, 80, 0.10) 100%),
+      linear-gradient(180deg, #f0fdf2 0%, #b3ecbe 100%);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.9), inset 0 -1px 0 rgba(0, 60, 30, 0.2), 0 0 0 1px rgba(0, 80, 30, 0.35);
+    font-family: var(--font-pixel);
+    font-size: 13px;
+    color: #1a5328;
+    letter-spacing: 0.04em;
+  }
+  .runtime-pill .blink {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, #b8ffc4 0%, #2acb44 60%, #137a23 100%);
+    box-shadow: 0 0 8px #2acb44, inset 0 1px 0 rgba(255,255,255,0.8);
+    animation: blink 1.6s ease-in-out infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.45} }
+
+  /* ===========================================================
+     SCREEN 2 — Task chat
+     =========================================================== */
+  .col-projects { padding: 14px 12px; }
+  .col-chat { padding: 0; display: flex; flex-direction: column; overflow: hidden; }
+  .col-right { padding: 14px 16px; }
+
+  .chat-head {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 18px;
+    border-bottom: 1px solid rgba(8,30,50,0.12);
+    background: linear-gradient(180deg, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0.25) 100%);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.9);
+  }
+  .chat-head .ttl {
+    font-family: var(--font-display); font-size: 17px; color: var(--ink);
+  }
+  .chat-head .crumbs {
+    font-family: var(--font-pixel); font-size: 12px; color: var(--ink-3); letter-spacing: 0.05em;
+  }
+  .chat-head .rt {
+    margin-left: auto;
+    display: inline-flex; align-items: center; gap: 6px;
+    font-family: var(--font-pixel);
+    font-size: 12px; color: var(--ink-2);
+  }
+
+  .chat-body {
+    flex: 1;
+    padding: 22px;
+    background:
+      radial-gradient(60% 50% at 50% 0%, rgba(255,255,255,0.55) 0%, transparent 60%),
+      linear-gradient(180deg, rgba(255,255,255,0.30), rgba(255,255,255,0.06));
+    overflow-y: auto;
+    min-height: 480px;
+  }
+
+  .msg-row { display: flex; gap: 12px; margin-bottom: 18px; }
+  .msg-row.user { flex-direction: row-reverse; }
+  .avatar {
+    width: 32px; height: 32px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background:
+      radial-gradient(circle at 30% 25%, #fff 0%, rgba(255,255,255,0.4) 20%, transparent 50%),
+      radial-gradient(circle at 50% 60%, #ffb84a 0%, #ff5d8f 35%, #8466c6 70%, #0aa7c4 100%);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.7), inset 0 -2px 3px rgba(0,0,0,0.25), 0 1px 2px rgba(0,0,0,0.3);
+    display: grid; place-items: center;
+    font-family: var(--font-display);
+    font-size: 14px; color: #fff;
+    text-shadow: 0 1px 0 rgba(0,0,0,0.4);
+  }
+  .bubble {
+    max-width: 70%;
+    padding: 10px 14px;
+    border-radius: 18px;
+    font-family: var(--font-body);
+    font-size: 14px; line-height: 1.5;
+    color: var(--ink);
+    position: relative;
+  }
+  .bubble.user {
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.45) 8%, rgba(255,255,255,0.10) 45%, rgba(255,255,255,0) 50%),
+      linear-gradient(180deg, #6cb6ff 0%, #2a78d8 100%);
+    color: #fff;
+    text-shadow: 0 1px 0 rgba(0,0,0,0.25);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.85),
+      inset 0 -2px 4px rgba(0, 30, 80, 0.35),
+      0 6px 12px -4px rgba(10, 60, 120, 0.5),
+      0 0 0 1px rgba(20, 60, 110, 0.55);
+  }
+  .bubble.agent {
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.45) 8%, rgba(255,255,255,0.20) 50%, rgba(255,255,255,0.10) 100%),
+      linear-gradient(180deg, #ffffff 0%, #e6f2fa 100%);
+    box-shadow:
+      inset 0 1px 0 #fff,
+      inset 0 -1px 0 rgba(0, 40, 60, 0.15),
+      0 6px 12px -6px rgba(0, 40, 80, 0.35),
+      0 0 0 1px rgba(8, 30, 50, 0.12);
+  }
+  .bubble .meta {
+    font-family: var(--font-pixel);
+    font-size: 11px;
+    opacity: 0.75;
+    letter-spacing: 0.05em;
+    margin-top: 4px;
+  }
+
+  /* Tool call card */
+  .tool-card {
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.35) 8%, rgba(255,255,255,0.10) 50%, rgba(255,255,255,0.05) 100%),
+      linear-gradient(180deg, #fff4d8 0%, #ffd968 100%);
+    box-shadow:
+      inset 0 1px 0 #fff,
+      inset 0 -1px 0 rgba(120, 60, 0, 0.25),
+      0 6px 12px -6px rgba(120, 60, 0, 0.35),
+      0 0 0 1px rgba(140, 80, 0, 0.4);
+    border-radius: 14px;
+    padding: 10px 14px;
+    margin: 10px 0 10px 44px;
+    font-family: var(--font-pixel);
+    font-size: 13px;
+    color: #5a3a00;
+  }
+  .tool-card .tool-name {
+    font-family: var(--font-display);
+    font-size: 13px;
+    color: #3a2400;
+    margin-bottom: 4px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .tool-card .tool-name::before {
+    content: "🔧"; font-size: 12px;
+  }
+
+  /* Approval card */
+  .approval-card {
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.35) 8%, rgba(255,255,255,0.10) 50%, rgba(255,255,255,0.05) 100%),
+      linear-gradient(180deg, #ffe2ed 0%, #ff8aaf 100%);
+    box-shadow:
+      inset 0 1px 0 #fff,
+      inset 0 -1px 0 rgba(110, 0, 40, 0.3),
+      0 6px 12px -6px rgba(180, 30, 80, 0.4),
+      0 0 0 1px rgba(160, 30, 80, 0.5);
+    border-radius: 16px;
+    padding: 14px 16px;
+    margin: 10px 0 10px 44px;
+  }
+  .approval-card .lbl {
+    font-family: var(--font-display); font-size: 14px; color: #6e0028; margin-bottom: 6px;
+  }
+  .approval-card .row {
+    display: flex; align-items: center; gap: 10px;
+    font-family: var(--font-pixel); font-size: 13px; color: #6e0028;
+  }
+  .approval-card .timer {
+    margin-left: auto;
+    font-family: var(--font-tiny);
+    font-size: 10px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    background: #6e0028; color: #fff;
+    letter-spacing: 0.1em;
+  }
+  .approval-card .actions { margin-top: 10px; display: flex; gap: 8px; }
+
+  /* Composer */
+  .composer {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 14px;
+    border-top: 1px solid rgba(8,30,50,0.12);
+    background: linear-gradient(180deg, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0.30) 100%);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.9);
+  }
+  .composer .input {
+    flex: 1;
+    padding: 10px 14px;
+    border-radius: 12px;
+    background: linear-gradient(180deg, #fff 0%, #f0f6fa 100%);
+    box-shadow:
+      inset 0 2px 4px rgba(0, 40, 70, 0.15),
+      0 0 0 1px rgba(8,30,50,0.18);
+    font-family: var(--font-body);
+    font-size: 13px;
+    color: var(--ink);
+    border: none;
+    outline: none;
+  }
+  .composer .hint {
+    font-family: var(--font-pixel);
+    font-size: 11px;
+    color: var(--ink-3);
+    letter-spacing: 0.05em;
+  }
+
+  /* Right column */
+  .right-h {
+    font-family: var(--font-display);
+    font-size: 14px;
+    color: var(--ink-2);
+    text-shadow: 0 1px 0 rgba(255,255,255,0.7);
+    margin-bottom: 8px;
+  }
+
+  /* Mid column task list */
+  .task-item {
+    padding: 9px 12px;
+    border-radius: 12px;
+    font-family: var(--font-body);
+    font-size: 13px;
+    color: var(--ink-2);
+    margin: 3px 0;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .task-item.active {
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.5) 8%, rgba(108, 182, 255, 0.35) 50%, rgba(42, 120, 216, 0.45) 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.85),
+      inset 0 -2px 3px rgba(0, 30, 80, 0.25),
+      0 0 0 1px rgba(20, 60, 120, 0.5);
+    color: #fff;
+    text-shadow: 0 1px 0 rgba(0,0,0,0.3);
+  }
+  .task-item .marker {
+    font-family: var(--font-pixel);
+    font-size: 12px;
+    opacity: 0.6;
+  }
+  .new-task-btn {
+    width: 100%;
+    margin-top: 8px;
+  }
+
+  /* Screen separator */
+  .scene-label {
+    display: flex; align-items: center; gap: 16px;
+    margin: 60px auto 22px;
+    max-width: 1280px;
+    color: #fff;
+  }
+  .scene-label .num {
+    font-family: var(--font-tiny);
+    font-size: 14px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    background: linear-gradient(180deg, #ff8a1f 0%, #d95d00 100%);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.5), 0 4px 0 rgba(0,0,0,0.25), 0 6px 12px rgba(0,0,0,0.35);
+    color: #fff;
+    text-shadow: 0 1px 0 rgba(0,0,0,0.5);
+    letter-spacing: 0.1em;
+  }
+  .scene-label .ttl {
+    font-family: var(--font-display);
+    font-size: 22px;
+    color: #fff;
+    text-shadow: 0 2px 0 rgba(0,0,0,0.3), 0 0 18px rgba(255,255,255,0.4);
+  }
+  .scene-label .pinstripe {
+    flex: 1; height: 6px;
+    background: repeating-linear-gradient(0deg, rgba(255,255,255,0.35) 0px, rgba(255,255,255,0.35) 1px, transparent 1px, transparent 3px);
+    border-radius: 2px;
+    box-shadow: 0 1px 0 rgba(0,0,0,0.15);
+  }
+
+  /* Floating system badge */
+  .y2k-badge {
+    position: fixed; right: 22px; bottom: 22px;
+    z-index: 1000;
+    padding: 12px 16px;
+    border-radius: 14px;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.35) 8%, rgba(255,255,255,0.10) 50%, rgba(255,255,255,0.05) 100%),
+      linear-gradient(180deg, #f5d780 0%, #c98a1f 100%);
+    box-shadow: inset 0 1px 0 #fff, 0 8px 16px rgba(0,0,0,0.4), 0 0 0 1px rgba(100,60,0,0.5);
+    font-family: var(--font-tiny);
+    font-size: 9px;
+    color: #4a2a00;
+    letter-spacing: 0.12em;
+    text-align: center;
+    line-height: 1.7;
+  }
+
+  /* Sparkle */
+  .sparkle {
+    position: absolute;
+    width: 16px; height: 16px;
+    pointer-events: none;
+    background:
+      radial-gradient(circle at center, #fff 0%, rgba(255,255,255,0.5) 30%, transparent 60%);
+    animation: sparkle 3s ease-in-out infinite;
+  }
+  .sparkle::before, .sparkle::after {
+    content: ""; position: absolute; inset: 0;
+    background: linear-gradient(0deg, transparent 47%, #fff 49%, #fff 51%, transparent 53%),
+                linear-gradient(90deg, transparent 47%, #fff 49%, #fff 51%, transparent 53%);
+  }
+  @keyframes sparkle { 0%,100%{opacity:0.3; transform:scale(0.8)} 50%{opacity:1; transform:scale(1.2)} }
+
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     SCENE 1 — WORKSPACE HOME (mirrors your screenshot 1)
+     ============================================================ -->
+<div class="scene-label">
+  <span class="num">SCENE 01</span>
+  <span class="ttl">Workspace Home · 你好 dev</span>
+  <span class="pinstripe"></span>
+</div>
+
+<div class="imac-window plastic">
+  <div class="titlebar">
+    <div class="lights">
+      <span class="light red"></span>
+      <span class="light yellow"></span>
+      <span class="light green"></span>
+    </div>
+    <span class="title">Brainrot.app — Workspace: 12345</span>
+    <span style="margin-left:auto; font-family:var(--font-pixel); font-size:11px; color:var(--ink-3); letter-spacing:0.08em;">PowerPC · OS X 10.1 · 1024×768</span>
+  </div>
+
+  <div class="app-grid">
+
+    <!-- ─────── Sidebar ─────── -->
+    <aside class="plastic snow sidebar">
+      <div class="brand">
+        <div class="brand-logo"></div>
+        <div class="brand-text">
+          Brainrot
+          <small>AI · CHAT · v2.001</small>
+        </div>
+      </div>
+
+      <div class="nav-section-label">Workspace</div>
+      <div class="nav-item active">
+        <span class="dot" style="--dot:#0aa7c4"></span>
+        12345
+      </div>
+
+      <div class="nav-section-label">Tools</div>
+      <div class="nav-item"><span class="dot" style="--dot:#ff8a1f"></span>项目</div>
+      <div class="nav-item"><span class="dot" style="--dot:#8466c6"></span>Agents</div>
+      <div class="nav-item"><span class="dot" style="--dot:#b6d24c"></span>Runtimes</div>
+      <div class="nav-item"><span class="dot" style="--dot:#ff5d8f"></span>设置</div>
+
+      <div class="nav-section-label" style="margin-top:14px">项目</div>
+      <div class="nav-item child"><span class="dot" style="--dot:#0aa7c4"></span>123</div>
+      <div class="nav-item child"><span class="dot" style="--dot:#ff8a1f"></span>12456</div>
+
+      <div style="margin-top:24px; text-align:center;">
+        <button class="aqua-btn graphite" style="font-size:11px; padding:6px 14px;">
+          + 切换 Workspace
+        </button>
+      </div>
+    </aside>
+
+    <!-- ─────── Main ─────── -->
+    <section class="plastic snow main" style="position:relative; overflow:hidden;">
+
+      <span class="sparkle" style="top: 30px; right: 80px;"></span>
+      <span class="sparkle" style="top: 120px; right: 220px; animation-delay: 1.2s;"></span>
+
+      <div class="greeting">
+        <h1>你好 dev</h1>
+        <span class="sub">↳ 共有 1 个 项目 · 0 个 agents 在线</span>
+        <span class="greeting-actions">
+          <button class="aqua-btn graphite">+ 添加项目</button>
+          <button class="aqua-btn">+ 添加 agent</button>
+        </span>
+      </div>
+
+      <!-- News banner -->
+      <div class="news plastic snow" style="margin-top:4px;">
+        <span class="badge">NEWS</span>
+        <div class="news-text">
+          <strong>没有在线的 agent</strong> · 需要 daemon 运行后再启动 agent 来响应你的对话。<br>
+          <span style="color:var(--ink-3); font-family:var(--font-pixel); font-size:12px;">→ 启动 daemon: 在 Brainrot 桌面 app 中点击 "Start daemon" 按钮</span>
+        </div>
+      </div>
+
+      <!-- Projects -->
+      <div class="h-section">
+        <h2>项目</h2>
+        <span class="count">[ 2 ]</span>
+        <span class="pinstripe"></span>
+      </div>
+
+      <div class="project-grid">
+
+        <!-- card 1: bondi blue -->
+        <div class="project-card plastic">
+          <div class="card-head">
+            <span class="swatch" style="--swatch:#0aa7c4"></span>
+            <div class="pname">123
+              <small>P-1F2A · 03 days ago</small>
+            </div>
+            <span class="pmenu">⋯</span>
+          </div>
+          <div class="stats">
+            <div class="stat"><div class="n">1</div><div class="l">任务</div></div>
+            <div class="stat"><div class="n">1</div><div class="l">Agents</div></div>
+            <div class="stat"><div class="n">0</div><div class="l">待审批</div></div>
+          </div>
+          <div class="footer">
+            <span class="mini-tag">●agent dev</span>
+            <span class="more">查看 →</span>
+          </div>
+        </div>
+
+        <!-- card 2: tangerine -->
+        <div class="project-card plastic tangerine">
+          <div class="card-head">
+            <span class="swatch" style="--swatch:#ff8a1f"></span>
+            <div class="pname">12456
+              <small>P-9B7C · 11 hours ago</small>
+            </div>
+            <span class="pmenu">⋯</span>
+          </div>
+          <div class="stats">
+            <div class="stat"><div class="n">3</div><div class="l">任务</div></div>
+            <div class="stat"><div class="n">2</div><div class="l">Agents</div></div>
+            <div class="stat"><div class="n">0</div><div class="l">待审批</div></div>
+          </div>
+          <div class="footer">
+            <span class="mini-tag">●agent prod</span>
+            <span class="mini-tag">●agent test</span>
+            <span class="more">查看 →</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Runtimes -->
+      <div class="h-section">
+        <h2>Runtimes</h2>
+        <span class="count">[ 1 ]</span>
+        <span class="pinstripe"></span>
+      </div>
+      <div class="runtimes-row plastic snow">
+        <span class="label">Online ▸</span>
+        <span class="runtime-pill"><span class="blink"></span>LAPTOP-9KCM4MS2</span>
+        <span style="margin-left:auto; font-family:var(--font-pixel); font-size:12px; color:var(--ink-3); letter-spacing:0.06em;">
+          uptime 04:21:18 · ping 12ms
+        </span>
+      </div>
+
+    </section>
+  </div>
+</div>
+
+
+<!-- ============================================================
+     SCENE 2 — TASK CHAT (mirrors your screenshot 2)
+     ============================================================ -->
+<div class="scene-label">
+  <span class="num">SCENE 02</span>
+  <span class="ttl">Task Card · @agent dev</span>
+  <span class="pinstripe"></span>
+</div>
+
+<div class="imac-window plastic">
+  <div class="titlebar">
+    <div class="lights">
+      <span class="light red"></span>
+      <span class="light yellow"></span>
+      <span class="light green"></span>
+    </div>
+    <span class="title">Brainrot.app — 12345 ▸ 123 ▸ 任务 1</span>
+    <span style="margin-left:auto; font-family:var(--font-pixel); font-size:11px; color:var(--ink-3); letter-spacing:0.08em;">⌘ 帮助 · F1 快捷键</span>
+  </div>
+
+  <div class="app-grid three">
+
+    <!-- col 1: workspace sidebar (compact) -->
+    <aside class="plastic snow sidebar">
+      <div class="brand">
+        <div class="brand-logo"></div>
+        <div class="brand-text">
+          Brainrot
+          <small>AI · CHAT · v2.001</small>
+        </div>
+      </div>
+      <div class="nav-section-label">Workspace</div>
+      <div class="nav-item active"><span class="dot" style="--dot:#0aa7c4"></span>12345</div>
+      <div class="nav-section-label">Tools</div>
+      <div class="nav-item"><span class="dot" style="--dot:#ff8a1f"></span>项目</div>
+      <div class="nav-item"><span class="dot" style="--dot:#8466c6"></span>Agents</div>
+      <div class="nav-item"><span class="dot" style="--dot:#b6d24c"></span>Runtimes</div>
+      <div class="nav-item"><span class="dot" style="--dot:#ff5d8f"></span>设置</div>
+      <div class="nav-section-label" style="margin-top:14px">项目</div>
+      <div class="nav-item child active"><span class="dot" style="--dot:#0aa7c4"></span>123</div>
+      <div class="nav-item child"><span class="dot" style="--dot:#ff8a1f"></span>12456</div>
+    </aside>
+
+    <!-- col 2: project tasks -->
+    <aside class="plastic snow col-projects">
+      <div style="display:flex; align-items:center; gap:8px; padding:4px 8px 12px; border-bottom: 1px dashed var(--hair); margin-bottom:8px;">
+        <span class="swatch" style="--swatch:#0aa7c4; width:18px; height:18px;"></span>
+        <span style="font-family:var(--font-display); font-size:15px;">123</span>
+        <span style="margin-left:auto; font-family:var(--font-pixel); font-size:11px; color:var(--ink-3);">P-1F2A</span>
+      </div>
+
+      <div class="nav-section-label">任务</div>
+      <div class="task-item active">
+        <span class="marker">◆</span>
+        任务 1
+        <span style="margin-left:auto; font-family:var(--font-pixel); font-size:11px;">●</span>
+      </div>
+      <div class="task-item">
+        <span class="marker">○</span>
+        新建任务
+      </div>
+
+      <button class="aqua-btn new-task-btn" style="margin-top:12px;">+ 新建任务</button>
+
+      <div style="margin-top:18px;">
+        <div class="nav-section-label">Agents</div>
+        <div style="display:flex; gap:6px; flex-wrap:wrap; padding:4px 6px;">
+          <span class="mini-tag"><span class="dot" style="width:8px;height:8px;--dot:#28c840"></span>dev</span>
+          <span class="mini-tag" style="opacity:0.55;"><span class="dot" style="width:8px;height:8px;--dot:#888"></span>prod</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- col 3: chat -->
+    <section class="plastic snow col-chat">
+      <header class="chat-head">
+        <span class="swatch" style="--swatch:#0aa7c4; width:20px; height:20px;"></span>
+        <div>
+          <div class="ttl">任务 1</div>
+          <div class="crumbs">12345 ▸ 123 ▸ 任务 1</div>
+        </div>
+        <span class="rt">
+          <span class="blink" style="width:8px;height:8px;border-radius:50%;background:radial-gradient(circle at 30% 30%, #b8ffc4 0%, #2acb44 60%, #137a23 100%);box-shadow:0 0 8px #2acb44;"></span>
+          @dev · online
+        </span>
+      </header>
+
+      <div class="chat-body">
+
+        <!-- user msg -->
+        <div class="msg-row user">
+          <div class="avatar">N</div>
+          <div class="bubble user">
+            @dev 你好,可以帮我看一下当前 frontend 的 y2k 配色吗?
+            <div class="meta">17:53 · 已发送</div>
+          </div>
+        </div>
+
+        <!-- agent msg -->
+        <div class="msg-row">
+          <div class="avatar" style="background: radial-gradient(circle at 30% 25%, #fff 0%, rgba(255,255,255,0.4) 20%, transparent 50%), radial-gradient(circle at 50% 60%, #5fd6ec 0%, #0aa7c4 60%, #006e87 100%);">D</div>
+          <div class="bubble agent">
+            好的!正在读取 <code style="font-family:var(--font-pixel); background:rgba(8,30,50,0.06); padding:1px 5px; border-radius:4px;">styles/tokens/palette.css</code>。当前 palette 还是 Aero Vista (2007) 风格 —— 是时候让它回到 iMac G3 时代了 🍬
+            <div class="meta">17:53 · @dev</div>
+          </div>
+        </div>
+
+        <!-- tool call -->
+        <div class="tool-card">
+          <div class="tool-name">Read · styles/tokens/palette.css</div>
+          <div>读取 100 行 · 提取了 23 个 CSS 变量</div>
+        </div>
+
+        <!-- approval needed -->
+        <div class="approval-card">
+          <div class="lbl">⚠ 需要审批 · Tool Use</div>
+          <div class="row">
+            <span><strong>Edit</strong> · styles/tokens/palette.css</span>
+            <span class="timer">59:42</span>
+          </div>
+          <div style="font-family:var(--font-pixel); font-size:12px; margin-top:6px; color:#6e0028;">
+            将 23 个颜色变量从 Aero Vista 替换为 iMac G3 Bondi Blue + 糖果色系
+          </div>
+          <div class="actions">
+            <button class="aqua-btn" style="font-size:11px; padding:6px 14px;">✓ 批准</button>
+            <button class="aqua-btn graphite" style="font-size:11px; padding:6px 14px;">✗ 拒绝</button>
+            <button class="aqua-btn graphite" style="font-size:11px; padding:6px 14px;">查看 diff</button>
+          </div>
+        </div>
+
+        <!-- agent finish -->
+        <div class="msg-row">
+          <div class="avatar" style="background: radial-gradient(circle at 30% 25%, #fff 0%, rgba(255,255,255,0.4) 20%, transparent 50%), radial-gradient(circle at 50% 60%, #5fd6ec 0%, #0aa7c4 60%, #006e87 100%);">D</div>
+          <div class="bubble agent">
+            等你批准后我会替换 23 个变量并触发 HMR,你可以直接在浏览器看到效果。
+            <div class="meta">17:54 · @dev</div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="composer">
+        <input class="input" placeholder="输入消息,@ 一下 agent · Ctrl+Enter 发送" />
+        <span class="hint">Ctrl ↩</span>
+        <button class="aqua-btn">▶ 发送</button>
+      </div>
+    </section>
+
+    <!-- col 4: artifacts -->
+    <aside class="plastic snow col-right">
+      <div class="right-h">产出物 · Artifacts</div>
+      <div class="news plastic snow" style="padding:10px 12px; margin-bottom:10px;">
+        <div style="font-family:var(--font-pixel); font-size:12px; color:var(--ink-3); letter-spacing:0.04em;">
+          agent 完成任务后产出的<br>文件会显示在这里
+        </div>
+      </div>
+
+      <div class="right-h" style="margin-top:14px;">最近活动</div>
+      <div style="font-family:var(--font-pixel); font-size:12px; color:var(--ink-2); line-height:1.9;">
+        <div>▸ 17:53 task created</div>
+        <div>▸ 17:53 @dev online</div>
+        <div>▸ 17:54 approval pending</div>
+      </div>
+
+      <div style="margin-top:18px; padding:10px 12px; border-radius:12px; background:linear-gradient(180deg, #f0fdf2, #cdebd2); box-shadow: inset 0 1px 0 #fff, 0 0 0 1px rgba(0,80,30,0.3);">
+        <div style="font-family:var(--font-display); font-size:13px; color:#1a5328;">Runtime</div>
+        <div style="font-family:var(--font-pixel); font-size:11px; color:#1a5328; letter-spacing:0.04em; margin-top:2px;">
+          LAPTOP-9KCM4MS2 · ping 12ms
+        </div>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<!-- Floating badge -->
+<div class="y2k-badge">
+  ★ POWERED BY<br>
+  BRAINROT 2K<br>
+  ──────────<br>
+  EST. 1999 · v2.001
+</div>
+
+</body>
+</html>

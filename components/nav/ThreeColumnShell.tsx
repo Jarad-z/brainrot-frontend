@@ -6,12 +6,7 @@ import { Breadcrumb } from "./Breadcrumb";
 import { AccountMenu } from "./AccountMenu";
 import { Input } from "@/components/brand/input";
 import { NotificationBell } from "@/components/layout/NotificationBell";
-import {
-  TooltipProvider,
-  Tooltip,
-  TooltipTrigger,
-  TooltipContent,
-} from "@/components/brand/tooltip";
+import { TooltipProvider } from "@/components/brand/tooltip";
 import type { User } from "@/lib/api/types";
 
 interface ThreeColumnShellProps {
@@ -23,11 +18,11 @@ export function ThreeColumnShell({ user, children }: ThreeColumnShellProps) {
   return (
     <TooltipProvider>
       <div
-        className="relative h-screen flex flex-col overflow-hidden"
+        className="app-shell relative h-screen flex flex-col overflow-hidden"
         style={{
           /* Windows 7 default Harmony — deep navy at top, electric mid,
              soft cyan at the bottom. The strong vertical range is what
-             makes Aero windows pop in front. */
+             makes Aero windows pop in front. Theme=y2k overrides this. */
           background:
             "linear-gradient(180deg, " +
             "#0d2746 0%, " +     /* near-black navy */
@@ -43,7 +38,7 @@ export function ThreeColumnShell({ user, children }: ThreeColumnShellProps) {
             the Win7 Harmony wallpaper. Bright core, broad halo. */}
         <div
           aria-hidden
-          className="pointer-events-none absolute"
+          className="app-shell-bg-sun pointer-events-none absolute"
           style={{
             top: "32%",
             left: "62%",
@@ -65,7 +60,7 @@ export function ThreeColumnShell({ user, children }: ThreeColumnShellProps) {
         {/* Aurora band — single broad sweep below the sun */}
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-x-0"
+          className="app-shell-bg-aurora pointer-events-none absolute inset-x-0"
           style={{
             top: "45%",
             height: "180px",
@@ -79,7 +74,7 @@ export function ThreeColumnShell({ user, children }: ThreeColumnShellProps) {
         {/* A few subtle sparkles, much fewer than before */}
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 opacity-55"
+          className="app-shell-bg-stars pointer-events-none absolute inset-0 opacity-55"
           style={{
             background:
               "radial-gradient(1.2px 1.2px at 22% 18%, white, transparent)," +
@@ -94,7 +89,7 @@ export function ThreeColumnShell({ user, children }: ThreeColumnShellProps) {
         {/* Subtle film grain */}
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 opacity-[0.06]"
+          className="app-shell-bg-grain pointer-events-none absolute inset-0 opacity-[0.06]"
           style={{
             backgroundImage:
               "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.6'/></svg>\")",
@@ -103,15 +98,17 @@ export function ThreeColumnShell({ user, children }: ThreeColumnShellProps) {
         />
 
         <OfflineBanner />
-        <div className="relative flex flex-1 min-h-0 gap-2 p-2">
-          {/* Sidebar — Aero glass island */}
+        <div className="relative flex flex-1 min-h-0 gap-2 p-2" style={{ zIndex: 2 }}>
+          {/* Sidebar — Aero glass island (under y2k: candy snow plastic).
+              The inner <aside> already has .aero-glass, which our theme
+              overrides for y2k. Don't double-stack a background here. */}
           <div className="shrink-0 flex flex-col">
             <Sidebar />
           </div>
 
           {/* Main glass island */}
           <div
-            className="flex-1 flex flex-col min-w-0 rounded-xl overflow-hidden"
+            className="app-shell-main-island flex-1 flex flex-col min-w-0 rounded-xl overflow-hidden"
             style={{
               background:
                 "linear-gradient(180deg, " +
@@ -130,27 +127,32 @@ export function ThreeColumnShell({ user, children }: ThreeColumnShellProps) {
             }}
           >
             <header
-              className="h-11 px-3 flex items-center gap-3 shrink-0"
+              className="app-shell-titlebar h-11 px-3 flex items-center gap-3 shrink-0"
               style={{
                 borderBottom: "1px solid rgba(155,200,235,0.40)",
                 background:
                   "linear-gradient(180deg, rgba(255,255,255,0.32) 0%, rgba(255,255,255,0.05) 100%)",
               }}
             >
+              {/* iMac window chrome — only visible under y2k theme */}
+              <div className="imac-chrome">
+                <div className="imac-lights">
+                  <span className="imac-light red" aria-hidden />
+                  <span className="imac-light yellow" aria-hidden />
+                  <span className="imac-light green" aria-hidden />
+                </div>
+              </div>
+
               <Breadcrumb />
               <div className="flex-1" />
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <span>
-                    <Input
-                      placeholder="搜任务、消息、@agent..."
-                      disabled
-                      className="w-[240px] !rounded-full !bg-white/55 !border-white/60"
-                    />
-                  </span>
-                </TooltipTrigger>
-                <TooltipContent>S3 上线后启用</TooltipContent>
-              </Tooltip>
+              <span className="imac-window-stamp imac-chrome">
+                Mac OS · iMac G3 · 800 × 600
+              </span>
+              <Input
+                placeholder="搜任务、消息、@agent..."
+                disabled
+                className="w-[240px] !rounded-full !bg-white/55 !border-white/60"
+              />
               <NotificationBell />
               <AccountMenu user={user} />
             </header>

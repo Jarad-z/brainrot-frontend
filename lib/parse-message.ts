@@ -70,6 +70,45 @@ function normalizeToolUsePayload(p: unknown): { tool_name: string; tool_use_id: 
   return { tool_name: "", tool_use_id: "", input: undefined };
 }
 
+// Claude CLI streams thinking as `{type:"assistant", message:{content:[{type:"thinking", thinking:"..."}]}}`.
+// The daemon forwards this as-is in `payload`, so we normalize it into the flat
+// `{text}` shape the renderer expects. We also fall back to `text` directly in
+// case some path already flattens it.
+function normalizeThinkingPayload(p: unknown): { text: string } {
+  if (p && typeof p === "object") {
+    const obj = p as Record<string, unknown>;
+    if (typeof obj.text === "string") return { text: obj.text };
+    const msg = obj.message as Record<string, unknown> | undefined;
+    const content = msg?.content;
+    if (Array.isArray(content) && content.length > 0) {
+      const c0 = content[0] as Record<string, unknown>;
+      if (c0 && c0.type === "thinking" && typeof c0.thinking === "string") {
+        return { text: c0.thinking };
+      }
+    }
+  }
+  return { text: "" };
+}
+
+// Defensive shape for assistant_text. The daemon flattens to `{text}` today,
+// but a future change or replayed-from-raw path could deliver the wrapped
+// Claude CLI envelope. Coerce both.
+function normalizeAssistantTextPayload(p: unknown): { text: string } {
+  if (p && typeof p === "object") {
+    const obj = p as Record<string, unknown>;
+    if (typeof obj.text === "string") return { text: obj.text };
+    const msg = obj.message as Record<string, unknown> | undefined;
+    const content = msg?.content;
+    if (Array.isArray(content) && content.length > 0) {
+      const c0 = content[0] as Record<string, unknown>;
+      if (c0 && c0.type === "text" && typeof c0.text === "string") {
+        return { text: c0.text };
+      }
+    }
+  }
+  return { text: "" };
+}
+
 function normalizeToolResultPayload(p: unknown): { tool_use_id: string; is_error: boolean; content: unknown } {
   if (p && typeof p === "object") {
     const obj = p as Record<string, unknown>;
@@ -111,6 +150,12 @@ export function parseMessageContent(content: Record<string, unknown> | string | 
   }
   if (raw.type === "tool_result") {
     return { type: "tool_result", payload: normalizeToolResultPayload(payload) };
+  }
+  if (raw.type === "thinking") {
+    return { type: "thinking", payload: normalizeThinkingPayload(payload) };
+  }
+  if (raw.type === "assistant_text") {
+    return { type: "assistant_text", payload: normalizeAssistantTextPayload(payload) };
   }
   return { type: raw.type, payload } as ParsedMessage;
 }

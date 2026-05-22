@@ -75,6 +75,7 @@ export function ProjectStatCard({ wsId, project, index = 0 }: ProjectStatCardPro
       style={{ animationDelay: `${index * 60}ms` }}
     >
       <article
+        data-swatch={swatch}
         className="relative h-full rounded-xl aero-glass overflow-hidden card-lift hover:card-lift-hover focus-within:shadow-[var(--focus-ring)]"
       >
         {/* Top edge — Aero glass highlight (no project color here, kept

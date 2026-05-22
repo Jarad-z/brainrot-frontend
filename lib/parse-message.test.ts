@@ -64,4 +64,46 @@ describe("parseMessageContent — permission_request payload", () => {
     });
     expect(parsed.type).toBe("tool_use");
   });
+
+  it("normalizes thinking payload from Claude CLI envelope", () => {
+    const parsed = parseMessageContent({
+      type: "thinking",
+      payload: {
+        type: "assistant",
+        message: { content: [{ type: "thinking", thinking: "let me think..." }] },
+      },
+    });
+    expect(parsed.type).toBe("thinking");
+    if (parsed.type === "thinking") expect(parsed.payload.text).toBe("let me think...");
+  });
+
+  it("accepts thinking payload that is already flat", () => {
+    const parsed = parseMessageContent({ type: "thinking", payload: { text: "flat" } });
+    expect(parsed.type).toBe("thinking");
+    if (parsed.type === "thinking") expect(parsed.payload.text).toBe("flat");
+  });
+
+  it("falls back to empty text when thinking payload is malformed", () => {
+    const parsed = parseMessageContent({ type: "thinking", payload: { foo: "bar" } });
+    expect(parsed.type).toBe("thinking");
+    if (parsed.type === "thinking") expect(parsed.payload.text).toBe("");
+  });
+
+  it("normalizes assistant_text from Claude CLI envelope", () => {
+    const parsed = parseMessageContent({
+      type: "assistant_text",
+      payload: {
+        type: "assistant",
+        message: { content: [{ type: "text", text: "wrapped reply" }] },
+      },
+    });
+    expect(parsed.type).toBe("assistant_text");
+    if (parsed.type === "assistant_text") expect(parsed.payload.text).toBe("wrapped reply");
+  });
+
+  it("falls back to empty text when assistant_text payload is malformed", () => {
+    const parsed = parseMessageContent({ type: "assistant_text", payload: { foo: "bar" } });
+    expect(parsed.type).toBe("assistant_text");
+    if (parsed.type === "assistant_text") expect(parsed.payload.text).toBe("");
+  });
 });

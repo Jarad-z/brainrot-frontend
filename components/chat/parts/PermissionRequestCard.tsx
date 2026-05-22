@@ -81,12 +81,19 @@ export function PermissionRequestCard({ msg, taskId }: PermissionRequestCardProp
       : "";
 
   return (
-    <div className="chat-indent my-2 border border-accent-wash-2 rounded-xl overflow-hidden shadow-[var(--shadow-2)] bg-paper-0">
-      <div className="flex items-center justify-between px-3.5 py-2 bg-accent-wash text-ink-0 border-b border-accent-wash-2">
+    <div
+      data-approval-card
+      className="chat-indent my-2 border border-accent-wash-2 rounded-xl overflow-hidden shadow-[var(--shadow-2)] bg-paper-0"
+    >
+      <div
+        data-approval-header
+        className="flex items-center justify-between px-3.5 py-2 bg-accent-wash text-ink-0 border-b border-accent-wash-2"
+      >
         <span className="font-semibold text-sm">
           <span className="text-accent">●</span> {tool_name} 请求批准
         </span>
         <span
+          data-approval-timer
           className={`font-mono text-xs ${
             urgent
               ? "text-countdown-urgent font-bold animate-pulse"
@@ -111,12 +118,14 @@ export function PermissionRequestCard({ msg, taskId }: PermissionRequestCardProp
         )}
         <div className="flex justify-end gap-2">
           <button
+            data-approval-action="deny"
             onClick={() => submit("denied")}
             className="px-3.5 py-1.5 border border-hairline rounded-lg text-sm font-medium text-ink-1 hover:bg-paper-1 transition-colors"
           >
             拒绝
           </button>
           <button
+            data-approval-action="edit"
             onClick={() => {
               setNoteOpen(true);
               submit("approved_with_edits");
@@ -126,6 +135,7 @@ export function PermissionRequestCard({ msg, taskId }: PermissionRequestCardProp
             批准并修改
           </button>
           <button
+            data-approval-action="approve"
             onClick={() => submit("approved")}
             className="px-3.5 py-1.5 bg-accent text-accent-fg rounded-lg text-sm font-semibold hover:opacity-90 shadow-[var(--shadow-1)] transition-opacity"
           >

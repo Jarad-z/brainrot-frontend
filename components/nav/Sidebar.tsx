@@ -95,34 +95,34 @@ export function Sidebar() {
           </p>
           {effectiveWsId ? (
             <Link href={`/w/${effectiveWsId}`}>
-              <NavItem active={isOverview}>概览</NavItem>
+              <NavItem active={isOverview} swatch="bondi">概览</NavItem>
             </Link>
           ) : (
-            <NavItem>概览</NavItem>
+            <NavItem swatch="bondi">概览</NavItem>
           )}
           <Link href="/approvals">
-            <NavItem active={isApprovals}>{messages.shell.pendingApprovals}</NavItem>
+            <NavItem active={isApprovals} swatch="strawberry">{messages.shell.pendingApprovals}</NavItem>
           </Link>
           {effectiveWsId ? (
             <Link href={`/w/${effectiveWsId}/agents`}>
-              <NavItem active={isAgents}>{messages.shell.agents}</NavItem>
+              <NavItem active={isAgents} swatch="grape">{messages.shell.agents}</NavItem>
             </Link>
           ) : (
-            <NavItem>{messages.shell.agents}</NavItem>
+            <NavItem swatch="grape">{messages.shell.agents}</NavItem>
           )}
           {effectiveWsId ? (
             <Link href={`/w/${effectiveWsId}/runtimes`}>
-              <NavItem active={isRuntimes}>{messages.shell.runtimes}</NavItem>
+              <NavItem active={isRuntimes} swatch="lime">{messages.shell.runtimes}</NavItem>
             </Link>
           ) : (
-            <NavItem>{messages.shell.runtimes}</NavItem>
+            <NavItem swatch="lime">{messages.shell.runtimes}</NavItem>
           )}
           {effectiveWsId ? (
             <Link href={`/w/${effectiveWsId}/settings`}>
-              <NavItem active={isSettings}>{messages.shell.settings}</NavItem>
+              <NavItem active={isSettings} swatch="tangerine">{messages.shell.settings}</NavItem>
             </Link>
           ) : (
-            <NavItem>{messages.shell.settings}</NavItem>
+            <NavItem swatch="tangerine">{messages.shell.settings}</NavItem>
           )}
 
           {/* projects */}

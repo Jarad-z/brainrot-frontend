@@ -1,6 +1,5 @@
 "use client";
 import { StatusChip } from "@/components/brand/status-chip";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/brand/tooltip";
 import { IconButton } from "@/components/brand/icon-button";
 import { CancelRunButton } from "./CancelRunButton";
 import type { TaskCard } from "@/lib/api/types";
@@ -15,6 +14,7 @@ export function TaskHeader({ task, taskId }: TaskHeaderProps) {
 
   return (
     <header
+      data-task-header
       className="sticky top-0 z-10 px-5 py-3"
       style={{
         background:
@@ -63,16 +63,9 @@ export function TaskHeader({ task, taskId }: TaskHeaderProps) {
 
         <div className="flex items-center gap-1.5 shrink-0">
           <CancelRunButton taskId={taskId} busy={busy} />
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <span>
-                <IconButton disabled aria-label="更多">
-                  ⋯
-                </IconButton>
-              </span>
-            </TooltipTrigger>
-            <TooltipContent>S3 上线后启用</TooltipContent>
-          </Tooltip>
+          <IconButton disabled aria-label="更多">
+            ⋯
+          </IconButton>
         </div>
       </div>
     </header>

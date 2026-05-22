@@ -1,0 +1,1552 @@
+/* ================================================================
+   themes/y2k-imac.css — iMac G3 / Aqua (1998–2003)
+   ----------------------------------------------------------------
+   Activated by [data-theme="y2k-imac"] on <html>. Re-declares the
+   same token names as the default (Aero Vista) theme so every
+   Tailwind class and every component re-skins itself with zero
+   markup changes. Also overrides the .aero-* utilities used in
+   markup with iMac G3 plastic / Aqua pinstripe recipes.
+
+   Anchors: iMac G3 Bondi Blue, Aqua OS X 10.0–10.4 pinstripe,
+   Apple traffic-light controls, candy translucent ABS plastic,
+   Chicago/Charcoal display typography.
+   ================================================================ */
+
+html[data-theme="y2k-imac"] {
+  /* ─── Paper — slightly warmer translucent whites for plastic glow */
+  --paper-0: #ffffff;
+  --paper-1: #f1faff;
+  --paper-2: #e3f2fa;
+
+  /* ─── Ink — deep navy-ink, readable on candy translucent shells */
+  --ink-0: #0a1c2e;
+  --ink-1: #1e3a55;
+  --ink-2: #355a7a;
+  --ink-3: #6788a3;
+
+  /* ─── Hairlines — cooler & a touch darker so they read through gloss */
+  --hairline: #bcd6e8;
+
+  /* ─── Accent — iMac G3 Bondi Blue family */
+  --accent:        #0aa7c4;   /* Bondi Blue (original 1998 iMac) */
+  --accent-deep:   #006e87;
+  --accent-glow:   #5fd6ec;
+  --accent-light:  #b5ecf5;
+  --accent-fg:     #ffffff;
+
+  /* Compat — old names re-pointed to candy family */
+  --accent-poppy: #ff5d8f;    /* strawberry */
+  --accent-moss:  #b6d24c;    /* lime */
+  --accent-honey: #ff8a1f;    /* tangerine */
+  --accent-plum:  #8466c6;    /* grape */
+
+  /* Soft tinted washes — selection / hover wash */
+  --accent-wash:   #d9f5fb;
+  --accent-wash-2: #9be0ed;
+
+  /* ─── Project swatches — iMac flavor family */
+  --swatch-green-stripe: #b6d24c;  --swatch-green-border: #8aa530;  --swatch-green-text: #4a5e10;
+  --swatch-blue-stripe:  #0aa7c4;  --swatch-blue-border:  #006e87;  --swatch-blue-text:  #003e4d;
+  --swatch-pink-stripe:  #ff5d8f;  --swatch-pink-border:  #c8385f;  --swatch-pink-text:  #6e0028;
+  --swatch-amber-stripe: #ff8a1f;  --swatch-amber-border: #d95d00;  --swatch-amber-text: #5a2400;
+  --swatch-violet-stripe:#8466c6;  --swatch-violet-border:#5e459a;  --swatch-violet-text:#2e1e5a;
+  --swatch-teal-stripe:  #5fd6ec;  --swatch-teal-border:  #2aa6c1;  --swatch-teal-text:  #003e4d;
+
+  /* Semantic aliases — preserved names, retuned values */
+  --bg-primary:   var(--paper-0);
+  --bg-secondary: var(--paper-1);
+  --bg-tertiary:  var(--paper-2);
+  --text-primary:   var(--ink-0);
+  --text-secondary: var(--ink-1);
+  --text-tertiary:  var(--ink-2);
+  --bg-surface-action:   var(--accent);
+  --text-surface-action: var(--accent-fg);
+  --danger: #ff3344;
+
+  /* Editorial canvas — the desktop behind the windows */
+  --paper-canvas: #5fd6ec;
+
+  /* ─── Plastic recipe (referenced by .aero-glass override below) */
+  --plastic-fill-top:    rgba(255, 255, 255, 0.55);
+  --plastic-fill-mid:    rgba(255, 255, 255, 0.18);
+  --plastic-fill-bot:    rgba(8, 60, 90, 0.12);
+  --plastic-edge-top:    rgba(255, 255, 255, 0.95);
+  --plastic-edge-bot:    rgba(0, 80, 110, 0.35);
+  --plastic-ring-outer:  rgba(255, 255, 255, 0.6);
+  --plastic-ring-deep:   rgba(0, 60, 90, 0.22);
+  /* Snow-white plastic body — the prototype's sidebar/main panel are
+     near-white, not blue. The cyan accents come from the swatches
+     and the orb, not the panel body. */
+  --plastic-tint-1:      #ffffff;
+  --plastic-tint-2:      #eef7fb;
+
+  /* ─── Typography — Chicago/Lucida display + VT323 pixel + 8-bit tiny.
+     The VT323/PressStart variables are loaded by next/font in the root
+     layout; we point our own slots at them so all of Tailwind's
+     font-mono / font-display utilities flip under the y2k theme. */
+  --font-display:
+    "Chicago", "Charcoal", "Lucida Grande", "Lucida Sans",
+    "Trebuchet MS", "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
+  --font-body:
+    "Lucida Grande", "Lucida Sans", "Trebuchet MS",
+    "Microsoft YaHei", "PingFang SC", -apple-system, system-ui, sans-serif;
+  --font-mono: var(--font-vt323), "VT323", "MS Sans Serif", "Courier New", monospace;
+  --font-tiny: var(--font-pixel-tiny), "Press Start 2P", "VT323", monospace;
+
+  /* ─── Shadow recipe — plastic gets a real cast shadow */
+  --shadow-1:
+    0 1px 2px rgba(0, 60, 90, 0.10),
+    0 2px 4px -2px rgba(0, 60, 90, 0.08);
+  --shadow-2:
+    0 4px 12px rgba(0, 60, 90, 0.18),
+    0 2px 4px rgba(0, 60, 90, 0.10);
+  --shadow-3:
+    0 14px 36px -8px rgba(0, 60, 90, 0.45),
+    0 6px 14px -4px rgba(0, 60, 90, 0.28);
+  --shadow-soft:
+    0 22px 48px -16px rgba(0, 60, 90, 0.55),
+    0 8px 18px -4px rgba(0, 60, 90, 0.32);
+  --shadow-lift:
+    0 8px 18px -6px rgba(0, 60, 90, 0.28),
+    0 2px 4px rgba(0, 60, 90, 0.10);
+  --shadow-pixel-sm: 0 1px 2px rgba(0, 60, 90, 0.18);
+  --shadow-pixel-md:
+    0 4px 10px rgba(0, 60, 90, 0.18),
+    0 1px 2px rgba(0, 60, 90, 0.10);
+
+  /* Pulse / focus ring — Bondi cyan halo */
+  --focus-ring:
+    0 0 0 3px rgba(10, 167, 196, 0.38),
+    0 0 14px rgba(10, 167, 196, 0.30);
+}
+
+/* =================================================================
+   THE DESKTOP — Bondi sky with grape/orange/lime light spots.
+   The default theme paints html with a flat sky. We replace it.
+   ================================================================= */
+html[data-theme="y2k-imac"] {
+  background:
+    radial-gradient(120% 80% at 12% -10%, rgba(255, 138, 31, 0.40) 0%, transparent 55%),
+    radial-gradient(110% 70% at 100% 30%, rgba(132, 102, 198, 0.50) 0%, transparent 60%),
+    radial-gradient(120% 80% at 50% 120%, rgba(182, 210, 76, 0.50) 0%, transparent 55%),
+    radial-gradient(140% 100% at 50% 50%, #5fd6ec 0%, #0aa7c4 55%, #006e87 100%);
+  background-attachment: fixed;
+}
+
+/* Very subtle CRT scanlines across the whole desktop */
+html[data-theme="y2k-imac"] body::after {
+  content: "";
+  position: fixed; inset: 0;
+  background-image: repeating-linear-gradient(
+    0deg,
+    rgba(255,255,255,0.022) 0px,
+    rgba(255,255,255,0.022) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  pointer-events: none;
+  mix-blend-mode: overlay;
+  z-index: 9999;
+}
+
+/* =================================================================
+   AERO UTILITIES → PLASTIC RECIPES
+   The codebase uses .aero-glass / .aero-button / .aero-active /
+   .aero-glass-soft / .aero-glass-blue everywhere. Re-skin under the
+   y2k theme so no markup changes are needed.
+   ================================================================= */
+
+[data-theme="y2k-imac"] .aero-glass,
+[data-theme="y2k-imac"] [class*="aero-glass"] {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+[data-theme="y2k-imac"] .aero-glass {
+  position: relative;
+  /* Stacked backgrounds — top-of-panel "wet" crescent baked into the
+     background-image stack so it never gets covered by children, no
+     z-index gymnastics needed. */
+  background:
+    radial-gradient(120% 70% at 50% 0%,
+      rgba(255,255,255,0.85) 0%,
+      rgba(255,255,255,0.45) 18%,
+      rgba(255,255,255,0.15) 38%,
+      rgba(255,255,255,0) 60%),
+    linear-gradient(180deg,
+      var(--plastic-fill-top) 0%,
+      var(--plastic-fill-mid) 38%,
+      rgba(255,255,255,0.08) 60%,
+      var(--plastic-fill-bot) 100%),
+    linear-gradient(180deg, var(--plastic-tint-1) 0%, var(--plastic-tint-2) 100%);
+  border: none;
+  box-shadow:
+    inset 0 1px 0 var(--plastic-edge-top),
+    inset 0 -1px 0 var(--plastic-edge-bot),
+    0 0 0 1px var(--plastic-ring-outer),
+    0 0 0 2px var(--plastic-ring-deep),
+    0 22px 40px -18px rgba(0, 60, 90, 0.55),
+    0 8px 14px -6px rgba(0, 60, 90, 0.35);
+}
+/* Remove the pseudo-element approach — replaced by the radial-gradient
+   layer above. Kept here null to override any older rule chain. */
+[data-theme="y2k-imac"] .aero-glass::before {
+  content: none;
+}
+
+/* Soft variant — used by nested rails. Snow-white plastic. */
+[data-theme="y2k-imac"] .aero-glass-soft {
+  position: relative;
+  background:
+    radial-gradient(120% 70% at 50% 0%,
+      rgba(255,255,255,0.85) 0%,
+      rgba(255,255,255,0.40) 22%,
+      rgba(255,255,255,0.12) 42%,
+      rgba(255,255,255,0) 60%),
+    linear-gradient(180deg,
+      rgba(255,255,255,0.85) 0%,
+      rgba(255,255,255,0.45) 38%,
+      rgba(0, 60, 90, 0.10) 100%),
+    linear-gradient(180deg, #ffffff 0%, #e6f2fa 100%);
+  border: none;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.95),
+    inset 0 -1px 0 rgba(0, 80, 110, 0.25),
+    0 0 0 1px rgba(255,255,255,0.7),
+    0 0 0 2px rgba(0, 60, 90, 0.18),
+    0 8px 18px -8px rgba(0, 60, 90, 0.32);
+  color: var(--ink-1);
+}
+[data-theme="y2k-imac"] .aero-glass-soft::before { content: none; }
+
+/* Blue variant — used by user chat bubbles. Becomes Aqua. */
+[data-theme="y2k-imac"] .aero-glass-blue {
+  position: relative;
+  background:
+    linear-gradient(180deg,
+      rgba(255,255,255,0.85) 0%,
+      rgba(255,255,255,0.30) 8%,
+      rgba(255,255,255,0.08) 45%,
+      rgba(255,255,255,0) 50%),
+    repeating-linear-gradient(90deg,
+      rgba(255,255,255,0.06) 0px,
+      rgba(255,255,255,0.06) 1px,
+      transparent 1px,
+      transparent 3px),
+    linear-gradient(180deg, #6cb6ff 0%, #2a78d8 50%, #1a5cb0 100%);
+  border: none;
+  color: #ffffff;
+  text-shadow: 0 1px 0 rgba(0, 20, 60, 0.30);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.80),
+    inset 0 -2px 4px rgba(0, 20, 60, 0.35),
+    0 0 0 1px rgba(20, 60, 110, 0.55),
+    0 6px 14px -6px rgba(10, 60, 120, 0.50);
+}
+
+/* Aqua button — pinstripe + lozenge + breathing pulse */
+[data-theme="y2k-imac"] .aero-button {
+  background:
+    linear-gradient(180deg,
+      rgba(255,255,255,0.95) 0%,
+      rgba(255,255,255,0.55) 8%,
+      rgba(255,255,255,0.10) 45%,
+      rgba(255,255,255,0) 50%),
+    repeating-linear-gradient(90deg,
+      rgba(255,255,255,0.08) 0px,
+      rgba(255,255,255,0.08) 1px,
+      transparent 1px,
+      transparent 3px),
+    linear-gradient(180deg, #6cb6ff 0%, #2a78d8 50%, #1a5cb0 100%);
+  color: #ffffff;
+  text-shadow: 0 1px 0 rgba(0, 20, 60, 0.35);
+  border: none;
+  border-radius: 999px;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.85),
+    inset 0 -2px 4px rgba(0, 20, 60, 0.35),
+    0 0 0 1px rgba(20, 60, 110, 0.55),
+    0 6px 12px -4px rgba(10, 60, 120, 0.50);
+  animation: y2k-aqua-pulse 2.4s ease-in-out infinite;
+  transition: transform 80ms ease, filter 120ms ease;
+}
+[data-theme="y2k-imac"] .aero-button-hover {
+  animation-duration: 1.2s;
+  filter: brightness(1.10) saturate(1.15);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.95),
+    inset 0 -2px 4px rgba(0, 20, 60, 0.35),
+    0 0 0 1px rgba(20, 60, 110, 0.65),
+    0 8px 16px -4px rgba(10, 60, 120, 0.55),
+    0 0 18px rgba(108, 182, 255, 0.55);
+}
+[data-theme="y2k-imac"] .aero-button-active {
+  transform: translateY(1px) scale(0.985);
+  filter: brightness(0.92);
+  box-shadow:
+    inset 0 2px 4px rgba(0, 20, 60, 0.45),
+    inset 0 -1px 0 rgba(255,255,255,0.4),
+    0 0 0 1px rgba(20, 60, 110, 0.6);
+}
+
+/* Active sidebar pill — same Aqua skin but lower-saturation */
+[data-theme="y2k-imac"] .aero-active {
+  background:
+    linear-gradient(180deg,
+      rgba(255,255,255,0.90) 0%,
+      rgba(255,255,255,0.50) 8%,
+      rgba(108, 182, 255, 0.35) 50%,
+      rgba(42, 120, 216, 0.45) 100%);
+  border: none;
+  color: #ffffff;
+  text-shadow: 0 1px 0 rgba(0, 20, 60, 0.30);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.85),
+    inset 0 -2px 3px rgba(0, 30, 80, 0.25),
+    0 0 0 1px rgba(20, 60, 120, 0.50);
+}
+
+/* Page-scope subtle radial glow → Bondi rim-light */
+[data-theme="y2k-imac"] .aero-glow {
+  background:
+    radial-gradient(circle at 25% -10%, rgba(95, 214, 236, 0.45) 0%, transparent 45%),
+    radial-gradient(circle at 80% 110%, rgba(255, 138, 31, 0.30) 0%, transparent 50%);
+}
+
+/* =================================================================
+   Tailwind compat overrides — under the y2k theme, the "soft hairline"
+   and "blue accent" rewrites from globals.css still apply because we
+   only swapped the underlying tokens. No additional overrides needed
+   for .border-ink-0 / .bg-ink-0 / etc.
+   ================================================================= */
+
+/* =================================================================
+   Y2K-only helpers — opt-in classes used by the theme switcher and
+   any component that wants extra y2k flavor.
+   ================================================================= */
+
+@keyframes y2k-aqua-pulse {
+  0%, 100% { filter: brightness(1) saturate(1); }
+  50%      { filter: brightness(1.10) saturate(1.12); }
+}
+
+@keyframes y2k-blink {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.45; }
+}
+
+[data-theme="y2k-imac"] .y2k-pixel {
+  font-family: var(--font-mono);
+  letter-spacing: 0.06em;
+}
+
+[data-theme="y2k-imac"] .y2k-traffic-lights {
+  display: inline-flex; gap: 8px; align-items: center;
+}
+[data-theme="y2k-imac"] .y2k-light {
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 30% 25%, #fff 0%, rgba(255,255,255,0.3) 20%, transparent 50%),
+    radial-gradient(circle at 50% 60%, var(--y2k-c, #ff7a73) 0%, var(--y2k-c-deep, #c83830) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.6),
+    inset 0 -1px 1px rgba(0,0,0,0.25),
+    0 1px 1px rgba(0,0,0,0.25),
+    0 0 0 1px rgba(0,0,0,0.25);
+  display: inline-block;
+}
+[data-theme="y2k-imac"] .y2k-light.red    { --y2k-c: #ff7a73; --y2k-c-deep: #c83830; }
+[data-theme="y2k-imac"] .y2k-light.yellow { --y2k-c: #ffd25a; --y2k-c-deep: #c79212; }
+[data-theme="y2k-imac"] .y2k-light.green  { --y2k-c: #58dd66; --y2k-c-deep: #1d9c2b; }
+
+/* Selection — Bondi cyan tint */
+[data-theme="y2k-imac"] ::selection {
+  background: var(--accent-wash-2);
+  color: var(--ink-0);
+}
+
+/* Scrollbar — chunkier, Aqua tinted */
+[data-theme="y2k-imac"] *::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+[data-theme="y2k-imac"] *::-webkit-scrollbar-thumb {
+  background:
+    linear-gradient(180deg,
+      rgba(255,255,255,0.6) 0%,
+      rgba(255,255,255,0.10) 45%,
+      rgba(255,255,255,0) 50%),
+    linear-gradient(180deg, #6cb6ff 0%, #2a78d8 100%);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box, padding-box;
+  box-shadow:
+    inset 0 0 0 1px rgba(20, 60, 110, 0.55);
+}
+[data-theme="y2k-imac"] *::-webkit-scrollbar-thumb:hover {
+  filter: brightness(1.1);
+}
+
+/* Composer focus ring — Bondi halo */
+[data-theme="y2k-imac"] .composer-focus-ring:focus-within {
+  background: var(--paper-0);
+  border-color: color-mix(in srgb, var(--accent) 50%, var(--hairline));
+  box-shadow:
+    0 1px 0 inset rgba(255, 255, 255, 0.7),
+    0 0 0 4px color-mix(in srgb, var(--accent) 18%, transparent),
+    0 4px 14px color-mix(in srgb, var(--accent) 18%, transparent);
+}
+
+/* =================================================================
+   THEME SWITCHER WIDGET (renders in both themes, styled per theme)
+   ================================================================= */
+.theme-switcher {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  font-family: var(--font-display);
+  font-size: 12px;
+  color: var(--ink-1);
+  background: rgba(255,255,255,0.9);
+  border: 1px solid var(--hairline);
+  box-shadow:
+    0 1px 0 inset rgba(255,255,255,0.7),
+    0 12px 28px -10px rgba(15, 23, 42, 0.20),
+    0 4px 8px -2px rgba(15, 23, 42, 0.08);
+  min-width: 168px;
+}
+.theme-switcher__label {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  padding: 0 2px 2px;
+}
+.theme-switcher__btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--ink-1);
+  font: inherit;
+  cursor: pointer;
+  text-align: left;
+  transition: background 120ms ease, border-color 120ms ease;
+}
+.theme-switcher__btn:hover {
+  background: var(--accent-wash);
+}
+.theme-switcher__btn[aria-pressed="true"] {
+  background: var(--accent);
+  border-color: color-mix(in srgb, var(--accent) 65%, black);
+  color: var(--accent-fg);
+}
+.theme-switcher__chip {
+  width: 14px; height: 14px; flex-shrink: 0;
+  border-radius: 50%;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.6), 0 1px 1px rgba(0,0,0,0.2);
+}
+.theme-switcher__chip--aero {
+  background: radial-gradient(circle at 30% 25%, #fff 0%, transparent 50%),
+              radial-gradient(circle at 50% 60%, #5b9bd5 0%, #1e4877 100%);
+}
+.theme-switcher__chip--y2k {
+  background: radial-gradient(circle at 30% 25%, #fff 0%, transparent 50%),
+              radial-gradient(circle at 50% 60%, #ff8a1f 0%, #ff5d8f 35%, #8466c6 70%, #0aa7c4 100%);
+}
+
+/* Switcher under y2k theme — itself becomes plastic */
+[data-theme="y2k-imac"] .theme-switcher {
+  position: fixed;
+  background:
+    linear-gradient(180deg,
+      rgba(255,255,255,0.85) 0%,
+      rgba(255,255,255,0.45) 38%,
+      rgba(0, 60, 90, 0.10) 100%),
+    linear-gradient(180deg, #ffffff 0%, #e6f2fa 100%);
+  border: none;
+  font-family: var(--font-display);
+  color: var(--ink-0);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.95),
+    inset 0 -1px 0 rgba(0, 80, 110, 0.25),
+    0 0 0 1px rgba(255,255,255,0.7),
+    0 0 0 2px rgba(0, 60, 90, 0.22),
+    0 14px 30px -10px rgba(0, 60, 90, 0.45);
+}
+[data-theme="y2k-imac"] .theme-switcher__label {
+  font-family: var(--font-mono);
+  color: var(--ink-2);
+}
+[data-theme="y2k-imac"] .theme-switcher__btn[aria-pressed="true"] {
+  background:
+    linear-gradient(180deg,
+      rgba(255,255,255,0.85) 0%,
+      rgba(255,255,255,0.30) 8%,
+      rgba(255,255,255,0.10) 45%,
+      rgba(255,255,255,0) 50%),
+    repeating-linear-gradient(90deg,
+      rgba(255,255,255,0.08) 0px,
+      rgba(255,255,255,0.08) 1px,
+      transparent 1px,
+      transparent 3px),
+    linear-gradient(180deg, #6cb6ff 0%, #2a78d8 50%, #1a5cb0 100%);
+  color: #ffffff;
+  text-shadow: 0 1px 0 rgba(0, 20, 60, 0.30);
+  border: none;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.85),
+    inset 0 -2px 4px rgba(0, 20, 60, 0.35),
+    0 0 0 1px rgba(20, 60, 110, 0.55);
+}
+
+/* =================================================================
+   APP SHELL — theme-aware desktop background + main island.
+   Default (aero): Win7 sky. y2k: Bondi candy.
+   The default visuals come from ThreeColumnShell's inline styles, which
+   we keep intact; under y2k we OVERRIDE them by adding a higher-z bg
+   layer + restyling the island.
+   ================================================================= */
+html[data-theme="y2k-imac"] .app-shell-bg-sun,
+html[data-theme="y2k-imac"] .app-shell-bg-aurora,
+html[data-theme="y2k-imac"] .app-shell-bg-stars,
+html[data-theme="y2k-imac"] .app-shell-bg-grain {
+  display: none !important;
+}
+
+html[data-theme="y2k-imac"] .app-shell {
+  /* Calm pastel teal — soft cyan top, slightly deeper teal bottom.
+     No competing radial color spots; the desktop should recede so
+     the snow-plastic islands take the spotlight. */
+  background:
+    linear-gradient(180deg,
+      #9fd2dd 0%,
+      #7ab8c9 50%,
+      #5e9eb0 100%) !important;
+}
+
+/* Soft Bondi case-light orbs — pure white highlights only, no color
+   tint so the new palette stays uniform. */
+html[data-theme="y2k-imac"] .app-shell::before {
+  content: "";
+  position: absolute; inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(160px 160px at 18% 22%, rgba(255,255,255,0.22) 0%, transparent 70%),
+    radial-gradient(120px 120px at 86% 14%, rgba(255,255,255,0.15) 0%, transparent 70%),
+    radial-gradient(200px 200px at 72% 82%, rgba(255,255,255,0.14) 0%, transparent 70%);
+}
+
+/* CRT-ish scanlines, very subtle */
+html[data-theme="y2k-imac"] .app-shell::after {
+  content: "";
+  position: fixed; inset: 0;
+  pointer-events: none;
+  background-image: repeating-linear-gradient(
+    0deg,
+    rgba(255,255,255,0.022) 0px,
+    rgba(255,255,255,0.022) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  mix-blend-mode: overlay;
+  z-index: 1;
+}
+
+/* Main island — under y2k, it becomes a candy snow-plastic shell */
+html[data-theme="y2k-imac"] .app-shell-main-island {
+  background:
+    radial-gradient(80% 40% at 50% 0%,
+      rgba(255,255,255,0.92) 0%,
+      rgba(255,255,255,0.50) 28%,
+      rgba(255,255,255,0.20) 50%,
+      rgba(255,255,255,0) 70%),
+    linear-gradient(180deg,
+      rgba(255,255,255,0.85) 0%,
+      rgba(255,255,255,0.45) 38%,
+      rgba(0, 60, 90, 0.10) 100%),
+    linear-gradient(180deg, #ffffff 0%, #e6f2fa 100%) !important;
+  border: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.95),
+    inset 0 -1px 0 rgba(0, 80, 110, 0.25),
+    0 0 0 1px rgba(255,255,255,0.7),
+    0 0 0 2px rgba(0, 60, 90, 0.22),
+    0 22px 48px -16px rgba(0, 60, 90, 0.55) !important;
+  position: relative;
+}
+/* Pseudo-element approach removed; gradient baked into background. */
+html[data-theme="y2k-imac"] .app-shell-main-island::before { content: none; }
+
+/* Titlebar strip — under y2k becomes Aqua pinstripe */
+html[data-theme="y2k-imac"] .app-shell-titlebar {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.55) 45%, rgba(255,255,255,0.20) 100%),
+    repeating-linear-gradient(180deg, #f0f4f8 0px, #f0f4f8 1px, #dde6ee 1px, #dde6ee 2px) !important;
+  border-bottom: 1px solid rgba(0, 80, 110, 0.20) !important;
+  box-shadow:
+    inset 0 1px 0 #fff,
+    inset 0 -1px 0 rgba(0,0,0,0.10),
+    0 1px 0 rgba(0,0,0,0.05) !important;
+}
+
+/* Sidebar uses .aero-glass which is already re-skinned above into the
+   candy snow plastic recipe. No separate sidebar class needed. */
+
+/* =================================================================
+   iMac WINDOW CHROME — only rendered when y2k theme is active.
+   The chrome elements have these classes but are display:none by
+   default; under y2k they appear inside the titlebar.
+   ================================================================= */
+.imac-chrome { display: none; }
+html[data-theme="y2k-imac"] .imac-chrome {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  position: relative;
+  z-index: 2;
+}
+
+/* Traffic lights — same recipe as .y2k-light but namespaced */
+html[data-theme="y2k-imac"] .imac-lights {
+  display: inline-flex; gap: 8px; align-items: center;
+}
+html[data-theme="y2k-imac"] .imac-light {
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 30% 25%, #fff 0%, rgba(255,255,255,0.3) 20%, transparent 50%),
+    radial-gradient(circle at 50% 60%, var(--y2k-c, #ff7a73) 0%, var(--y2k-c-deep, #c83830) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.6),
+    inset 0 -1px 1px rgba(0,0,0,0.25),
+    0 1px 1px rgba(0,0,0,0.25),
+    0 0 0 1px rgba(0,0,0,0.25);
+  display: inline-block;
+}
+html[data-theme="y2k-imac"] .imac-light.red    { --y2k-c: #ff7a73; --y2k-c-deep: #c83830; }
+html[data-theme="y2k-imac"] .imac-light.yellow { --y2k-c: #ffd25a; --y2k-c-deep: #c79212; }
+html[data-theme="y2k-imac"] .imac-light.green  { --y2k-c: #58dd66; --y2k-c-deep: #1d9c2b; }
+
+html[data-theme="y2k-imac"] .imac-window-title {
+  font-family: var(--font-display);
+  font-size: 13px;
+  color: var(--ink-1);
+  text-shadow: 0 1px 0 #fff;
+  letter-spacing: 0.02em;
+}
+
+html[data-theme="y2k-imac"] .imac-window-stamp {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-3);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* =================================================================
+   HERO TYPOGRAPHY — make 你好 dev big and characterful
+   ================================================================= */
+html[data-theme="y2k-imac"] .y2k-hero {
+  font-family: var(--font-display) !important;
+  font-size: 44px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.005em !important;
+  line-height: 1.05 !important;
+  color: var(--ink-0);
+  text-shadow:
+    0 2px 0 rgba(255,255,255,0.65),
+    0 -1px 0 rgba(0,0,0,0.05);
+}
+html[data-theme="y2k-imac"] .y2k-hero-sub {
+  font-family: var(--font-mono) !important;
+  font-size: 14px !important;
+  letter-spacing: 0.04em;
+  color: var(--ink-3);
+}
+
+/* Section headers — pinstripe rule like the prototype */
+html[data-theme="y2k-imac"] .y2k-section-heading {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+html[data-theme="y2k-imac"] .y2k-section-heading > .y2k-pinstripe {
+  display: block !important;
+  flex: 1;
+  height: 8px;
+  background: repeating-linear-gradient(0deg, rgba(8,30,50,0.10) 0px, rgba(8,30,50,0.10) 1px, transparent 1px, transparent 2px);
+  border-radius: 2px;
+  margin-bottom: 4px;
+}
+
+/* =================================================================
+   PROJECT CARD candy tint — flip the whole card into its swatch
+   color under y2k. The component sets data-swatch on the article.
+   ================================================================= */
+html[data-theme="y2k-imac"] article[data-swatch] {
+  background:
+    linear-gradient(180deg,
+      rgba(255,255,255,0.55) 0%,
+      rgba(255,255,255,0.18) 38%,
+      rgba(255,255,255,0.08) 60%,
+      rgba(0, 0, 0, 0.10) 100%),
+    linear-gradient(180deg,
+      color-mix(in srgb, var(--swatch-c, var(--accent)) 40%, #ffffff) 0%,
+      var(--swatch-c, var(--accent)) 100%) !important;
+  position: relative;
+}
+html[data-theme="y2k-imac"] article[data-swatch] > *:first-child + * {
+  position: relative; z-index: 1;
+}
+
+html[data-theme="y2k-imac"] article[data-swatch="blue"]   { --swatch-c: #0aa7c4; }
+html[data-theme="y2k-imac"] article[data-swatch="amber"]  { --swatch-c: #ff8a1f; }
+html[data-theme="y2k-imac"] article[data-swatch="pink"]   { --swatch-c: #ff5d8f; }
+html[data-theme="y2k-imac"] article[data-swatch="green"]  { --swatch-c: #b6d24c; }
+html[data-theme="y2k-imac"] article[data-swatch="violet"] { --swatch-c: #8466c6; }
+html[data-theme="y2k-imac"] article[data-swatch="teal"]   { --swatch-c: #5fd6ec; }
+
+/* Inner Metric tiles on candy cards — keep them white so numbers read */
+html[data-theme="y2k-imac"] article[data-swatch] [class*="text-ink-0"],
+html[data-theme="y2k-imac"] article[data-swatch] [class*="text-ink-1"] {
+  color: #ffffff !important;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.20);
+}
+html[data-theme="y2k-imac"] article[data-swatch] [class*="text-ink-2"],
+html[data-theme="y2k-imac"] article[data-swatch] [class*="text-ink-3"] {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+/* =================================================================
+   BRAND MARK — replace flat blue square with candy rainbow orb
+   ================================================================= */
+html[data-theme="y2k-imac"] .brand-mark {
+  background:
+    radial-gradient(circle at 30% 28%, #ffffff 0%, rgba(255,255,255,0.4) 18%, transparent 45%),
+    radial-gradient(circle at 50% 60%, #ffb84a 0%, #ff5d8f 35%, #8466c6 70%, #0aa7c4 100%) !important;
+  border-radius: 50% !important;
+  box-shadow:
+    inset 0 1px 1px rgba(255,255,255,0.7),
+    inset 0 -2px 4px rgba(0,0,0,0.25),
+    0 2px 4px rgba(0,0,0,0.30),
+    0 0 0 1px rgba(0,0,0,0.10) !important;
+  color: transparent !important;
+}
+html[data-theme="y2k-imac"] .brand-mark .brand-mark__letter {
+  display: none;
+}
+
+/* "Brainrot" wordmark + sub-line styling under y2k */
+html[data-theme="y2k-imac"] .sidebar .font-extrabold {
+  font-family: var(--font-display) !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.005em !important;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.7);
+}
+html[data-theme="y2k-imac"] .sidebar .font-extrabold + div {
+  font-family: var(--font-mono) !important;
+  font-size: 11px !important;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3) !important;
+}
+
+/* =================================================================
+   NAV ITEM — candy 3D sphere in front under y2k
+   ================================================================= */
+html[data-theme="y2k-imac"] .nav-item {
+  font-family: var(--font-body);
+  font-size: 13px;
+}
+
+html[data-theme="y2k-imac"] .nav-item[data-nav-swatch]::before {
+  content: "";
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background:
+    radial-gradient(circle at 30% 25%, #fff 0%, rgba(255,255,255,0.45) 22%, transparent 55%),
+    radial-gradient(circle at 50% 60%, var(--nav-c, #0aa7c4) 0%, var(--nav-c-deep, #006e87) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.65),
+    inset 0 -1px 1px rgba(0,0,0,0.20),
+    0 1px 1px rgba(0,0,0,0.20);
+  margin-right: 2px;
+}
+html[data-theme="y2k-imac"] .nav-item[data-nav-swatch="bondi"]       { --nav-c: #0aa7c4; --nav-c-deep: #006e87; }
+html[data-theme="y2k-imac"] .nav-item[data-nav-swatch="tangerine"]   { --nav-c: #ff8a1f; --nav-c-deep: #c25400; }
+html[data-theme="y2k-imac"] .nav-item[data-nav-swatch="grape"]       { --nav-c: #8466c6; --nav-c-deep: #4f3792; }
+html[data-theme="y2k-imac"] .nav-item[data-nav-swatch="lime"]        { --nav-c: #b6d24c; --nav-c-deep: #7a9528; }
+html[data-theme="y2k-imac"] .nav-item[data-nav-swatch="strawberry"]  { --nav-c: #ff5d8f; --nav-c-deep: #c32a5c; }
+html[data-theme="y2k-imac"] .nav-item[data-nav-swatch="teal"]        { --nav-c: #5fd6ec; --nav-c-deep: #2aa6c1; }
+
+/* =================================================================
+   PROJ ITEM (sidebar projects list) — upgrade tiny dot to 3D sphere
+   The component already has a <span> with bg-[var(--swatch-*-stripe)],
+   we re-paint it as a sphere via attribute selectors on [data-swatch].
+   ================================================================= */
+html[data-theme="y2k-imac"] [data-swatch] > span:first-child {
+  width: 14px !important;
+  height: 14px !important;
+  border-radius: 50% !important;
+  background:
+    radial-gradient(circle at 30% 25%, #fff 0%, rgba(255,255,255,0.45) 22%, transparent 55%),
+    radial-gradient(circle at 50% 60%, var(--proj-c, #0aa7c4) 0%, var(--proj-c-deep, #006e87) 100%) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.65),
+    inset 0 -1px 1px rgba(0,0,0,0.20),
+    0 1px 1px rgba(0,0,0,0.20) !important;
+}
+html[data-theme="y2k-imac"] [data-swatch="blue"]   > span:first-child { --proj-c: #0aa7c4; --proj-c-deep: #006e87; }
+html[data-theme="y2k-imac"] [data-swatch="amber"]  > span:first-child { --proj-c: #ff8a1f; --proj-c-deep: #c25400; }
+html[data-theme="y2k-imac"] [data-swatch="pink"]   > span:first-child { --proj-c: #ff5d8f; --proj-c-deep: #c32a5c; }
+html[data-theme="y2k-imac"] [data-swatch="green"]  > span:first-child { --proj-c: #b6d24c; --proj-c-deep: #7a9528; }
+html[data-theme="y2k-imac"] [data-swatch="violet"] > span:first-child { --proj-c: #8466c6; --proj-c-deep: #4f3792; }
+html[data-theme="y2k-imac"] [data-swatch="teal"]   > span:first-child { --proj-c: #5fd6ec; --proj-c-deep: #2aa6c1; }
+
+/* But the article[data-swatch] (project STAT CARD) — its first span is
+   the candy-dot inside the card header, which we DON'T want enlarged
+   (the whole card is already tinted). Scope the override to nav-style
+   proj items by limiting to elements with the .nav-item-like layout. */
+html[data-theme="y2k-imac"] article[data-swatch] > div > header > span:first-child {
+  /* Restore the small dot inside cards — these are not nav items. */
+  width: 10px !important;
+  height: 10px !important;
+}
+
+/* =================================================================
+   PIXEL LABELS — section headings inside sidebar
+   ================================================================= */
+html[data-theme="y2k-imac"] .pixel-label {
+  font-family: var(--font-mono) !important;
+  font-size: 13px !important;
+  font-weight: 400 !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+  color: var(--ink-3) !important;
+}
+
+/* =================================================================
+   ROUNDED CORNERS — iMac G3 plastic is much more pillowy than Aero.
+   Override Tailwind's rounded-* utilities only under y2k so aero
+   stays exactly as it was.
+   ================================================================= */
+
+/* Main app surfaces — pillowy iMac G3 cabinet radius */
+html[data-theme="y2k-imac"] .app-shell-main-island,
+html[data-theme="y2k-imac"] .sidebar,
+html[data-theme="y2k-imac"] aside.aero-glass {
+  border-radius: 32px !important;
+}
+
+/* =================================================================
+   AQUA CAPSULE PILLS
+   Sidebar nav items + sidebar project rail items → full pills.
+   Project STAT CARD (article[data-swatch]) stays at 28px above.
+   ================================================================= */
+html[data-theme="y2k-imac"] .nav-item {
+  border-radius: 999px !important;
+  padding-top: 8px !important;
+  padding-bottom: 8px !important;
+}
+
+/* Sidebar ProjItem rows — the inline div with data-swatch from
+   proj-item.tsx (NOT the project stat card on the home page). */
+html[data-theme="y2k-imac"] div[data-swatch]:not(article) {
+  border-radius: 999px !important;
+  padding-top: 8px !important;
+  padding-bottom: 8px !important;
+}
+
+/* Task list rows (TaskRow in the project task list pane) — they use
+   .rounded-md but the active state needs to look like an Aqua pill.
+   Bump the row radius significantly so even inactive rows feel candy. */
+html[data-theme="y2k-imac"] a[data-active],
+html[data-theme="y2k-imac"] a[data-active] + a,
+html[data-theme="y2k-imac"] .task-row,
+html[data-theme="y2k-imac"] [data-task-row] {
+  border-radius: 999px !important;
+}
+
+/* The TaskRow component is rendered as a <Link> with rounded-md.
+   Target it positionally: any <a> with rounded-md inside a task pane
+   container gets pill-rounded under y2k. */
+html[data-theme="y2k-imac"] [class*="aero-glass"] a.rounded-md {
+  border-radius: 999px !important;
+  padding-left: 14px !important;
+  padding-right: 14px !important;
+}
+
+/* =================================================================
+   CHAT BUBBLES — Aqua user pill + snow-white agent plastic.
+   Override the inline styles from UserMessage / AssistantMessage.
+   ================================================================= */
+
+/* User bubble — true Aqua candy pill, big rounded rect (not lozenge) */
+html[data-theme="y2k-imac"] [data-bubble="user"] {
+  background:
+    linear-gradient(180deg,
+      rgba(255,255,255,0.92) 0%,
+      rgba(255,255,255,0.55) 8%,
+      rgba(255,255,255,0.15) 45%,
+      rgba(255,255,255,0) 50%),
+    repeating-linear-gradient(90deg,
+      rgba(255,255,255,0.07) 0px,
+      rgba(255,255,255,0.07) 1px,
+      transparent 1px,
+      transparent 3px),
+    linear-gradient(180deg, #6cb6ff 0%, #2a78d8 50%, #1a5cb0 100%) !important;
+  border: none !important;
+  border-radius: 22px !important;
+  padding: 12px 18px !important;
+  font-size: 15px !important;
+  line-height: 1.55 !important;
+  color: #ffffff !important;
+  text-shadow: 0 1px 0 rgba(0, 20, 60, 0.30) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.85),
+    inset 0 -2px 4px rgba(0, 20, 60, 0.30),
+    0 0 0 1px rgba(20, 60, 110, 0.55),
+    0 6px 14px -4px rgba(10, 60, 120, 0.45) !important;
+  max-width: 80%;
+}
+
+/* Agent bubble — snow plastic */
+html[data-theme="y2k-imac"] [data-bubble="assistant"] {
+  background:
+    radial-gradient(120% 70% at 50% 0%,
+      rgba(255,255,255,0.85) 0%,
+      rgba(255,255,255,0.35) 22%,
+      rgba(255,255,255,0.10) 45%,
+      rgba(255,255,255,0) 60%),
+    linear-gradient(180deg,
+      rgba(255,255,255,0.85) 0%,
+      rgba(255,255,255,0.45) 38%,
+      rgba(0, 60, 90, 0.06) 100%),
+    linear-gradient(180deg, #ffffff 0%, #e6f2fa 100%) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: none !important;
+  border-radius: 22px !important;
+  padding: 12px 18px !important;
+  font-size: 15px !important;
+  line-height: 1.55 !important;
+  color: var(--ink-0) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.95),
+    inset 0 -1px 0 rgba(0, 80, 110, 0.20),
+    0 0 0 1px rgba(255,255,255,0.7),
+    0 0 0 2px rgba(0, 60, 90, 0.18),
+    0 6px 14px -6px rgba(0, 60, 90, 0.28) !important;
+}
+
+/* Agent avatar — turn the square chrome tile into a 3D candy ball */
+html[data-theme="y2k-imac"] [data-chat="avatar"] {
+  border-radius: 50% !important;
+  border: none !important;
+  background:
+    radial-gradient(circle at 30% 25%, #fff 0%, rgba(255,255,255,0.45) 22%, transparent 55%),
+    radial-gradient(circle at 50% 60%, #5fd6ec 0%, #0aa7c4 60%, #006e87 100%) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.7),
+    inset 0 -2px 4px rgba(0,0,0,0.25),
+    0 2px 4px rgba(0,0,0,0.30),
+    0 0 0 1px rgba(0, 60, 90, 0.30) !important;
+}
+
+/* Under y2k, ToolPair's .chat-indent (48px) is 8px more than the
+   AssistantMessage indent (avatar 30px + gap 10px = 40px). Pull it
+   back to align flush with the agent text/thinking bubbles. */
+html[data-theme="y2k-imac"] .chat-indent {
+  margin-left: 40px !important;
+}
+
+/* =================================================================
+   TOOL CARD — under y2k a honey-amber plastic capsule.
+   Generous radius (22px) + breathing room + truncate-safe path.
+   ================================================================= */
+html[data-theme="y2k-imac"] [data-tool-card] {
+  background:
+    radial-gradient(140% 60% at 50% 0%,
+      rgba(255,255,255,0.80) 0%,
+      rgba(255,255,255,0.30) 24%,
+      rgba(255,255,255,0.08) 48%,
+      rgba(255,255,255,0) 65%),
+    linear-gradient(180deg,
+      rgba(255,255,255,0.55) 0%,
+      rgba(255,255,255,0.18) 38%,
+      rgba(255,255,255,0.06) 60%,
+      rgba(120, 60, 0, 0.10) 100%),
+    linear-gradient(180deg, #fff4d8 0%, #ffd968 100%) !important;
+  border: none !important;
+  /* Match the agent / user / thinking bubble radius exactly */
+  border-radius: 22px !important;
+  overflow: hidden !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.95),
+    inset 0 -1px 0 rgba(120, 60, 0, 0.22),
+    0 0 0 1px rgba(140, 80, 0, 0.30),
+    0 0 0 2px rgba(140, 80, 0, 0.10),
+    0 6px 14px -6px rgba(120, 60, 0, 0.35) !important;
+}
+
+/* Tool card header row — generous padding so name + path breathe */
+html[data-theme="y2k-imac"] [data-tool-header] {
+  padding: 8px 14px !important;
+  font-family: var(--font-mono) !important;
+  background: transparent !important;
+  min-width: 0;
+}
+html[data-theme="y2k-imac"] [data-tool-header]:hover {
+  background: rgba(255, 217, 104, 0.25) !important;
+}
+
+html[data-theme="y2k-imac"] [data-tool-name] {
+  font-family: var(--font-display) !important;
+  font-weight: 700 !important;
+  font-size: 13px !important;
+  color: #4a2a00 !important;
+}
+/* Tool name "🔧" prefix — emoji marker before the name */
+html[data-theme="y2k-imac"] [data-tool-name]::before {
+  content: "🔧";
+  margin-right: 6px;
+  font-size: 11px;
+  vertical-align: 1px;
+}
+
+html[data-theme="y2k-imac"] [data-tool-path] {
+  font-family: var(--font-mono) !important;
+  font-size: 12px !important;
+  color: rgba(74, 42, 0, 0.65) !important;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+html[data-theme="y2k-imac"] [data-tool-result] {
+  padding: 8px 14px !important;
+  background: rgba(255, 255, 255, 0.40) !important;
+  border-top: 1px solid rgba(140, 80, 0, 0.22) !important;
+  color: #5a3a00 !important;
+  min-width: 0;
+}
+html[data-theme="y2k-imac"] [data-tool-result] span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Tool card running indicator row */
+html[data-theme="y2k-imac"] [data-tool-card] > div:last-child {
+  background: rgba(255, 255, 255, 0.30) !important;
+  color: #5a3a00 !important;
+  border-top-color: rgba(140, 80, 0, 0.22) !important;
+}
+
+/* Tool card body (expanded inputs) */
+html[data-theme="y2k-imac"] [data-tool-card] [class*="bg-bg-tertiary"] {
+  background: rgba(255, 255, 255, 0.45) !important;
+  border-top-color: rgba(140, 80, 0, 0.22) !important;
+  color: #5a3a00 !important;
+  padding: 10px 14px !important;
+}
+
+/* =================================================================
+   RADIX DIALOG (modals) — fix the inherited shadcn defaults that
+   render content with no background and a black 80% overlay.
+   Under both themes the modal needs a visible body; under y2k it
+   becomes a snow-plastic capsule with a soft cyan-tinted overlay.
+   ================================================================= */
+
+/* y2k: overlay → soft cyan tint instead of black */
+html[data-theme="y2k-imac"] [data-dialog-overlay] {
+  background: radial-gradient(120% 80% at 50% 30%,
+    rgba(95, 165, 183, 0.35) 0%,
+    rgba(60, 130, 150, 0.55) 70%) !important;
+  backdrop-filter: blur(4px) !important;
+  -webkit-backdrop-filter: blur(4px) !important;
+}
+
+/* y2k: dialog content → snow-plastic capsule */
+html[data-theme="y2k-imac"] [data-dialog-content] {
+  background:
+    radial-gradient(120% 60% at 50% 0%,
+      rgba(255,255,255,0.85) 0%,
+      rgba(255,255,255,0.40) 30%,
+      rgba(255,255,255,0.15) 55%,
+      rgba(255,255,255,0) 75%),
+    linear-gradient(180deg, #ffffff 0%, #eef7fb 100%) !important;
+  border: none !important;
+  border-radius: 28px !important;
+  padding: 28px !important;
+  color: var(--ink-0) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.95),
+    inset 0 -1px 0 rgba(0, 80, 110, 0.20),
+    0 0 0 1px rgba(255,255,255,0.7),
+    0 0 0 2px rgba(0, 60, 90, 0.22),
+    0 30px 60px -16px rgba(0, 60, 90, 0.55),
+    0 12px 24px -8px rgba(0, 60, 90, 0.30) !important;
+}
+
+/* Modal form inputs — snow plastic input field */
+html[data-theme="y2k-imac"] [data-dialog-content] input[type="text"],
+html[data-theme="y2k-imac"] [data-dialog-content] input:not([type]),
+html[data-theme="y2k-imac"] [data-dialog-content] textarea {
+  background: #ffffff !important;
+  border: 1px solid rgba(0, 60, 90, 0.25) !important;
+  border-radius: 12px !important;
+  padding: 10px 14px !important;
+  color: var(--ink-0) !important;
+  box-shadow: inset 0 2px 4px rgba(0, 40, 70, 0.10) !important;
+}
+html[data-theme="y2k-imac"] [data-dialog-content] input:focus,
+html[data-theme="y2k-imac"] [data-dialog-content] textarea:focus {
+  outline: none !important;
+  border-color: var(--accent) !important;
+  box-shadow:
+    inset 0 2px 4px rgba(0, 40, 70, 0.10),
+    0 0 0 3px rgba(10, 167, 196, 0.30) !important;
+}
+
+/* Modal title */
+html[data-theme="y2k-imac"] [data-dialog-content] h2,
+html[data-theme="y2k-imac"] [data-dialog-content] [class*="DialogTitle"] {
+  font-family: var(--font-display) !important;
+  font-size: 20px !important;
+  font-weight: 700 !important;
+  color: var(--ink-0) !important;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.7);
+}
+
+/* Modal label text */
+html[data-theme="y2k-imac"] [data-dialog-content] label > span {
+  font-family: var(--font-display) !important;
+  font-size: 13px !important;
+  color: var(--ink-1) !important;
+}
+
+/* Modal CTA buttons */
+html[data-theme="y2k-imac"] [data-dialog-content] button[type="submit"] {
+  background:
+    linear-gradient(180deg,
+      rgba(255,255,255,0.95) 0%,
+      rgba(255,255,255,0.55) 8%,
+      rgba(255,255,255,0.10) 45%,
+      rgba(255,255,255,0) 50%),
+    repeating-linear-gradient(90deg,
+      rgba(255,255,255,0.08) 0px,
+      rgba(255,255,255,0.08) 1px,
+      transparent 1px,
+      transparent 3px),
+    linear-gradient(180deg, #6cb6ff 0%, #2a78d8 50%, #1a5cb0 100%) !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 999px !important;
+  padding: 8px 18px !important;
+  font-family: var(--font-display) !important;
+  font-weight: 600 !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.85),
+    inset 0 -2px 4px rgba(0, 20, 60, 0.30),
+    0 0 0 1px rgba(20, 60, 110, 0.55),
+    0 4px 10px -2px rgba(10, 60, 120, 0.40) !important;
+}
+html[data-theme="y2k-imac"] [data-dialog-content] button[type="button"]:not([data-dialog-content] button[type="submit"]) {
+  background:
+    linear-gradient(180deg,
+      rgba(255,255,255,0.85) 0%,
+      rgba(255,255,255,0.40) 8%,
+      rgba(255,255,255,0.10) 45%,
+      rgba(255,255,255,0) 50%),
+    linear-gradient(180deg, #c2cdd6 0%, #6f8090 50%, #475866 100%) !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 999px !important;
+  padding: 8px 18px !important;
+  font-family: var(--font-display) !important;
+  font-weight: 600 !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.85),
+    inset 0 -2px 4px rgba(20, 30, 50, 0.35),
+    0 0 0 1px rgba(40, 60, 80, 0.55),
+    0 4px 10px -2px rgba(40, 60, 80, 0.30) !important;
+}
+
+/* =================================================================
+   RADIX POPOVER / DROPDOWN MENU — same fix as Dialog.
+   Status change menu, mention picker, agent picker etc.
+   ================================================================= */
+
+/* Both themes — ensure visible background */
+[data-radix-popper-content-wrapper] > * {
+  background-color: var(--paper-0) !important;
+  color: var(--ink-0) !important;
+}
+
+/* y2k: snow-plastic popover */
+html[data-theme="y2k-imac"] [data-radix-popper-content-wrapper] > * {
+  background:
+    radial-gradient(120% 50% at 50% 0%,
+      rgba(255,255,255,0.85) 0%,
+      rgba(255,255,255,0.40) 35%,
+      rgba(255,255,255,0) 70%),
+    linear-gradient(180deg, #ffffff 0%, #eef7fb 100%) !important;
+  border: none !important;
+  border-radius: 20px !important;
+  padding: 8px !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.95),
+    inset 0 -1px 0 rgba(0, 80, 110, 0.18),
+    0 0 0 1px rgba(255,255,255,0.7),
+    0 0 0 2px rgba(0, 60, 90, 0.20),
+    0 20px 40px -12px rgba(0, 60, 90, 0.45) !important;
+}
+
+/* =================================================================
+   TASK HEADER ("刘海") — under y2k, switch from Aero blue band to
+   a light snow-plastic strip that matches the rest of the panels.
+   ================================================================= */
+html[data-theme="y2k-imac"] [data-task-header] {
+  background:
+    radial-gradient(140% 80% at 50% 0%,
+      rgba(255,255,255,0.85) 0%,
+      rgba(255,255,255,0.40) 30%,
+      rgba(255,255,255,0.15) 55%,
+      rgba(255,255,255,0) 75%),
+    linear-gradient(180deg,
+      rgba(255,255,255,0.92) 0%,
+      rgba(244,250,253,0.92) 50%,
+      rgba(225,240,248,0.88) 100%) !important;
+  border-bottom: 1px solid rgba(0, 60, 90, 0.18) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.95),
+    inset 0 -1px 0 rgba(0, 80, 110, 0.12) !important;
+}
+
+/* Tool status — 3D candy ball replacing the lucide icon.
+   Wrapper span gets a radial sphere background; the icon inside is
+   hidden so we don't see the SVG glyph on top of the ball. */
+html[data-theme="y2k-imac"] [data-tool-status] {
+  width: 14px !important;
+  height: 14px !important;
+  border-radius: 50% !important;
+  display: inline-block !important;
+  flex-shrink: 0;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.65),
+    inset 0 -1px 1px rgba(0,0,0,0.25),
+    0 1px 1px rgba(0,0,0,0.20),
+    0 0 0 1px rgba(0,0,0,0.20) !important;
+}
+html[data-theme="y2k-imac"] [data-tool-status] > svg {
+  display: none !important;
+}
+
+html[data-theme="y2k-imac"] [data-tool-status="ok"] {
+  background:
+    radial-gradient(circle at 30% 25%, #fff 0%, rgba(255,255,255,0.4) 22%, transparent 55%),
+    radial-gradient(circle at 50% 60%, #6be58c 0%, #2ac24a 60%, #137a23 100%) !important;
+}
+html[data-theme="y2k-imac"] [data-tool-status="err"] {
+  background:
+    radial-gradient(circle at 30% 25%, #fff 0%, rgba(255,255,255,0.4) 22%, transparent 55%),
+    radial-gradient(circle at 50% 60%, #ff8a85 0%, #ff3b30 60%, #a8120a 100%) !important;
+  animation: y2k-blink 1.8s ease-in-out infinite !important;
+}
+/* Running — yellow pulsing ball */
+html[data-theme="y2k-imac"] [data-tool-status="run"] {
+  background:
+    radial-gradient(circle at 30% 25%, #fff 0%, rgba(255,255,255,0.4) 22%, transparent 55%),
+    radial-gradient(circle at 50% 60%, #ffe25a 0%, #f0a52a 60%, #9a6209 100%) !important;
+  animation: y2k-blink 1.2s ease-in-out infinite !important;
+}
+
+/* =================================================================
+   THINKING BUBBLE — snow-plastic capsule with pink "思考" label chip.
+   Sits in the same column as the agent text bubble (no extra indent).
+   ================================================================= */
+html[data-theme="y2k-imac"] [data-bubble="thinking"] {
+  /* Stretch so it shares the same left/right edges as the assistant
+     text bubble in the same column. */
+  display: flex !important;
+  width: 100% !important;
+  background:
+    radial-gradient(140% 60% at 50% 0%,
+      rgba(255,255,255,0.85) 0%,
+      rgba(255,255,255,0.35) 22%,
+      rgba(255,255,255,0.10) 45%,
+      rgba(255,255,255,0) 60%),
+    linear-gradient(180deg,
+      rgba(255,255,255,0.85) 0%,
+      rgba(255,255,255,0.45) 38%,
+      rgba(0, 60, 90, 0.06) 100%),
+    linear-gradient(180deg, #ffffff 0%, #f0f7fb 100%) !important;
+  border: none !important;
+  border-radius: 22px !important;
+  padding: 10px 14px !important;
+  font-size: 13px !important;
+  line-height: 1.55 !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.95),
+    inset 0 -1px 0 rgba(0, 80, 110, 0.16),
+    0 0 0 1px rgba(255,255,255,0.7),
+    0 0 0 2px rgba(0, 60, 90, 0.14),
+    0 4px 10px -4px rgba(0, 60, 90, 0.20) !important;
+}
+html[data-theme="y2k-imac"] [data-thinking-label] {
+  display: none !important;
+}
+html[data-theme="y2k-imac"] [data-thinking-text] {
+  font-family: var(--font-body) !important;
+  font-style: italic !important;
+  color: var(--ink-2) !important;
+}
+
+/* =================================================================
+   APPROVAL CARD — under y2k turn into a STRAWBERRY pink plastic card
+   with a black-pill timer badge and Aqua action buttons.
+   ================================================================= */
+html[data-theme="y2k-imac"] [data-approval-card] {
+  background:
+    radial-gradient(120% 70% at 50% 0%,
+      rgba(255,255,255,0.85) 0%,
+      rgba(255,255,255,0.35) 22%,
+      rgba(255,255,255,0.10) 45%,
+      rgba(255,255,255,0) 60%),
+    linear-gradient(180deg,
+      rgba(255,255,255,0.85) 0%,
+      rgba(255,255,255,0.30) 8%,
+      rgba(255,255,255,0.10) 50%,
+      rgba(110, 0, 40, 0.18) 100%),
+    linear-gradient(180deg, #ffe2ed 0%, #ff8aaf 100%) !important;
+  border: none !important;
+  border-radius: 20px !important;
+  overflow: hidden !important;
+  box-shadow:
+    inset 0 1px 0 #fff,
+    inset 0 -1px 0 rgba(110, 0, 40, 0.30),
+    0 0 0 1px rgba(160, 30, 80, 0.45),
+    0 0 0 2px rgba(160, 30, 80, 0.15),
+    0 8px 16px -6px rgba(180, 30, 80, 0.40) !important;
+}
+
+html[data-theme="y2k-imac"] [data-approval-card] [data-approval-header] {
+  background: transparent !important;
+  border-bottom: 1px solid rgba(110, 0, 40, 0.25) !important;
+  color: #6e0028 !important;
+}
+html[data-theme="y2k-imac"] [data-approval-card] [data-approval-header] span,
+html[data-theme="y2k-imac"] [data-approval-card] [data-approval-header] strong {
+  color: #6e0028 !important;
+}
+html[data-theme="y2k-imac"] [data-approval-card] [data-approval-header] .text-accent {
+  color: #ff5d8f !important;
+}
+
+html[data-theme="y2k-imac"] [data-approval-timer] {
+  font-family: var(--font-tiny) !important;
+  font-size: 11px !important;
+  background: #6e0028 !important;
+  color: #ffffff !important;
+  padding: 4px 10px !important;
+  border-radius: 8px !important;
+  letter-spacing: 0.10em !important;
+}
+
+/* Inner monospace summary box inside the approval card */
+html[data-theme="y2k-imac"] [data-approval-card] pre {
+  background: rgba(255, 255, 255, 0.55) !important;
+  border: 1px solid rgba(110, 0, 40, 0.20) !important;
+  color: #5a0020 !important;
+  border-radius: 12px !important;
+}
+
+/* Approval action buttons — Aqua pinstripe pills */
+html[data-theme="y2k-imac"] [data-approval-action] {
+  background:
+    linear-gradient(180deg,
+      rgba(255,255,255,0.95) 0%,
+      rgba(255,255,255,0.55) 8%,
+      rgba(255,255,255,0.10) 45%,
+      rgba(255,255,255,0) 50%),
+    repeating-linear-gradient(90deg,
+      rgba(255,255,255,0.08) 0px,
+      rgba(255,255,255,0.08) 1px,
+      transparent 1px,
+      transparent 3px),
+    linear-gradient(180deg, #6cb6ff 0%, #2a78d8 50%, #1a5cb0 100%) !important;
+  color: #ffffff !important;
+  text-shadow: 0 1px 0 rgba(0, 20, 60, 0.35) !important;
+  border: none !important;
+  border-radius: 999px !important;
+  padding: 6px 16px !important;
+  font-family: var(--font-display) !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.85),
+    inset 0 -2px 4px rgba(0, 20, 60, 0.35),
+    0 0 0 1px rgba(20, 60, 110, 0.55),
+    0 4px 10px -2px rgba(10, 60, 120, 0.40) !important;
+  transition: filter 120ms ease, transform 80ms ease !important;
+}
+html[data-theme="y2k-imac"] [data-approval-action]:hover {
+  filter: brightness(1.08) saturate(1.10);
+}
+html[data-theme="y2k-imac"] [data-approval-action]:active {
+  transform: translateY(1px) scale(0.985);
+}
+
+/* Deny / edit buttons — graphite Aqua variant so the visual hierarchy
+   tells "approve" (blue) apart from secondary actions (gray) */
+html[data-theme="y2k-imac"] [data-approval-action="deny"],
+html[data-theme="y2k-imac"] [data-approval-action="edit"] {
+  background:
+    linear-gradient(180deg,
+      rgba(255,255,255,0.85) 0%,
+      rgba(255,255,255,0.40) 8%,
+      rgba(255,255,255,0.10) 45%,
+      rgba(255,255,255,0) 50%),
+    repeating-linear-gradient(90deg,
+      rgba(255,255,255,0.08) 0px,
+      rgba(255,255,255,0.08) 1px,
+      transparent 1px,
+      transparent 3px),
+    linear-gradient(180deg, #c2cdd6 0%, #6f8090 50%, #475866 100%) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.85),
+    inset 0 -2px 4px rgba(20, 30, 50, 0.40),
+    0 0 0 1px rgba(40, 60, 80, 0.55),
+    0 4px 10px -2px rgba(40, 60, 80, 0.35) !important;
+}
+
+/* =================================================================
+   COMPOSER — snow plastic pill + Aqua send oval
+   ================================================================= */
+html[data-theme="y2k-imac"] [data-composer] {
+  background:
+    radial-gradient(120% 70% at 50% 0%,
+      rgba(255,255,255,0.85) 0%,
+      rgba(255,255,255,0.35) 22%,
+      rgba(255,255,255,0.10) 45%,
+      rgba(255,255,255,0) 60%),
+    linear-gradient(180deg,
+      rgba(255,255,255,0.85) 0%,
+      rgba(255,255,255,0.45) 38%,
+      rgba(0, 60, 90, 0.06) 100%),
+    linear-gradient(180deg, #ffffff 0%, #e6f2fa 100%) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: none !important;
+  border-radius: 22px !important;
+  padding: 10px 14px !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.95),
+    inset 0 -1px 0 rgba(0, 80, 110, 0.20),
+    0 0 0 1px rgba(255,255,255,0.7),
+    0 0 0 2px rgba(0, 60, 90, 0.18),
+    0 8px 18px -8px rgba(0, 60, 90, 0.30) !important;
+}
+
+/* Composer "Ctrl+Enter" hint — pixel font */
+html[data-theme="y2k-imac"] [data-composer] .text-ink-3 {
+  font-family: var(--font-mono) !important;
+  letter-spacing: 0.06em !important;
+}
+
+/* Send button — Aqua oval. Override both inline disabled style and
+   the .aero-button class so it always reads as a candy pill. */
+html[data-theme="y2k-imac"] [data-composer-send] {
+  background:
+    linear-gradient(180deg,
+      rgba(255,255,255,0.95) 0%,
+      rgba(255,255,255,0.55) 8%,
+      rgba(255,255,255,0.10) 45%,
+      rgba(255,255,255,0) 50%),
+    repeating-linear-gradient(90deg,
+      rgba(255,255,255,0.08) 0px,
+      rgba(255,255,255,0.08) 1px,
+      transparent 1px,
+      transparent 3px),
+    linear-gradient(180deg, #6cb6ff 0%, #2a78d8 50%, #1a5cb0 100%) !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 999px !important;
+  width: 44px !important;
+  height: 32px !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.85),
+    inset 0 -2px 4px rgba(0, 20, 60, 0.35),
+    0 0 0 1px rgba(20, 60, 110, 0.55),
+    0 4px 10px -2px rgba(10, 60, 120, 0.45) !important;
+  animation: y2k-aqua-pulse 2.4s ease-in-out infinite !important;
+  transition: filter 120ms ease, transform 80ms ease !important;
+}
+html[data-theme="y2k-imac"] [data-composer-send]:hover:not(:disabled) {
+  filter: brightness(1.10) saturate(1.15);
+  animation-duration: 1.2s !important;
+}
+html[data-theme="y2k-imac"] [data-composer-send]:active:not(:disabled) {
+  transform: translateY(1px) scale(0.985);
+  filter: brightness(0.94);
+}
+html[data-theme="y2k-imac"] [data-composer-send]:disabled {
+  filter: grayscale(0.5) brightness(0.85);
+  opacity: 0.7;
+  animation: none !important;
+}
+
+/* All aero-glass cards / panels — sub-panels stay slightly tighter */
+html[data-theme="y2k-imac"] .rounded-xl.aero-glass,
+html[data-theme="y2k-imac"] .aero-glass.rounded-xl,
+html[data-theme="y2k-imac"] article.aero-glass,
+html[data-theme="y2k-imac"] section.aero-glass {
+  border-radius: 28px !important;
+}
+
+/* Inner Metric tiles inside project cards */
+html[data-theme="y2k-imac"] article[data-swatch] .rounded-md {
+  border-radius: 16px !important;
+}
+
+/* Tailwind class-level bumps under y2k.
+   Order matters: only flip the medium/large tiers; keep .rounded-full
+   (pills/buttons) and .rounded-sm (tags) untouched. */
+html[data-theme="y2k-imac"] .rounded-md { border-radius: 14px !important; }
+html[data-theme="y2k-imac"] .rounded-lg { border-radius: 20px !important; }
+html[data-theme="y2k-imac"] .rounded-xl { border-radius: 28px !important; }
+html[data-theme="y2k-imac"] .rounded-2xl { border-radius: 36px !important; }
+html[data-theme="y2k-imac"] .rounded-3xl { border-radius: 44px !important; }
+
+/* Modals, dialogs, popovers — generous pillowy radius */
+html[data-theme="y2k-imac"] [role="dialog"],
+html[data-theme="y2k-imac"] [data-radix-popper-content-wrapper] > * {
+  border-radius: 28px !important;
+}
+
+/* Inputs, buttons, chips that aren't already a full pill */
+html[data-theme="y2k-imac"] input:not([class*="rounded-full"]):not([type="checkbox"]):not([type="radio"]),
+html[data-theme="y2k-imac"] textarea,
+html[data-theme="y2k-imac"] select {
+  border-radius: 14px !important;
+}

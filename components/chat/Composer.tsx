@@ -121,7 +121,7 @@ export function Composer({ wsId, taskId, projectId }: ComposerProps) {
 
   function send() {
     if (!editor) return;
-    const { text, mentions } = serializeEditor(editor);
+    const { text, mentions } = serializeEditor(editor, agentsRef.current);
     if (!text.trim()) return;
     sendMutation.mutate(
       { text, mentions },
@@ -142,6 +142,7 @@ export function Composer({ wsId, taskId, projectId }: ComposerProps) {
 
   return (
     <div
+      data-composer
       className="composer-wrap composer-focus-ring relative flex items-end gap-2 px-4 py-2 rounded-xl transition-all backdrop-blur-xl"
       style={{
         background:
@@ -161,6 +162,7 @@ export function Composer({ wsId, taskId, projectId }: ComposerProps) {
         </span>
         <button
           type="button"
+          data-composer-send
           onClick={send}
           disabled={!canSend}
           className={`inline-flex items-center justify-center w-9 h-9 rounded-lg text-white transition-all active:translate-y-px ${

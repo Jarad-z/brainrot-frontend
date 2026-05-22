@@ -33,6 +33,7 @@ export function UserMessage({
           </div>
         )}
         <div
+          data-bubble="user"
           className="relative px-3.5 py-2 text-[14px] leading-[1.55] whitespace-pre-wrap break-words text-white"
           style={{
             background:

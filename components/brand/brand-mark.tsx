@@ -11,14 +11,16 @@ export interface BrandMarkProps {
 export function BrandMark({ logo, size = 36, className }: BrandMarkProps) {
   return (
     <span
+      data-brand="mark"
       className={cn(
-        "grid place-items-center bg-accent text-accent-fg font-bold rounded-[10px]",
+        "brand-mark grid place-items-center bg-accent text-accent-fg font-bold rounded-[10px]",
         "shadow-[var(--shadow-1)]",
         className,
       )}
       style={{ width: size, height: size, fontSize: Math.round(size * 0.46) }}
     >
-      {logo}
+      {/* Letter is hidden under y2k via CSS, replaced by gradient orb */}
+      <span className="brand-mark__letter">{logo}</span>
     </span>
   );
 }

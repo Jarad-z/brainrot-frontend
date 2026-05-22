@@ -9,6 +9,7 @@
 @import "../styles/tokens/status.css";
 @import "../styles/tokens/tweaks.css";
 @import "../styles/layout-rules.css";
+@import "../styles/themes/y2k-imac.css";
 
 @theme {
   --color-paper-0: var(--paper-0);

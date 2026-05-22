@@ -26,6 +26,16 @@ function authorKey(m: ClientMessage): string {
   return `sys:${m.parsed.type}`;
 }
 
+// Banner-style messages (result summaries, rate-limit heartbeats, system
+// notes) render as full-width strips with no avatar. They must not interrupt
+// the avatar-grouping of the bubble-style messages around them: otherwise the
+// agent's actual reply ends up as "not first in group" behind an invisible
+// banner and renders without an avatar.
+function isBannerType(m: ClientMessage): boolean {
+  const t = m.parsed.type;
+  return t === "result" || t === "rate_limit_event" || t === "system";
+}
+
 function isSystemNoise(msg: ClientMessage): boolean {
   if (msg.parsed.type !== "system") return false;
   const payload = msg.parsed.payload;
@@ -63,10 +73,21 @@ export function MessageList({ taskId, wsId }: MessageListProps) {
     [messages, pairing.consumed],
   );
 
-  const isFirstInGroup = useMemo(
-    () => visible.map((m, i) => i === 0 || authorKey(visible[i - 1]!) !== authorKey(m)),
-    [visible],
-  );
+  const isFirstInGroup = useMemo(() => {
+    const out: boolean[] = [];
+    let lastBubbleKey: string | null = null;
+    for (const m of visible) {
+      if (isBannerType(m)) {
+        // Banners don't carry an avatar slot and must not reset grouping.
+        out.push(false);
+        continue;
+      }
+      const key = authorKey(m);
+      out.push(key !== lastBubbleKey);
+      lastBubbleKey = key;
+    }
+    return out;
+  }, [visible]);
 
   const prevCountRef = useRef(visible.length);
   const [newFromIndex, setNewFromIndex] = useState(visible.length);

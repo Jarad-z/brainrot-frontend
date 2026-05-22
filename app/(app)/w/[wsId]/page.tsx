@@ -63,7 +63,7 @@ export default function WorkspaceHomePage({ params }: PageProps) {
             <p className="text-[11.5px] uppercase tracking-[0.14em] text-ink-3 font-semibold mb-2">
               Workspace
             </p>
-            <h1 className="text-[28px] font-semibold tracking-[-0.02em] text-ink-0 leading-[1.15] m-0">
+            <h1 className="y2k-hero text-[28px] font-semibold tracking-[-0.02em] text-ink-0 leading-[1.15] m-0">
               你好 {displayName}
               <span className="text-ink-3">.</span>
             </h1>
@@ -111,17 +111,18 @@ export default function WorkspaceHomePage({ params }: PageProps) {
         <div className="grid grid-cols-1 xl:grid-cols-[1fr_320px] gap-6 mt-7">
           {/* ----- Projects column ----- */}
           <section className="min-w-0">
-            <div className="flex items-baseline justify-between mb-3.5">
-              <h2 className="text-[15px] font-semibold text-ink-0 m-0 flex items-baseline gap-2">
+            <div className="y2k-section-heading flex items-baseline justify-between mb-3.5">
+              <h2 className="text-[15px] font-semibold text-ink-0 m-0 flex items-baseline gap-2 shrink-0">
                 项目
                 <span className="text-[12px] font-mono text-ink-3 tabular-nums">
                   {projects.length}
                 </span>
               </h2>
+              <span className="y2k-pinstripe" aria-hidden style={{ display: "none" }} />
               <button
                 type="button"
                 onClick={() => setCreateOpen(true)}
-                className="text-[12.5px] text-ink-2 hover:text-accent transition-colors inline-flex items-center gap-1"
+                className="text-[12.5px] text-ink-2 hover:text-accent transition-colors inline-flex items-center gap-1 shrink-0"
               >
                 <Plus className="w-3.5 h-3.5" />
                 新建

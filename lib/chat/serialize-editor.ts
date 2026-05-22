@@ -1,6 +1,14 @@
 import type { Editor } from "@tiptap/core";
 
-export function serializeEditor(editor: Editor): { text: string; mentions: string[] } {
+export interface SerializeAgentLookup {
+  id: string;
+  handle: string;
+}
+
+export function serializeEditor(
+  editor: Editor,
+  agents?: ReadonlyArray<SerializeAgentLookup>,
+): { text: string; mentions: string[] } {
   const mentions: string[] = [];
   let text = "";
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- ProseMirror Node type is deeply parameterized; we access well-known fields
@@ -15,11 +23,29 @@ export function serializeEditor(editor: Editor): { text: string; mentions: strin
     }
     return true;
   });
-  // Collapse runs of 2+ spaces that immediately follow a mention handle.
-  // The MentionExtension auto-inserts a single space after the picked mention;
-  // when the user also types a space, two adjacent text nodes get concatenated
-  // and we end up with "@handle  text". We fix it in serialization only —
-  // the editor doc itself keeps the auto-space for UX reasons.
   const collapsed = text.replace(/(@[A-Za-z0-9_-]+)  +/g, "$1 ");
-  return { text: collapsed.replace(/\n+$/, ""), mentions };
+  const trimmed = collapsed.replace(/\n+$/, "");
+
+  // Fallback: a user who types "@writer" without committing the suggestion
+  // popup produces a plain text token, no mention node. Resolve any
+  // @handle substrings against the supplied agent lookup so the backend
+  // still gets a real agent id and dispatches a run.
+  if (agents && agents.length > 0) {
+    const seen = new Set(mentions);
+    const byHandle = new Map<string, string>();
+    for (const a of agents) byHandle.set(a.handle.toLowerCase(), a.id);
+    const re = /@([A-Za-z0-9_-]+)/g;
+    let m: RegExpExecArray | null;
+    while ((m = re.exec(trimmed)) !== null) {
+      const handle = m[1];
+      if (!handle) continue;
+      const id = byHandle.get(handle.toLowerCase());
+      if (id && !seen.has(id)) {
+        seen.add(id);
+        mentions.push(id);
+      }
+    }
+  }
+
+  return { text: trimmed, mentions };
 }

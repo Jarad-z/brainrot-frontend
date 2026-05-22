@@ -84,4 +84,47 @@ describe("serializeEditor", () => {
     const ed = mockEditor({ descendants: (cb) => { for (const n of nodes) cb(n); } });
     expect(serializeEditor(ed)).toEqual({ text: "hello  world", mentions: [] });
   });
+
+  describe("plain-text @handle fallback", () => {
+    const agents = [
+      { id: "a1", handle: "writer" },
+      { id: "a2", handle: "coder" },
+    ];
+
+    it("resolves a typed @handle that never went through the suggestion popup", () => {
+      const nodes = [paragraphNode(), textNode("@writer 你好")];
+      const ed = mockEditor({ descendants: (cb) => { for (const n of nodes) cb(n); } });
+      expect(serializeEditor(ed, agents)).toEqual({ text: "@writer 你好", mentions: ["a1"] });
+    });
+
+    it("matches handles case-insensitively", () => {
+      const nodes = [paragraphNode(), textNode("@Writer hi")];
+      const ed = mockEditor({ descendants: (cb) => { for (const n of nodes) cb(n); } });
+      expect(serializeEditor(ed, agents)).toEqual({ text: "@Writer hi", mentions: ["a1"] });
+    });
+
+    it("ignores @handles that don't match any agent", () => {
+      const nodes = [paragraphNode(), textNode("@unknown hi")];
+      const ed = mockEditor({ descendants: (cb) => { for (const n of nodes) cb(n); } });
+      expect(serializeEditor(ed, agents)).toEqual({ text: "@unknown hi", mentions: [] });
+    });
+
+    it("de-duplicates an id already supplied by a real mention node", () => {
+      const nodes = [paragraphNode(), mentionNode("a1", "writer"), textNode(" and again @writer")];
+      const ed = mockEditor({ descendants: (cb) => { for (const n of nodes) cb(n); } });
+      expect(serializeEditor(ed, agents)).toEqual({ text: "@writer and again @writer", mentions: ["a1"] });
+    });
+
+    it("resolves multiple distinct @handles in order of appearance", () => {
+      const nodes = [paragraphNode(), textNode("@coder then @writer")];
+      const ed = mockEditor({ descendants: (cb) => { for (const n of nodes) cb(n); } });
+      expect(serializeEditor(ed, agents)).toEqual({ text: "@coder then @writer", mentions: ["a2", "a1"] });
+    });
+
+    it("does nothing when agents lookup is empty", () => {
+      const nodes = [paragraphNode(), textNode("@writer hi")];
+      const ed = mockEditor({ descendants: (cb) => { for (const n of nodes) cb(n); } });
+      expect(serializeEditor(ed, [])).toEqual({ text: "@writer hi", mentions: [] });
+    });
+  });
 });
