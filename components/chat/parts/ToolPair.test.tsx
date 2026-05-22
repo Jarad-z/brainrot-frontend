@@ -47,7 +47,7 @@ describe("ToolPair", () => {
     const { container } = render(
       <ToolPair useMsg={useMsg} resultMsg={resultMsg} taskId="t1" />,
     );
-    const head = container.querySelector(".tool-head");
+    const head = container.querySelector("[data-tool-header]");
     expect(head).toBeTruthy();
     if (head) fireEvent.click(head);
   });
