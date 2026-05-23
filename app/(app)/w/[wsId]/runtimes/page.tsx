@@ -6,6 +6,7 @@ import { useWorkspaceRuntimes } from "@/hooks/useWorkspaceRuntimes";
 import { useWorkspaceMembers } from "@/hooks/useWorkspaceMembers";
 import { useSession } from "@/hooks/useSession";
 import { messages } from "@/lib/messages";
+import { relativeTime } from "@/lib/format";
 import {
   PageHeader,
   PageTitle,
@@ -78,7 +79,7 @@ export default function RuntimesPage() {
                   isMine={isMine}
                   lastHeartbeat={
                     r.last_heartbeat
-                      ? `${m.lastHeartbeat} ${r.last_heartbeat}`
+                      ? `${m.lastHeartbeat} ${relativeTime(r.last_heartbeat)}`
                       : undefined
                   }
                 />
