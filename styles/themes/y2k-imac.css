@@ -1071,6 +1071,177 @@ html[data-theme="y2k-imac"] [data-tool-card] [class*="bg-bg-tertiary"] {
 }
 
 /* =================================================================
+   EMPTY-STATE / CALLOUT GLYPHS — the pale-cyan circles with a thin
+   lucide ✓ or + inside. Under y2k those become 3D Bondi candy balls
+   with a chunky white glyph baked in.
+   ================================================================= */
+html[data-theme="y2k-imac"] .bg-accent-wash.text-accent[class*="rounded-full"],
+html[data-theme="y2k-imac"] .bg-accent-wash.text-accent[class*="rounded-2xl"],
+html[data-theme="y2k-imac"] .bg-accent-wash.text-accent[class*="rounded-xl"] {
+  background:
+    radial-gradient(circle at 30% 25%, #fff 0%, rgba(255,255,255,0.45) 22%, transparent 55%),
+    radial-gradient(circle at 50% 60%, #5fd6ec 0%, #0aa7c4 60%, #006e87 100%) !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 50% !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.65),
+    inset 0 -2px 3px rgba(0,0,0,0.25),
+    0 2px 4px rgba(0,0,0,0.25),
+    0 0 0 1px rgba(0, 60, 90, 0.30) !important;
+}
+/* The lucide icon inside should be white + thicker for legibility */
+html[data-theme="y2k-imac"] .bg-accent-wash.text-accent[class*="rounded"] > svg {
+  color: #ffffff !important;
+  stroke-width: 2.8 !important;
+  filter: drop-shadow(0 1px 0 rgba(0, 30, 50, 0.45));
+  position: relative;
+  z-index: 1;
+}
+/* The status banner uses an SVG path with stroke="currentColor"
+   inside a rounded-full bg-accent-wash. Force the path stroke white. */
+html[data-theme="y2k-imac"] .bg-accent-wash.text-accent[class*="rounded"] svg path {
+  stroke: #ffffff !important;
+}
+
+/* The ProjectStatCard inline "@" badge (tiny 4x4 swatch) — give it the
+   same ball treatment so it doesn't look pasted onto candy cards. */
+html[data-theme="y2k-imac"] .bg-accent-wash.text-accent.rounded-full {
+  background:
+    radial-gradient(circle at 30% 25%, #fff 0%, rgba(255,255,255,0.45) 22%, transparent 55%),
+    radial-gradient(circle at 50% 60%, #5fd6ec 0%, #0aa7c4 60%, #006e87 100%) !important;
+}
+/* On a tinted project card, the @ badge background should stand out */
+html[data-theme="y2k-imac"] article[data-swatch] .bg-accent-wash.text-accent {
+  background:
+    radial-gradient(circle at 30% 25%, #fff 0%, rgba(255,255,255,0.45) 22%, transparent 55%),
+    radial-gradient(circle at 50% 60%, #fff8 0%, #ffffffbb 100%) !important;
+  color: var(--ink-0) !important;
+}
+
+/* =================================================================
+   LEGACY CTA BUTTONS — many pages use a hand-rolled "ink-stamp +
+   bg-ink-0" pattern (Agents page, Runtimes page, Members list etc.)
+   instead of the brand <Button> component. Under y2k those should
+   still read as Aqua pills.
+   ================================================================= */
+html[data-theme="y2k-imac"] a.bg-ink-0,
+html[data-theme="y2k-imac"] button.bg-ink-0,
+html[data-theme="y2k-imac"] a.bg-bg-surface-action,
+html[data-theme="y2k-imac"] button.bg-bg-surface-action,
+html[data-theme="y2k-imac"] a.bg-accent,
+html[data-theme="y2k-imac"] button.bg-accent {
+  background:
+    linear-gradient(180deg,
+      rgba(255,255,255,0.95) 0%,
+      rgba(255,255,255,0.55) 8%,
+      rgba(255,255,255,0.10) 45%,
+      rgba(255,255,255,0) 50%),
+    repeating-linear-gradient(90deg,
+      rgba(255,255,255,0.08) 0px,
+      rgba(255,255,255,0.08) 1px,
+      transparent 1px,
+      transparent 3px),
+    linear-gradient(180deg, #6cb6ff 0%, #2a78d8 50%, #1a5cb0 100%) !important;
+  color: #ffffff !important;
+  text-shadow: 0 1px 0 rgba(0, 20, 60, 0.35) !important;
+  border: none !important;
+  border-radius: 999px !important;
+  padding: 8px 18px !important;
+  font-family: var(--font-display) !important;
+  font-weight: 600 !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.85),
+    inset 0 -2px 4px rgba(0, 20, 60, 0.35),
+    0 0 0 1px rgba(20, 60, 110, 0.55),
+    0 4px 10px -2px rgba(10, 60, 120, 0.40) !important;
+  animation: y2k-aqua-pulse 2.4s ease-in-out infinite !important;
+  transition: filter 120ms ease, transform 80ms ease !important;
+}
+html[data-theme="y2k-imac"] a.bg-ink-0:hover,
+html[data-theme="y2k-imac"] button.bg-ink-0:hover,
+html[data-theme="y2k-imac"] a.bg-bg-surface-action:hover,
+html[data-theme="y2k-imac"] button.bg-bg-surface-action:hover,
+html[data-theme="y2k-imac"] a.bg-accent:hover,
+html[data-theme="y2k-imac"] button.bg-accent:hover {
+  filter: brightness(1.10) saturate(1.12);
+  animation-duration: 1.2s !important;
+}
+html[data-theme="y2k-imac"] a.bg-ink-0:active,
+html[data-theme="y2k-imac"] button.bg-ink-0:active,
+html[data-theme="y2k-imac"] a.bg-bg-surface-action:active,
+html[data-theme="y2k-imac"] button.bg-bg-surface-action:active,
+html[data-theme="y2k-imac"] a.bg-accent:active,
+html[data-theme="y2k-imac"] button.bg-accent:active {
+  transform: translateY(1px) scale(0.985);
+  filter: brightness(0.94);
+}
+html[data-theme="y2k-imac"] button.bg-ink-0:disabled,
+html[data-theme="y2k-imac"] button.bg-bg-surface-action:disabled,
+html[data-theme="y2k-imac"] button.bg-accent:disabled {
+  filter: grayscale(0.4) brightness(0.85);
+  animation: none !important;
+}
+
+/* "Ghost / archived" buttons — typical: bg-white/55 + border-hairline
+   or border-[1.5px] border-ink-0. Make them graphite Aqua pills. */
+html[data-theme="y2k-imac"] button.border-ink-0:not(.bg-ink-0):not([class*="text-danger"]):not([class*="bg-bg-surface-action"]),
+html[data-theme="y2k-imac"] a.border-ink-0:not(.bg-ink-0):not([class*="text-danger"]):not([class*="bg-bg-surface-action"]) {
+  background:
+    linear-gradient(180deg,
+      rgba(255,255,255,0.85) 0%,
+      rgba(255,255,255,0.40) 8%,
+      rgba(255,255,255,0.10) 45%,
+      rgba(255,255,255,0) 50%),
+    linear-gradient(180deg, #c2cdd6 0%, #6f8090 50%, #475866 100%) !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 999px !important;
+  padding: 8px 18px !important;
+  font-family: var(--font-display) !important;
+  font-weight: 600 !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.85),
+    inset 0 -2px 4px rgba(20, 30, 50, 0.35),
+    0 0 0 1px rgba(40, 60, 80, 0.55),
+    0 4px 10px -2px rgba(40, 60, 80, 0.30) !important;
+}
+html[data-theme="y2k-imac"] button.border-ink-0:disabled,
+html[data-theme="y2k-imac"] a.border-ink-0[aria-disabled="true"] {
+  filter: grayscale(0.4) brightness(0.85);
+  opacity: 0.7;
+}
+
+/* Danger button — red graphite Aqua pill (Leave workspace) */
+html[data-theme="y2k-imac"] button.border-danger,
+html[data-theme="y2k-imac"] a.border-danger,
+html[data-theme="y2k-imac"] button[class*="text-danger"][class*="border"]:not([class*="bg-"]) {
+  background:
+    linear-gradient(180deg,
+      rgba(255,255,255,0.95) 0%,
+      rgba(255,255,255,0.45) 8%,
+      rgba(255,255,255,0.10) 45%,
+      rgba(255,255,255,0) 50%),
+    linear-gradient(180deg, #ff8a85 0%, #ff3b30 50%, #c41610 100%) !important;
+  color: #ffffff !important;
+  text-shadow: 0 1px 0 rgba(80, 0, 0, 0.45) !important;
+  border: none !important;
+  border-radius: 999px !important;
+  padding: 8px 18px !important;
+  font-family: var(--font-display) !important;
+  font-weight: 700 !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.75),
+    inset 0 -2px 4px rgba(110, 0, 0, 0.40),
+    0 0 0 1px rgba(110, 0, 0, 0.55),
+    0 4px 10px -2px rgba(170, 30, 30, 0.40) !important;
+  transition: filter 120ms ease, transform 80ms ease !important;
+}
+html[data-theme="y2k-imac"] button.border-danger:hover {
+  filter: brightness(1.08) saturate(1.10);
+}
+
+/* =================================================================
    RADIX DIALOG (modals) — fix the inherited shadcn defaults that
    render content with no background and a black 80% overlay.
    Under both themes the modal needs a visible body; under y2k it
