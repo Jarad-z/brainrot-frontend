@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { Agent, AgentInput, Runtime } from "@/lib/api/types";
 import { messages } from "@/lib/messages";
+import { useSession } from "@/hooks/useSession";
 
 interface AgentFormProps {
   mode: "create" | "edit";
@@ -35,19 +36,26 @@ export function AgentForm({
   onSubmit,
 }: AgentFormProps) {
   const m = messages.agents.form;
+  const { data: me } = useSession();
   const [handle, setHandle] = useState(initial?.handle ?? "");
   const [name, setName] = useState(initial?.name ?? "");
   const [model, setModel] = useState(initial?.model ?? MODELS[1]);
-  const [runtimeId, setRuntimeId] = useState(initial?.runtime_id ?? runtimes[0]?.id ?? "");
 
-  // runtimes may arrive after first render (loading async). If we still don't
-  // have a selection, fall back to the first one — otherwise the <select>
-  // *displays* runtimes[0] but state stays "" and submit is silently blocked.
+  // Agents belong to whoever owns the runtime they're attached to. On Create,
+  // there's nothing to choose — agents always run on the caller's own machine.
+  // On Edit, the runtime is immutable (handle/runtime are pinned at creation).
+  const myRuntime = useMemo(
+    () => (me ? runtimes.find((r) => r.user_id === me.id) ?? null : null),
+    [runtimes, me],
+  );
+  const [runtimeId, setRuntimeId] = useState(
+    initial?.runtime_id ?? myRuntime?.id ?? "",
+  );
   useEffect(() => {
-    if (!runtimeId && runtimes.length > 0 && runtimes[0]) {
-      setRuntimeId(runtimes[0].id);
+    if (!runtimeId && myRuntime) {
+      setRuntimeId(myRuntime.id);
     }
-  }, [runtimes, runtimeId]);
+  }, [myRuntime, runtimeId]);
   const [instructions, setInstructions] = useState(initial?.instructions ?? "");
   const [envRaw, setEnvRaw] = useState(
     initial ? JSON.stringify(initial.custom_env, null, 2) : "",
@@ -153,25 +161,12 @@ export function AgentForm({
         </select>
       </label>
 
-      <label className="flex flex-col gap-1">
-        <span className="text-xs font-semibold text-ink-1">{m.runtime}</span>
-        {runtimes.length === 0 ? (
-          <span className="text-xs text-state-failed">{m.noRuntimes}</span>
-        ) : (
-          <select
-            aria-label={m.runtime}
-            value={runtimeId}
-            onChange={(e) => setRuntimeId(e.target.value)}
-            className="px-3 py-2 border-[1.5px] border-hairline rounded-sm text-sm"
-          >
-            {runtimes.map((r) => (
-              <option key={r.id} value={r.id}>
-                {r.host} {r.online ? "(在线)" : "(离线)"}
-              </option>
-            ))}
-          </select>
-        )}
-      </label>
+      {/* Runtime is implicit: agents always run on the caller's own machine.
+          We show a readonly hint (or warning if the user hasn't connected a
+          device yet) instead of a selector. On edit the runtime is locked. */}
+      {mode === "create" && !myRuntime && runtimes.length >= 0 && (
+        <p className="text-xs text-state-failed">{m.noRuntimes}</p>
+      )}
 
       <label className="flex flex-col gap-1">
         <span className="text-xs font-semibold text-ink-1">{m.instructions}</span>

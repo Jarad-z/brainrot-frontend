@@ -11,6 +11,11 @@ export interface AgentCardProps {
   description?: string;
   /** Single-character avatar glyph (e.g. "W" for @writer). */
   avatarGlyph?: string;
+  /** Display name of the user who published this agent. Shown as "by <name>" to
+   *  surface ownership in a multi-user workspace. */
+  ownerName?: string | null;
+  /** True if the agent runs on the signed-in user's device. Gates edit/archive UI. */
+  isMine?: boolean;
   onClick?: () => void;
   className?: string;
 }
@@ -24,6 +29,8 @@ export function AgentCard({
   online,
   description,
   avatarGlyph,
+  ownerName,
+  isMine,
   onClick,
   className,
 }: AgentCardProps) {
@@ -74,8 +81,18 @@ export function AgentCard({
           {online ? "online" : "offline"}
         </span>
       </div>
-      <div className="flex items-center justify-between text-xs">
+      <div className="flex items-center justify-between text-xs gap-2">
         <span className="font-mono text-ink-2 truncate">{model}</span>
+        {ownerName && (
+          <span className="font-mono text-[11px] text-ink-3 shrink-0">
+            by {ownerName}
+            {isMine && (
+              <span className="ml-1.5 px-1 py-0.5 rounded-sm bg-accent-moss/15 text-accent-moss font-bold">
+                you
+              </span>
+            )}
+          </span>
+        )}
       </div>
       {description && (
         <p className="text-sm text-ink-1 line-clamp-2 m-0">{description}</p>

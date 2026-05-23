@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useWorkspaceAgents } from "@/hooks/useWorkspaceAgents";
 import { useWorkspaceRuntimes } from "@/hooks/useWorkspaceRuntimes";
+import { useWorkspaceMembers } from "@/hooks/useWorkspaceMembers";
+import { useSession } from "@/hooks/useSession";
 import { messages } from "@/lib/messages";
 import {
   PageHeader,
@@ -21,9 +23,15 @@ export default function AgentsListPage() {
   const router = useRouter();
   const { data: agents = [], isLoading } = useWorkspaceAgents(wsId);
   const { data: runtimes = [] } = useWorkspaceRuntimes(wsId);
+  const { data: members = [] } = useWorkspaceMembers(wsId);
+  const { data: me } = useSession();
   const [showArchived, setShowArchived] = useState(false);
 
   const onlineRuntimeIds = new Set(runtimes.filter((r) => r.online).map((r) => r.id));
+  // runtime_id → user_id and user_id → member name. Together they let an
+  // agent be labelled with its publisher's name without an extra fetch.
+  const runtimeToUser = new Map(runtimes.map((r) => [r.id, r.user_id] as const));
+  const memberById = new Map(members.map((mem) => [mem.user_id, mem] as const));
   const visible = showArchived ? agents : agents.filter((a) => !a.archived);
 
   return (
@@ -76,24 +84,31 @@ export default function AgentsListPage() {
         />
       ) : (
         <ul className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 list-none p-0">
-          {visible.map((a) => (
-            <li key={a.id} className={a.archived ? "opacity-60" : undefined}>
-              <AgentCard
-                handle={a.handle}
-                name={a.name || `@${a.handle}`}
-                model={a.model ?? "—"}
-                online={onlineRuntimeIds.has(a.runtime_id)}
-                description={a.description || undefined}
-                avatarGlyph={a.handle.charAt(0).toUpperCase()}
-                onClick={() => router.push(`/w/${wsId}/agents/${a.id}`)}
-              />
-              {a.archived && (
-                <span className="mt-2 inline-block px-1.5 py-0.5 bg-paper-1 border-[1.5px] border-hairline rounded text-[11px] font-bold text-ink-2">
-                  {messages.agents.archivedBadge}
-                </span>
-              )}
-            </li>
-          ))}
+          {visible.map((a) => {
+            const ownerUserId = runtimeToUser.get(a.runtime_id) ?? null;
+            const owner = ownerUserId ? memberById.get(ownerUserId) : null;
+            const isMine = me && ownerUserId ? ownerUserId === me.id : false;
+            return (
+              <li key={a.id} className={a.archived ? "opacity-60" : undefined}>
+                <AgentCard
+                  handle={a.handle}
+                  name={a.name || `@${a.handle}`}
+                  model={a.model ?? "—"}
+                  online={onlineRuntimeIds.has(a.runtime_id)}
+                  description={a.description || undefined}
+                  avatarGlyph={a.handle.charAt(0).toUpperCase()}
+                  ownerName={owner?.name ?? null}
+                  isMine={isMine}
+                  onClick={() => router.push(`/w/${wsId}/agents/${a.id}`)}
+                />
+                {a.archived && (
+                  <span className="mt-2 inline-block px-1.5 py-0.5 bg-paper-1 border-[1.5px] border-hairline rounded text-[11px] font-bold text-ink-2">
+                    {messages.agents.archivedBadge}
+                  </span>
+                )}
+              </li>
+            );
+          })}
         </ul>
       )}
     </main>

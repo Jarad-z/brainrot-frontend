@@ -4,12 +4,17 @@ import { cn } from "@/lib/utils";
 import { Card } from "./card";
 
 export interface RuntimeCardProps {
+  /** Display name for the device — usually the owning user's name with a fallback to host. */
   name: string;
+  /** Owner email (shown small under name; helps disambiguate when two members share a name). */
+  ownerEmail?: string | null;
   host?: string | null;
   osArch?: string;
   capacity?: number;
   online?: boolean;
-  /** Human-friendly relative time, e.g. "2 分钟前". */
+  /** True if the runtime's user_id matches the signed-in user. Renders a "you" badge. */
+  isMine?: boolean;
+  /** Human-friendly relative time, e.g. "2 minutes ago". */
   lastHeartbeat?: string;
   onClick?: () => void;
   className?: string;
@@ -19,10 +24,12 @@ export interface RuntimeCardProps {
  *  style tile. Includes a pulsing heartbeat dot for online runtimes. */
 export function RuntimeCard({
   name,
+  ownerEmail,
   host,
   osArch,
   capacity,
   online,
+  isMine,
   lastHeartbeat,
   onClick,
   className,
@@ -34,17 +41,32 @@ export function RuntimeCard({
       onClick={onClick}
       className={cn(
         "flex flex-col gap-3 cursor-pointer p-4 min-h-[140px]",
+        isMine && "ring-2 ring-accent-moss/40",
         className,
       )}
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <div className="font-mono text-[13px] text-ink-0 font-bold truncate">
-            {name}
+          <div className="flex items-center gap-2">
+            <div className="font-mono text-[13px] text-ink-0 font-bold truncate">
+              {name}
+            </div>
+            {isMine && (
+              <span className="shrink-0 inline-flex items-center font-mono text-[10px] font-bold uppercase px-1.5 py-0.5 rounded-sm bg-accent-moss/15 text-accent-moss">
+                you
+              </span>
+            )}
           </div>
-          <div className="font-mono text-[11px] text-ink-2 mt-0.5 truncate">
-            {host ?? "—"}
-          </div>
+          {ownerEmail && (
+            <div className="font-mono text-[11px] text-ink-3 mt-0.5 truncate">
+              {ownerEmail}
+            </div>
+          )}
+          {host && (
+            <div className="font-mono text-[11px] text-ink-2 mt-0.5 truncate">
+              {host}
+            </div>
+          )}
         </div>
         <span
           className={cn(

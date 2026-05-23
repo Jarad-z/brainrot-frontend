@@ -181,10 +181,15 @@ export interface RunView {
 export interface Runtime {
   id: string;
   workspace_id: string;
-  host: string;
+  user_id: string;
+  name: string;
+  host: string | null;
+  os: string | null;
+  arch: string | null;
   online: boolean;
   last_heartbeat: string | null;
   capacity: number;
+  revoked: boolean;
   created_at: string;
 }
 

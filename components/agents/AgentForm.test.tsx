@@ -1,16 +1,36 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AgentForm } from "./AgentForm";
 import type { Runtime } from "@/lib/api/types";
+
+// AgentForm calls useSession() to discover the caller's own runtime. We mock
+// the session as user "u1" so the form auto-selects rt1 below.
+vi.mock("@/hooks/useSession", () => ({
+  useSession: () => ({
+    data: { id: "u1", email: "u1@test", name: "U1", avatar_url: null },
+    isPending: false,
+  }),
+}));
+
+function renderWithClient(ui: React.ReactElement) {
+  const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  return render(<QueryClientProvider client={qc}>{ui}</QueryClientProvider>);
+}
 
 const runtimes: Runtime[] = [
   {
     id: "rt1",
     workspace_id: "ws1",
+    user_id: "u1",
+    name: "alice's machine",
     host: "host-a",
+    os: "darwin",
+    arch: "arm64",
     online: true,
     last_heartbeat: "2026-05-18T00:00:00Z",
     capacity: 4,
+    revoked: false,
     created_at: "2026-05-18T00:00:00Z",
   },
 ];
@@ -18,7 +38,7 @@ const runtimes: Runtime[] = [
 describe("AgentForm", () => {
   it("blocks submission when env JSON is invalid", () => {
     const onSubmit = vi.fn();
-    render(
+    renderWithClient(
       <AgentForm
         mode="create"
         runtimes={runtimes}
@@ -39,7 +59,7 @@ describe("AgentForm", () => {
 
   it("submits parsed JSON objects, not strings", () => {
     const onSubmit = vi.fn();
-    render(
+    renderWithClient(
       <AgentForm
         mode="create"
         runtimes={runtimes}
