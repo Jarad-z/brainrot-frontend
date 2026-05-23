@@ -43,4 +43,16 @@ describe("AssistantMessage", () => {
     const card = container.querySelector(".thinking-card");
     if (card) fireEvent.click(card);
   });
+
+  it("renders nothing when thinking text is empty (Opus 4.x signature-only)", () => {
+    const emptyThinkMsg: ClientMessage = {
+      ...textMsg,
+      id: "a3",
+      parsed: { type: "thinking", payload: { text: "" } },
+    };
+    const { container } = render(
+      <AssistantMessage msg={emptyThinkMsg} taskId="t1" agent={baseAuthor} />,
+    );
+    expect(container.firstChild).toBeNull();
+  });
 });

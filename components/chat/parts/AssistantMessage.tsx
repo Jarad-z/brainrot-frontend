@@ -31,6 +31,13 @@ export function AssistantMessage({
     return null;
   }
 
+  // Opus 4.x emits thinking blocks with empty text and only an encrypted
+  // `signature` (Anthropic's summarized-thinking mode). There is nothing to
+  // render — drop the message entirely so the empty pill chrome doesn't appear.
+  if (msg.parsed.type === "thinking" && msg.parsed.payload.text === "") {
+    return null;
+  }
+
   const time = msg.created_at
     ? new Date(msg.created_at).toTimeString().slice(0, 5)
     : "";
