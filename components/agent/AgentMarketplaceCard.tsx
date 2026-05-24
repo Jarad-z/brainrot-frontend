@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { PublicAgentView } from "@/lib/api/types";
+import { PluginCapabilitiesSummary } from "./PluginCapabilitiesSummary";
 
 interface AgentMarketplaceCardProps {
   agent: PublicAgentView;
@@ -53,6 +54,14 @@ export function AgentMarketplaceCard({
           {agent.description}
         </p>
       )}
+      <PluginCapabilitiesSummary
+        skills={agent.skills}
+        commands={agent.commands}
+        subagents={agent.subagents}
+        hooksCount={agent.hooks_count}
+        mcpServers={agent.mcp_servers}
+        variant={variant}
+      />
       <div className="flex items-center justify-between text-xs text-ink-2">
         <span>by {agent.publisher_name}</span>
         {agent.published_at && (

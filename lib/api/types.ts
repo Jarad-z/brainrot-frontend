@@ -337,6 +337,17 @@ export interface InvitationView {
 }
 
 // Marketplace
+//
+// Plugin capability metadata (skill / command / subagent names + descriptions,
+// hooks count, MCP server names) IS surfaced on the marketplace view so
+// browsers can judge what an agent does. The actual content bodies — SKILL.md
+// markdown, hooks.json shell commands, MCP server configs, instructions — are
+// deliberately NOT exposed. Backend strips them via service.publicViewFromX.
+export interface PluginItemSummary {
+  name: string;
+  description?: string;
+}
+
 export interface PublicAgentView {
   id: string;
   handle: string;
@@ -348,6 +359,14 @@ export interface PublicAgentView {
   publisher_id: string;
   publisher_name: string;
   publisher_avatar_url?: string;
+  // Plugin capability summary — names + descriptions only.
+  skills: PluginItemSummary[];
+  commands: PluginItemSummary[];
+  subagents: PluginItemSummary[];
+  // Total hook matchers across all lifecycle events; 0 = no hooks configured.
+  hooks_count: number;
+  // MCP server names (sorted); server configs (command, args, env) not exposed.
+  mcp_servers: string[];
 }
 
 export interface InstallView {
