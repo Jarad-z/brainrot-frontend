@@ -17,6 +17,7 @@ import {
 import { swatchFromId } from "@/lib/swatch";
 import { messages } from "@/lib/messages";
 import { useWorkspaceContext } from "@/lib/workspace-context";
+import { useBadges } from "@/lib/stores/badges";
 import { CreateProjectModal } from "@/components/projects/CreateProjectModal";
 
 const LAST_WS_KEY = "brainrot.lastWsId";
@@ -66,6 +67,19 @@ export function Sidebar() {
   const isAgents = !!wsId && pathname === `/w/${wsId}/agents`;
   const isRuntimes = !!wsId && pathname === `/w/${wsId}/runtimes`;
   const isSettings = !!wsId && pathname === `/w/${wsId}/settings`;
+  const isFriends =
+    pathname === "/friends" || pathname.startsWith("/friends/");
+  const isMessages =
+    pathname === "/messages" || pathname.startsWith("/messages/");
+
+  // Global (workspace-agnostic) badge counters. Selector form auto-re-renders
+  // when the selected slice changes, so the badge counts update live.
+  const friendCount = useBadges(
+    (s) => s.friendRequests + s.workspaceInvitations,
+  );
+  const dmCount = useBadges((s) =>
+    Object.values(s.dm).reduce((a, b) => a + b, 0),
+  );
 
   return (
     <TooltipProvider>
@@ -90,6 +104,21 @@ export function Sidebar() {
 
         {/* nav */}
         <nav className="flex-1 overflow-y-auto py-2">
+          {/* Global (workspace-agnostic) entries — always visible. */}
+          <p className="px-4 pt-3 pb-1.5 pixel-label">
+            社交
+          </p>
+          <Link href="/friends">
+            <NavItem active={isFriends} swatch="teal" count={friendCount}>
+              Friends
+            </NavItem>
+          </Link>
+          <Link href="/messages">
+            <NavItem active={isMessages} swatch="bondi" count={dmCount}>
+              Messages
+            </NavItem>
+          </Link>
+
           <p className="px-4 pt-3 pb-1.5 pixel-label">
             导航
           </p>

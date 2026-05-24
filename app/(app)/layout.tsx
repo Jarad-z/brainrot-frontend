@@ -7,6 +7,7 @@ import { PageSkeleton } from "@/components/common/PageSkeleton";
 import { ThemeSwitcher } from "@/components/common/ThemeSwitcher";
 import { ThreeColumnShell } from "@/components/nav/ThreeColumnShell";
 import { DropZoneOverlay } from "@/components/upload/DropZoneOverlay";
+import { BadgeSeeder } from "@/components/BadgeSeeder";
 
 function DaemonBootstrap() {
   useDaemonBootstrap();
@@ -21,6 +22,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     <WorkspaceProvider>
       <WSProvider>
         <DaemonBootstrap />
+        <BadgeSeeder />
         <ThreeColumnShell user={user}>{children}</ThreeColumnShell>
         <DropZoneOverlay />
         <ThemeSwitcher />
