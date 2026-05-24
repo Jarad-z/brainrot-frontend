@@ -32,9 +32,11 @@ export default function AgentsListPage() {
   const { data: me } = useSession();
   const [showArchived, setShowArchived] = useState(false);
 
-  const onlineRuntimeIds = new Set(runtimes.filter((r) => r.online).map((r) => r.id));
   // runtime_id → user_id and user_id → member name. Together they let an
   // agent be labelled with its publisher's name without an extra fetch.
+  // (Online status now comes from the agent row itself via a.runtime_online —
+  // see AgentRefView. The per-ws runtimes list can't see the publisher's
+  // runtime for installed agents, so we no longer derive presence from it.)
   const runtimeToUser = new Map(runtimes.map((r) => [r.id, r.user_id] as const));
   const memberById = new Map(members.map((mem) => [mem.user_id, mem] as const));
   const visible = showArchived ? agents : agents.filter((a) => !a.archived);
@@ -120,7 +122,7 @@ export default function AgentsListPage() {
                     handle={a.handle}
                     name={a.name || `@${a.handle}`}
                     model={a.model ?? "—"}
-                    online={onlineRuntimeIds.has(a.runtime_id)}
+                    online={a.runtime_online}
                     description={a.description || undefined}
                     avatarGlyph={a.handle.charAt(0).toUpperCase()}
                     ownerName={
@@ -149,7 +151,7 @@ export default function AgentsListPage() {
                   <InstalledAgentCard
                     wsId={wsId}
                     agent={a}
-                    online={onlineRuntimeIds.has(a.runtime_id)}
+                    online={a.runtime_online}
                     ownerName={ownerNameFor(a, runtimeToUser, memberById)}
                   />
                   {a.archived && (

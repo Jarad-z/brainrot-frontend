@@ -321,10 +321,17 @@ export interface InstallView {
 
 // AgentRefView — extends the existing Agent type with marketplace-aware fields.
 // The backend's AgentRefView embeds the full AgentView shape and adds these.
+//
+// runtime_online is hydrated by the server from the agent's runtime row at
+// list time. For installed (marketplace) agents the publisher's runtime lives
+// in another workspace and is therefore NOT in this consumer's
+// GET /workspaces/{wsId}/runtimes — read presence from this field instead of
+// crossing the runtimes map (which would always say "offline").
 export interface AgentRefView extends Agent {
   effective_handle: string;
   is_installed: boolean;
   install_id?: string;
   publisher_workspace_id: string;
   visibility: "private" | "public";
+  runtime_online: boolean;
 }
