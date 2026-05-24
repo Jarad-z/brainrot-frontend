@@ -1,11 +1,19 @@
 import type { QueryClient } from "@tanstack/react-query";
-import type { Message, TaskCard, ApprovalDecision, ClientMessage } from "@/lib/api/types";
+import type {
+  Message,
+  TaskCard,
+  ApprovalDecision,
+  ClientMessage,
+  DirectMessage,
+  User,
+} from "@/lib/api/types";
 // run.completed payload lacks project_id/ws_id (see lib/ws/events.ts), so we
 // reverse-look projectId from the task detail cache to scope invalidation.
 // Tracked in docs/BACKEND_GAPS.md.
 import { queryKeys } from "@/lib/api/keys";
 import { enrichMessage } from "@/lib/chat/enrich-message";
 import { upsertMessage } from "@/lib/chat/upsert-message";
+import { useBadges } from "@/lib/stores/badges";
 import type { WSClient } from "./client";
 
 interface ChatUIStoreSlice {
@@ -46,6 +54,46 @@ export type WSEvent =
       scope: "task";
       id: string;
       payload: { approval_id: string; decision: ApprovalDecision; note?: string };
+    }
+  | { type: "friend.request.sent"; scope: "user"; id: string; payload: { from_id: string } }
+  | { type: "friend.request.accepted"; scope: "user"; id: string; payload: { by_user_id: string } }
+  | { type: "friend.request.declined"; scope: "user"; id: string; payload: { by_user_id: string } }
+  | { type: "friend.removed"; scope: "user"; id: string; payload: { by_user_id: string } }
+  | {
+      type: "workspace.invitation.created";
+      scope: "user";
+      id: string;
+      payload: { invitation_id: string; workspace_id: string; inviter_id: string; role: string };
+    }
+  | {
+      type: "workspace.invitation.accepted";
+      scope: "user" | "workspace";
+      id: string;
+      payload: Record<string, unknown>;
+    }
+  | {
+      type: "workspace.invitation.declined";
+      scope: "user";
+      id: string;
+      payload: Record<string, unknown>;
+    }
+  | {
+      type: "workspace.invitation.revoked";
+      scope: "user";
+      id: string;
+      payload: Record<string, unknown>;
+    }
+  | {
+      type: "dm.sent";
+      scope: "user";
+      id: string;
+      payload: { conversation_id: string; message: DirectMessage };
+    }
+  | {
+      type: "dm.read";
+      scope: "user";
+      id: string;
+      payload: { conversation_id: string; last_read_at: string };
     };
 
 export function registerHandlers(
@@ -70,6 +118,20 @@ export function registerHandlers(
         return onRunCompleted(data, queryClient);
       case "approval.decided":
         return onApprovalDecided(data, chatUI());
+      case "friend.request.sent":
+      case "friend.request.accepted":
+      case "friend.request.declined":
+      case "friend.removed":
+        return onFriendEvent(data, queryClient);
+      case "workspace.invitation.created":
+      case "workspace.invitation.accepted":
+      case "workspace.invitation.declined":
+      case "workspace.invitation.revoked":
+        return onInvitationEvent(data, queryClient);
+      case "dm.sent":
+        return onDMSent(data, queryClient);
+      case "dm.read":
+        return onDMRead(data, queryClient);
       default:
         return;
     }
@@ -131,4 +193,52 @@ export function onApprovalDecided(
     note: ev.payload.note,
     at: Date.now(),
   });
+}
+
+export function onFriendEvent(
+  ev: Extract<WSEvent, { type: `friend.${string}` }>,
+  qc: QueryClient,
+): void {
+  qc.invalidateQueries({ queryKey: queryKeys.friends.requests() });
+  qc.invalidateQueries({ queryKey: queryKeys.friends.list() });
+  if (ev.type === "friend.request.sent") {
+    useBadges.getState().bumpFriendRequests();
+  }
+}
+
+export function onInvitationEvent(
+  ev: Extract<WSEvent, { type: `workspace.invitation.${string}` }>,
+  qc: QueryClient,
+): void {
+  qc.invalidateQueries({ queryKey: queryKeys.invitations.incoming() });
+  if (ev.scope === "workspace") {
+    qc.invalidateQueries({ queryKey: queryKeys.workspaces.members(ev.id) });
+  }
+  if (ev.type === "workspace.invitation.created") {
+    useBadges.getState().bumpWorkspaceInvitations();
+  }
+}
+
+export function onDMSent(
+  ev: Extract<WSEvent, { type: "dm.sent" }>,
+  qc: QueryClient,
+): void {
+  qc.invalidateQueries({ queryKey: queryKeys.conversations.list() });
+  qc.setQueryData<DirectMessage[]>(
+    queryKeys.conversations.messages(ev.payload.conversation_id),
+    (old = []) => [ev.payload.message, ...old],
+  );
+  // Only bump badge for incoming messages (sender != me).
+  const me = qc.getQueryData<User>(queryKeys.me.self());
+  if (me && ev.payload.message.sender_id && ev.payload.message.sender_id !== me.id) {
+    useBadges.getState().bumpConversation(ev.payload.conversation_id);
+  }
+}
+
+export function onDMRead(
+  ev: Extract<WSEvent, { type: "dm.read" }>,
+  qc: QueryClient,
+): void {
+  useBadges.getState().clearConversation(ev.payload.conversation_id);
+  qc.invalidateQueries({ queryKey: queryKeys.conversations.list() });
 }

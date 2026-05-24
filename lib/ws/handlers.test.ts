@@ -1,8 +1,18 @@
 import { describe, it, expect, vi } from "vitest";
 import { QueryClient } from "@tanstack/react-query";
-import { onMessageAppended, onTaskMutation, onApprovalDecided, onRunCompleted } from "./handlers";
+import {
+  onMessageAppended,
+  onTaskMutation,
+  onApprovalDecided,
+  onRunCompleted,
+  onFriendEvent,
+  onInvitationEvent,
+  onDMSent,
+  onDMRead,
+} from "./handlers";
 import { queryKeys } from "@/lib/api/keys";
-import type { Message, TaskCard } from "@/lib/api/types";
+import { useBadges } from "@/lib/stores/badges";
+import type { Message, TaskCard, DirectMessage } from "@/lib/api/types";
 
 describe("WS handlers", () => {
   it("onMessageAppended upserts the enriched message into the task messages cache", () => {
@@ -97,5 +107,138 @@ describe("WS handlers", () => {
     expect(invSpy).toHaveBeenCalledWith({ queryKey: queryKeys.tasks.detail(taskId) });
     expect(invSpy).toHaveBeenCalledWith({ queryKey: queryKeys.tasks.runs(taskId) });
     expect(invSpy).toHaveBeenCalledWith({ queryKey: queryKeys.projects.tasks(projectId) });
+  });
+});
+
+describe("onFriendEvent", () => {
+  it("invalidates friend caches and bumps badge for request.sent", () => {
+    useBadges.getState().reset();
+    const qc = new QueryClient();
+    onFriendEvent(
+      { type: "friend.request.sent", scope: "user", id: "u1", payload: { from_id: "u2" } },
+      qc,
+    );
+    expect(useBadges.getState().friendRequests).toBe(1);
+  });
+
+  it("does NOT bump for accepted/declined/removed", () => {
+    useBadges.getState().reset();
+    const qc = new QueryClient();
+    onFriendEvent(
+      { type: "friend.request.accepted", scope: "user", id: "u1", payload: { by_user_id: "u2" } },
+      qc,
+    );
+    expect(useBadges.getState().friendRequests).toBe(0);
+  });
+});
+
+describe("onInvitationEvent", () => {
+  it("bumps badge on created", () => {
+    useBadges.getState().reset();
+    const qc = new QueryClient();
+    onInvitationEvent(
+      {
+        type: "workspace.invitation.created",
+        scope: "user",
+        id: "u1",
+        payload: { invitation_id: "i1", workspace_id: "w1", inviter_id: "u2", role: "editor" },
+      },
+      qc,
+    );
+    expect(useBadges.getState().workspaceInvitations).toBe(1);
+  });
+
+  it("invalidates workspace members on workspace-scope accepted", () => {
+    const qc = new QueryClient();
+    // Pre-populate workspace members cache so we can observe invalidation
+    qc.setQueryData(queryKeys.workspaces.members("w1"), [{ user_id: "u9" }]);
+    onInvitationEvent(
+      {
+        type: "workspace.invitation.accepted",
+        scope: "workspace",
+        id: "w1",
+        payload: { user_id: "u2", role: "editor" },
+      },
+      qc,
+    );
+    const state = qc.getQueryState(queryKeys.workspaces.members("w1"));
+    expect(state?.isInvalidated).toBe(true);
+  });
+});
+
+describe("onDMSent", () => {
+  it("prepends message + bumps badge when sender != me", () => {
+    useBadges.getState().reset();
+    const qc = new QueryClient();
+    qc.setQueryData(queryKeys.me.self(), { id: "me" });
+    qc.setQueryData<DirectMessage[]>(queryKeys.conversations.messages("c1"), [
+      {
+        id: "m0",
+        conversation_id: "c1",
+        sender_id: "me",
+        body: "old",
+        created_at: "2026-05-23T00:00:00Z",
+      },
+    ]);
+    const newMsg: DirectMessage = {
+      id: "m1",
+      conversation_id: "c1",
+      sender_id: "peer",
+      body: "hi",
+      created_at: "2026-05-23T00:00:01Z",
+    };
+    onDMSent(
+      {
+        type: "dm.sent",
+        scope: "user",
+        id: "me",
+        payload: { conversation_id: "c1", message: newMsg },
+      },
+      qc,
+    );
+    const msgs = qc.getQueryData<DirectMessage[]>(queryKeys.conversations.messages("c1"));
+    expect(msgs?.[0]!.id).toBe("m1");
+    expect(useBadges.getState().dm.c1).toBe(1);
+  });
+
+  it("does NOT bump badge when sender == me", () => {
+    useBadges.getState().reset();
+    const qc = new QueryClient();
+    qc.setQueryData(queryKeys.me.self(), { id: "me" });
+    const myMsg: DirectMessage = {
+      id: "m2",
+      conversation_id: "c2",
+      sender_id: "me",
+      body: "self",
+      created_at: "2026-05-23T00:00:02Z",
+    };
+    onDMSent(
+      {
+        type: "dm.sent",
+        scope: "user",
+        id: "me",
+        payload: { conversation_id: "c2", message: myMsg },
+      },
+      qc,
+    );
+    expect(useBadges.getState().dm.c2 ?? 0).toBe(0);
+  });
+});
+
+describe("onDMRead", () => {
+  it("clears conversation badge", () => {
+    useBadges.getState().bumpConversation("c1");
+    useBadges.getState().bumpConversation("c1");
+    const qc = new QueryClient();
+    onDMRead(
+      {
+        type: "dm.read",
+        scope: "user",
+        id: "me",
+        payload: { conversation_id: "c1", last_read_at: "2026-05-23T01:00:00Z" },
+      },
+      qc,
+    );
+    expect(useBadges.getState().dm.c1 ?? 0).toBe(0);
   });
 });
