@@ -126,6 +126,44 @@
       saving: "保存中…",
       handleConflict: "该 handle 已被占用",
       noRuntimes: "请先在 Connections 页接入你的 Claude Code 设备。",
+      avatarUrl: "头像 URL",
+      avatarUrlPlaceholder: "https://…/avatar.png",
+      description: "简介",
+      descriptionPlaceholder: "一句话说明这个 agent 的用途",
+      // Section titles + hints.
+      sectionBasic: "基础信息",
+      sectionSystemPrompt: "System Prompt",
+      sectionSystemPromptHint:
+        "持续注入到每次 run 的系统提示词。32 KB 硬上限；8 KB 起会有性能提示。",
+      sectionSkills: "Skills",
+      sectionSkillsHint:
+        "每个 skill 是一个独立的 SKILL.md，模型按需调用。最多 20 个，单个 ≤ 64 KB。",
+      sectionSkillsEmpty: "暂无 skill。点击下方按钮添加第一个。",
+      sectionCommands: "Commands",
+      sectionCommandsHint: "Slash commands，用户在聊天里输入 / 触发。最多 20 个。",
+      sectionCommandsEmpty: "暂无 command。",
+      sectionSubagents: "Subagents",
+      sectionSubagentsHint:
+        "可被主 agent 委派的子 agent；markdown 含 frontmatter（model、tools 等）。",
+      sectionSubagentsEmpty: "暂无 subagent。",
+      sectionHooks: "Hooks",
+      sectionHooksHint:
+        "PreToolUse / PostToolUse / SessionStart 等钩子，直接写 hooks.json 内容。32 KB 上限。",
+      sectionHooksWarning:
+        "⚠️ Hooks 中的 command 字段会在你的 runtime 主机上以 shell 命令执行，跟你本机的权限完全相同。只填写你能为之负责的命令；跨用户分发 agent 上线前不要使用 hooks。",
+      sectionMCP: "MCP",
+      sectionMCPHint:
+        "MCP servers。Daemon 会折叠进 plugin.json 的 mcpServers 字段；不要再传 --mcp-config。",
+      sectionAdvanced: "高级",
+      sectionAdvancedHint: "自定义环境变量和 CLI 启动参数。",
+      // Item labels used by RepeatableSpecList.
+      itemSkill: "skill",
+      itemCommand: "command",
+      itemSubagent: "subagent",
+      skillContentPlaceholder: "---\nname: ship\ndescription: ...\n---\n# Ship\n…",
+      commandContentPlaceholder: "---\ndescription: ...\n---\n# /review\n…",
+      subagentContentPlaceholder:
+        "---\nmodel: claude-haiku-4-5\ndescription: …\ntools: [Bash, Read]\n---\n# Fact checker\n…",
     },
   },
   runtimes: {

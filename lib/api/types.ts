@@ -49,6 +49,24 @@ export interface TaskCard {
 
 export type AgentBackendType = "claude";
 
+/**
+ * A single named bundle that gets materialized as a file in the agent's
+ * plugin tree. Shared shape for skills / commands / subagents — the
+ * difference is purely where the daemon writes the file:
+ *   skills    → <plugin>/skills/<name>/SKILL.md
+ *   commands  → <plugin>/commands/<name>.md
+ *   subagents → <plugin>/agents/<name>.md
+ * Content is the full markdown body (including any YAML frontmatter).
+ */
+export interface SkillSpec {
+  name: string;
+  description?: string;
+  content: string;
+}
+
+export type CommandSpec = SkillSpec;
+export type SubagentSpec = SkillSpec;
+
 /** Agent as returned by the backend (jsonb columns are decoded server-side). */
 export interface Agent {
   id: string;
@@ -59,17 +77,40 @@ export interface Agent {
   avatar_url: string | null;
   description: string;
   instructions: string;
+  /** len(instructions); exposed so the UI can render a soft-warning banner. */
+  instructions_bytes?: number;
+  /** Overrides the plugin name written into plugin.json. Empty → derive from handle. */
+  plugin_name?: string;
   backend_type: AgentBackendType;
   model: string | null;
   custom_env: Record<string, string>;
   custom_args: string[];
+  /**
+   * MCP config object. On the wire it stays in its original shape; the daemon
+   * folds it into plugin.json.mcpServers when materializing the plugin tree.
+   * Either {"mcpServers": {...}} (canonical) or {"<server-name>": {...}} (bare)
+   * — see API.md Limits for the validation rule.
+   */
   mcp_config: Record<string, unknown>;
+  skills: SkillSpec[];
+  commands: CommandSpec[];
+  subagents: SubagentSpec[];
+  /**
+   * Verbatim hooks.json blob (decoded to an object). Empty object = no hooks
+   * configured. Daemon writes it to <plugin>/hooks/hooks.json without
+   * validating shell commands — owner self-responsibility model.
+   */
+  hooks: Record<string, unknown>;
   archived: boolean;
   created_at: string;
   updated_at: string;
 }
 
-/** Input shape for POST /agents and PATCH /agents/{id}. Already in decoded form. */
+/**
+ * Input shape for POST /agents and PATCH /agents/{id}. Already in decoded form.
+ * `skills` / `commands` / `subagents` / `hooks` follow the same omit-keep /
+ * empty-clears PATCH semantics as the other JSONB fields.
+ */
 export interface AgentInput {
   runtime_id: string;
   handle: string;
@@ -81,6 +122,11 @@ export interface AgentInput {
   custom_env: Record<string, string>;
   custom_args: string[];
   mcp_config: Record<string, unknown>;
+  skills?: SkillSpec[];
+  commands?: CommandSpec[];
+  subagents?: SubagentSpec[];
+  hooks?: Record<string, unknown>;
+  plugin_name?: string;
 }
 
 export interface Message {

@@ -8,6 +8,7 @@ function mk(handle: string, archived = false): Agent {
     handle, name: handle.toUpperCase(), avatar_url: null,
     description: "", instructions: "", backend_type: "claude",
     model: null, custom_env: {}, custom_args: [], mcp_config: {},
+    skills: [], commands: [], subagents: [], hooks: {},
     archived, created_at: "", updated_at: "",
   };
 }
