@@ -30,4 +30,18 @@ export const queryKeys = {
   approvals: {
     task: (taskId: string) => ["approvals", "task", taskId] as const,
   },
+  friends: {
+    list: () => ["friends"] as const,
+    requests: () => ["friends", "requests"] as const,
+    blocked: () => ["friends", "blocked"] as const,
+    search: (email: string) => ["friends", "search", email] as const,
+  },
+  invitations: {
+    incoming: () => ["invitations", "incoming"] as const,
+    workspace: (wsId: string) => ["invitations", "workspace", wsId] as const,
+  },
+  conversations: {
+    list: () => ["conversations"] as const,
+    messages: (convId: string) => ["conversations", convId, "messages"] as const,
+  },
 } as const;

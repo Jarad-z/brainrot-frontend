@@ -252,3 +252,45 @@ export interface InviteInput {
   email: string;
   role: WorkspaceRole;
 }
+
+export type RelationshipStatus =
+  | "none" | "pending_outgoing" | "pending_incoming"
+  | "accepted" | "blocked_by_me" | "blocked_by_them";
+
+export interface UserSummary {
+  id: string;
+  name: string;
+  email: string;
+  avatar_url?: string;
+  relationship_status: RelationshipStatus;
+}
+
+export interface ConvSummary {
+  id: string;
+  peer: UserSummary;
+  last_message_preview?: string;
+  last_message_at?: string;
+  unread_count: number;
+}
+
+export interface DirectMessage {
+  id: string;
+  conversation_id: string;
+  sender_id: string | null;
+  body: string;
+  created_at: string;
+}
+
+export interface InvitationView {
+  id: string;
+  workspace_id: string;
+  workspace_name?: string;
+  workspace_slug?: string;
+  inviter_id: string;
+  inviter_name?: string;
+  invitee_id: string;
+  invitee_name?: string;
+  invitee_email?: string;
+  role: "owner" | "editor" | "viewer";
+  created_at: string;
+}
