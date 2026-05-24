@@ -71,6 +71,8 @@ export function Sidebar() {
     pathname === "/friends" || pathname.startsWith("/friends/");
   const isMessages =
     pathname === "/messages" || pathname.startsWith("/messages/");
+  const isMarketplace =
+    pathname === "/marketplace" || pathname.startsWith("/marketplace/");
 
   // Global (workspace-agnostic) badge counters. Selector form auto-re-renders
   // when the selected slice changes, so the badge counts update live.
@@ -116,6 +118,11 @@ export function Sidebar() {
           <Link href="/messages">
             <NavItem active={isMessages} swatch="bondi" count={dmCount}>
               Messages
+            </NavItem>
+          </Link>
+          <Link href="/marketplace">
+            <NavItem active={isMarketplace} swatch="tangerine">
+              Marketplace
             </NavItem>
           </Link>
 

@@ -4,10 +4,12 @@ import { useParams } from "next/navigation";
 import { useState } from "react";
 import { useAgent } from "@/hooks/useAgent";
 import { useUpdateAgent } from "@/hooks/useUpdateAgent";
+import { useWorkspaceAgents } from "@/hooks/useWorkspaceAgents";
 import { useWorkspaceRuntimes } from "@/hooks/useWorkspaceRuntimes";
 import { useSession } from "@/hooks/useSession";
 import { AgentForm } from "@/components/agents/AgentForm";
 import { ArchiveAgentButton } from "@/components/agents/ArchiveAgentButton";
+import { PublishAgentToggle } from "@/components/agent/PublishAgentToggle";
 import { ApiError } from "@/lib/api/client";
 import { messages } from "@/lib/messages";
 import type { AgentInput } from "@/lib/api/types";
@@ -16,6 +18,10 @@ export default function AgentDetailPage() {
   const { wsId, agentId } = useParams<{ wsId: string; agentId: string }>();
   const { data: agent, isLoading } = useAgent(agentId);
   const { data: runtimes = [] } = useWorkspaceRuntimes(wsId);
+  // List endpoint returns AgentRefView (with is_installed/visibility/install_id)
+  // — the single-agent GET does not. Use the list cache to discover those fields.
+  const { data: refList = [] } = useWorkspaceAgents(wsId);
+  const agentRef = refList.find((a) => a.id === agentId);
   const { data: me } = useSession();
   const mutation = useUpdateAgent(wsId, agentId);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -72,6 +78,9 @@ export default function AgentDetailPage() {
           key={agent.updated_at}
         />
       </fieldset>
+      {isMine && !agent.archived && agentRef && (
+        <PublishAgentToggle agent={agentRef} />
+      )}
     </main>
   );
 }
