@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useWorkspaceMembers } from "@/hooks/useWorkspaceMembers";
 import { useSession } from "@/hooks/useSession";
 import { MemberRow } from "./MemberRow";
+import { AddMemberFromFriendsDialog } from "./AddMemberFromFriendsDialog";
 import { messages } from "@/lib/messages";
 
 interface Props {
@@ -15,8 +16,7 @@ export function MembersList({ wsId }: Props) {
   const mb = messages.members;
   const { data: members, isLoading, isError } = useWorkspaceMembers(wsId);
   const { data: me } = useSession();
-  // TODO(Task 29): wire `addOpen`/`setAddOpen` to AddMemberFromFriendsDialog.
-  const [, setAddOpen] = useState(false);
+  const [addOpen, setAddOpen] = useState(false);
 
   const viewerRole = members?.find((mem) => mem.user_id === me?.id)?.role;
   const viewerIsOwner = viewerRole === "owner";
@@ -54,6 +54,11 @@ export function MembersList({ wsId }: Props) {
           ))}
         </ul>
       )}
+      <AddMemberFromFriendsDialog
+        open={addOpen}
+        onOpenChange={setAddOpen}
+        wsId={wsId}
+      />
     </section>
   );
 }
