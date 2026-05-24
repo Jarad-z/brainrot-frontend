@@ -44,4 +44,12 @@ export const queryKeys = {
     list: () => ["conversations"] as const,
     messages: (convId: string) => ["conversations", convId, "messages"] as const,
   },
+  marketplace: {
+    search: (q: string) => ["marketplace", "search", q] as const,
+    list: () => ["marketplace", "list"] as const,
+    agent: (agentId: string) => ["marketplace", "agent", agentId] as const,
+  },
+  installs: {
+    workspace: (wsId: string) => ["installs", "workspace", wsId] as const,
+  },
 } as const;

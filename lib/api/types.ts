@@ -289,3 +289,42 @@ export interface InvitationView {
   role: "owner" | "editor" | "viewer";
   created_at: string;
 }
+
+// Marketplace
+export interface PublicAgentView {
+  id: string;
+  handle: string;
+  name: string;
+  avatar_url?: string;
+  description: string;
+  published_at?: string;
+  install_count: number;
+  publisher_id: string;
+  publisher_name: string;
+  publisher_avatar_url?: string;
+}
+
+export interface InstallView {
+  id: string;
+  workspace_id: string;
+  source_agent_id: string;
+  source_handle: string;
+  source_name: string;
+  source_avatar_url?: string;
+  source_description: string;
+  effective_handle: string;
+  alias_handle?: string;
+  publisher_id: string;
+  publisher_name: string;
+  installed_at: string;
+}
+
+// AgentRefView — extends the existing Agent type with marketplace-aware fields.
+// The backend's AgentRefView embeds the full AgentView shape and adds these.
+export interface AgentRefView extends Agent {
+  effective_handle: string;
+  is_installed: boolean;
+  install_id?: string;
+  publisher_workspace_id: string;
+  visibility: "private" | "public";
+}
