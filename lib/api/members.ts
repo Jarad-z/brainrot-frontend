@@ -1,6 +1,5 @@
 import { apiFetch } from "./client";
 import type {
-  InviteInput,
   UpdateWorkspaceInput,
   Workspace,
   WorkspaceMember,
@@ -47,16 +46,6 @@ export async function updateWorkspace(
 ): Promise<Workspace> {
   return apiFetch<Workspace>(`/api/v1/workspaces/${wsId}`, {
     method: "PATCH",
-    body: JSON.stringify(input),
-  });
-}
-
-export async function inviteByEmail(
-  wsId: string,
-  input: InviteInput,
-): Promise<void> {
-  await apiFetch<void>(`/api/v1/workspaces/${wsId}/invitations`, {
-    method: "POST",
     body: JSON.stringify(input),
   });
 }

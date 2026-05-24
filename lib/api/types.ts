@@ -248,11 +248,6 @@ export interface UpdateWorkspaceInput {
   slug?: string;
 }
 
-export interface InviteInput {
-  email: string;
-  role: WorkspaceRole;
-}
-
 export type RelationshipStatus =
   | "none" | "pending_outgoing" | "pending_incoming"
   | "accepted" | "blocked_by_me" | "blocked_by_them";
