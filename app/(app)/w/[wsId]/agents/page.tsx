@@ -142,26 +142,28 @@ export default function AgentsListPage() {
           )}
 
           {installedAgents.length > 0 && (
-            <AgentGroup heading="从 marketplace 安装">
-              {installedAgents.map((a) => (
-                <li
-                  key={a.id}
-                  className={a.archived ? "opacity-60" : undefined}
-                >
-                  <InstalledAgentCard
-                    wsId={wsId}
-                    agent={a}
-                    online={a.runtime_online}
-                    ownerName={ownerNameFor(a, runtimeToUser, memberById)}
-                  />
-                  {a.archived && (
-                    <span className="mt-2 inline-block px-1.5 py-0.5 bg-paper-1 border-[1.5px] border-hairline rounded text-[11px] font-bold text-ink-2">
-                      {messages.agents.archivedBadge}
-                    </span>
-                  )}
-                </li>
-              ))}
-            </AgentGroup>
+            <div className="y2k-page">
+              <AgentGroup heading="从 MARKETPLACE 安装" y2k>
+                {installedAgents.map((a) => (
+                  <li
+                    key={a.id}
+                    className={a.archived ? "opacity-60" : undefined}
+                  >
+                    <InstalledAgentCard
+                      wsId={wsId}
+                      agent={a}
+                      online={a.runtime_online}
+                      ownerName={ownerNameFor(a, runtimeToUser, memberById)}
+                    />
+                    {a.archived && (
+                      <span className="mt-2 inline-block px-1.5 py-0.5 bg-paper-1 border-[1.5px] border-hairline rounded text-[11px] font-bold text-ink-2">
+                        {messages.agents.archivedBadge}
+                      </span>
+                    )}
+                  </li>
+                ))}
+              </AgentGroup>
+            </div>
           )}
         </div>
       )}
@@ -171,16 +173,25 @@ export default function AgentsListPage() {
 
 function AgentGroup({
   heading,
+  y2k = false,
   children,
 }: {
   heading: string;
+  y2k?: boolean;
   children: React.ReactNode;
 }) {
   return (
     <section>
-      <h2 className="mb-3 text-xs font-bold uppercase tracking-wider text-ink-2">
-        {heading}
-      </h2>
+      {y2k ? (
+        <h2 className="y2k-section-heading">
+          <span className="y2k-section-label">{heading}</span>
+          <span className="y2k-section-rule" aria-hidden />
+        </h2>
+      ) : (
+        <h2 className="mb-3 text-xs font-bold uppercase tracking-wider text-ink-2">
+          {heading}
+        </h2>
+      )}
       <ul className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 list-none p-0">
         {children}
       </ul>
@@ -257,10 +268,7 @@ function InstalledAgentCard({
           .toUpperCase()}
         ownerName={ownerName}
       />
-      <div className="flex items-center justify-between gap-2">
-        <span className="inline-block px-1.5 py-0.5 bg-paper-2 border-[1.5px] border-hairline rounded text-[11px] font-bold text-ink-2">
-          已安装
-        </span>
+      <div className="flex items-center justify-end gap-2">
         <button
           type="button"
           onClick={() => {
@@ -268,7 +276,7 @@ function InstalledAgentCard({
             mutation.mutate();
           }}
           disabled={mutation.isPending || !installId}
-          className="px-2.5 py-1 border-[1.5px] border-state-failed text-state-failed rounded-sm font-semibold text-xs disabled:opacity-60"
+          className="y2k-btn y2k-btn-danger"
         >
           {mutation.isPending ? "卸载中…" : "卸载"}
         </button>

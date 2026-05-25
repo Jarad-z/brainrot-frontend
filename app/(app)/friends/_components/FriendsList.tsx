@@ -31,18 +31,15 @@ export function FriendsList() {
     );
   }
   return (
-    <ul className="flex flex-col gap-1">
+    <ul className="flex flex-col gap-3 list-none p-0 m-0">
       {friends.data!.map((f) => (
         <li
           key={f.id}
-          className="flex items-center justify-between gap-3 rounded border border-line px-3 py-2"
+          className="y2k-card flex items-center justify-between gap-3"
         >
-          <UserAvatarChip user={f} />
+          <UserAvatarChip user={f} y2k />
           <div className="flex items-center gap-2">
-            <Link
-              href={`/messages?to=${f.id}`}
-              className="rounded border border-line px-2 py-1 text-xs"
-            >
+            <Link href={`/messages?to=${f.id}`} className="y2k-btn y2k-btn-primary">
               Message
             </Link>
             <button
@@ -52,7 +49,7 @@ export function FriendsList() {
                   removeMu.mutate(f.id);
                 }
               }}
-              className="rounded border border-line px-2 py-1 text-xs"
+              className="y2k-btn y2k-btn-ghost"
               disabled={removeMu.isPending}
             >
               Remove
@@ -64,7 +61,7 @@ export function FriendsList() {
                   blockMu.mutate(f.id);
                 }
               }}
-              className="rounded border border-line px-2 py-1 text-xs text-state-failed"
+              className="y2k-btn y2k-btn-danger"
               disabled={blockMu.isPending}
             >
               Block

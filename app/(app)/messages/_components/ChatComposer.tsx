@@ -38,18 +38,28 @@ export function ChatComposer({ peerId }: ChatComposerProps) {
   }
 
   return (
-    <div className="border-t border-line p-3">
-      <textarea
-        value={body}
-        onChange={(e) => setBody(e.target.value)}
-        onKeyDown={onKeyDown}
-        placeholder="Type a message. Enter to send, Shift+Enter for newline."
-        rows={2}
-        className="w-full resize-none rounded border border-line px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-ink-0"
-        disabled={mu.isPending}
-      />
+    <div className="y2k-composer-bar">
+      <div className="y2k-composer-shell">
+        <textarea
+          value={body}
+          onChange={(e) => setBody(e.target.value)}
+          onKeyDown={onKeyDown}
+          placeholder="Type a message. Enter to send, Shift+Enter for newline."
+          rows={2}
+          className="y2k-composer-input"
+          disabled={mu.isPending}
+        />
+        <button
+          type="button"
+          onClick={submit}
+          disabled={mu.isPending || !body.trim()}
+          className="y2k-btn y2k-btn-primary y2k-composer-send"
+        >
+          {mu.isPending ? "…" : "Send"}
+        </button>
+      </div>
       {mu.isError && (
-        <div className="mt-1 text-xs text-state-failed">
+        <div className="mt-1.5 text-xs text-[var(--y2k-strawberry-deep,#c8385f)] font-bold">
           Failed to send. {mu.error instanceof Error ? mu.error.message : ""}
         </div>
       )}

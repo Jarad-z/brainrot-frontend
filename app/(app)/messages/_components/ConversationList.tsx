@@ -5,7 +5,6 @@ import { useParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/api/keys";
 import { listConversations } from "@/lib/api/conversations";
-import { UserAvatarChip } from "@/components/user/UserAvatarChip";
 
 export function ConversationList() {
   const params = useParams<{ convId?: string }>();
@@ -15,12 +14,14 @@ export function ConversationList() {
     queryFn: listConversations,
   });
 
-  if (convs.isLoading) return <div className="p-3 text-sm text-ink-2">Loading…</div>;
+  if (convs.isLoading) {
+    return <div className="p-4 text-sm text-[#2c3e5a]">Loading…</div>;
+  }
   if ((convs.data ?? []).length === 0) {
     return (
-      <div className="p-3 text-sm text-ink-2">
+      <div className="p-4 text-sm text-[#2c3e5a]">
         No conversations yet. Start one from{" "}
-        <Link href="/friends" className="underline">
+        <Link href="/friends" className="underline font-semibold text-[#1e3a72]">
           /friends
         </Link>
         .
@@ -28,40 +29,79 @@ export function ConversationList() {
     );
   }
   return (
-    <ul className="flex flex-col">
+    <ul className="flex flex-col gap-2 p-3 list-none m-0">
       {convs.data!.map((c) => {
         const isActive = c.id === activeId;
+        const initials = c.peer.name
+          .split(" ")
+          .map((s) => s[0])
+          .join("")
+          .slice(0, 2)
+          .toUpperCase();
         return (
           <li key={c.id}>
             <Link
               href={`/messages/${c.id}`}
               className={
-                "flex items-start gap-3 px-3 py-2 border-b border-line " +
-                (isActive ? "bg-hairline" : "hover:bg-paper-2")
+                "y2k-card y2k-thread flex items-center gap-3" +
+                (isActive ? " y2k-thread-active" : "")
               }
             >
-              <UserAvatarChip user={c.peer} size="md" />
-              <div className="ml-auto flex flex-col items-end gap-1">
-                {c.unread_count > 0 && (
-                  <span className="rounded-full bg-ink-0 px-1.5 text-[10px] text-paper-0 leading-tight py-0.5">
-                    {c.unread_count}
-                  </span>
+              <div
+                data-y2k-avatar="true"
+                className="h-10 w-10 shrink-0 flex items-center justify-center text-sm overflow-hidden"
+              >
+                {c.peer.avatar_url ? (
+                  <img
+                    src={c.peer.avatar_url}
+                    alt=""
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <span>{initials || "?"}</span>
                 )}
-                {c.last_message_at && (
-                  <span className="text-[10px] text-ink-2">
-                    {new Date(c.last_message_at).toLocaleDateString()}
+              </div>
+              <div className="flex-1 min-w-0 flex flex-col gap-0.5">
+                <div className="flex items-baseline justify-between gap-2">
+                  <span className="text-[13px] font-bold text-[#1e3a72] truncate">
+                    {c.peer.name}
                   </span>
-                )}
+                  {c.last_message_at && (
+                    <span className="text-[10px] text-[#6c8acd] font-mono shrink-0">
+                      {formatStamp(c.last_message_at)}
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-[12px] text-[#4a5b80] truncate">
+                    {c.last_message_preview || (
+                      <span className="italic text-[#6c8acd]">no messages</span>
+                    )}
+                  </span>
+                  {c.unread_count > 0 && (
+                    <span className="y2k-unread-pip shrink-0">
+                      {c.unread_count}
+                    </span>
+                  )}
+                </div>
               </div>
             </Link>
-            {c.last_message_preview && (
-              <div className="px-3 pb-2 text-xs text-ink-2 line-clamp-1">
-                {c.last_message_preview}
-              </div>
-            )}
           </li>
         );
       })}
     </ul>
   );
+}
+
+function formatStamp(iso: string): string {
+  const d = new Date(iso);
+  const now = new Date();
+  const sameDay =
+    d.getFullYear() === now.getFullYear() &&
+    d.getMonth() === now.getMonth() &&
+    d.getDate() === now.getDate();
+  if (sameDay) {
+    return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  }
+  return `${d.getMonth() + 1}/${d.getDate()}`;
 }

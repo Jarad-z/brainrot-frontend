@@ -14,24 +14,28 @@ export default function FriendsPage() {
   const [searchOpen, setSearchOpen] = useState(false);
 
   return (
-    <div className="flex flex-col gap-4 p-6">
+    <div className="y2k-page flex flex-col gap-5 p-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold">Friends</h1>
+        <div>
+          <h1 className="y2k-hero">Friends</h1>
+          <div className="y2k-hero-sub">your circle on brainrot</div>
+        </div>
         <button
-          className="rounded bg-ink-0 px-3 py-1.5 text-sm text-paper-0"
+          type="button"
+          className="y2k-btn y2k-btn-primary"
           onClick={() => setSearchOpen(true)}
         >
-          Add by email
+          + Add by email
         </button>
       </div>
-      <nav className="flex gap-4 border-b border-line">
+      <nav className="y2k-tabs" role="tablist">
         {(["friends", "requests", "invitations", "blocked"] as Tab[]).map((t) => (
           <button
             key={t}
-            className={
-              "pb-2 text-sm " +
-              (tab === t ? "border-b-2 border-ink-0 font-medium" : "text-ink-2")
-            }
+            type="button"
+            role="tab"
+            aria-selected={tab === t}
+            className={"y2k-tab" + (tab === t ? " y2k-tab-active" : "")}
             onClick={() => setTab(t)}
           >
             {t.charAt(0).toUpperCase() + t.slice(1)}

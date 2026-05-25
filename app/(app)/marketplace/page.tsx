@@ -24,13 +24,12 @@ export default function MarketplacePage() {
   const items = agents.data ?? [];
 
   return (
-    <div className="flex flex-col gap-4 p-6 max-w-5xl mx-auto">
-      <header className="flex flex-col gap-2">
-        <h1 className="text-xl font-semibold">Agent marketplace</h1>
-        <p className="text-sm text-ink-2">
-          Browse public agents shared by other users. Install one to your
-          workspace to @-call it — the task will run on the publisher&apos;s
-          daemon.
+    <div className="y2k-page flex flex-col gap-5 p-6 max-w-5xl mx-auto">
+      <header className="flex flex-col gap-1.5">
+        <h1 className="y2k-hero">Agent marketplace</h1>
+        <p className="y2k-hero-sub">
+          browse public agents shared by other users · install one to your
+          workspace to @-call it
         </p>
       </header>
       <input
@@ -38,17 +37,17 @@ export default function MarketplacePage() {
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         placeholder="Search by handle, name, or description…"
-        className="rounded border border-line px-3 py-2 text-sm bg-paper-0"
+        className="y2k-input"
         autoFocus
       />
       {agents.isLoading ? (
-        <div className="py-6 text-sm text-ink-2">Loading…</div>
+        <div className="py-6 text-sm text-[#2c3e5a]">Loading…</div>
       ) : agents.isError ? (
-        <div className="py-6 text-sm text-state-failed">
+        <div className="py-6 text-sm text-[var(--y2k-strawberry-deep)]">
           Failed to load marketplace.
         </div>
       ) : items.length === 0 ? (
-        <div className="py-6 text-sm text-ink-2">
+        <div className="py-6 text-sm text-[#2c3e5a]">
           {debounced
             ? `No public agents match “${debounced}”.`
             : "No public agents yet."}

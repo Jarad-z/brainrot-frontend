@@ -15,24 +15,57 @@ export default function ConversationPage() {
     queryFn: listConversations,
   });
   const current = convs.data?.find((c) => c.id === convId);
+  const peerInitials = current?.peer.name
+    ?.split(" ")
+    .map((s) => s[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
 
   return (
-    <div className="flex h-full">
-      <aside className="w-80 border-r border-line overflow-y-auto">
+    <div className="y2k-page flex h-full">
+      <aside className="w-80 overflow-y-auto shrink-0 y2k-rail">
+        <div className="px-4 pt-5 pb-2">
+          <h1 className="y2k-hero" style={{ fontSize: 22 }}>
+            Messages
+          </h1>
+          <div className="y2k-hero-sub">your conversations</div>
+        </div>
         <ConversationList />
       </aside>
-      <main className="flex flex-1 flex-col">
+      <main className="flex flex-1 flex-col min-w-0">
         {current ? (
           <>
-            <header className="border-b border-line p-3 font-medium">
-              {current.peer.name}
+            <header className="y2k-thread-header flex items-center gap-3">
+              <div
+                data-y2k-avatar="true"
+                className="h-8 w-8 flex items-center justify-center text-xs overflow-hidden shrink-0"
+              >
+                {current.peer.avatar_url ? (
+                  <img
+                    src={current.peer.avatar_url}
+                    alt=""
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <span>{peerInitials || "?"}</span>
+                )}
+              </div>
+              <div className="flex flex-col leading-tight min-w-0">
+                <span className="y2k-thread-header-name truncate">
+                  {current.peer.name}
+                </span>
+                <span className="text-[11px] text-[#6c8acd] font-mono truncate">
+                  {current.peer.email}
+                </span>
+              </div>
             </header>
             <ChatPane convId={convId} peer={current.peer} />
             <ChatComposer peerId={current.peer.id} />
           </>
         ) : (
-          <div className="flex flex-1 items-center justify-center text-ink-2">
-            Loading…
+          <div className="flex flex-1 items-center justify-center">
+            <span className="y2k-empty-text">Loading…</span>
           </div>
         )}
       </main>

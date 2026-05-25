@@ -19,9 +19,12 @@ export function AgentMarketplaceCard({
     .toUpperCase();
 
   return (
-    <div className="rounded border border-line bg-paper-0 p-4 flex flex-col gap-3">
+    <div className="y2k-card y2k-marketplace-tile flex flex-col gap-3">
       <div className="flex items-start gap-3">
-        <div className="h-10 w-10 rounded-full bg-hairline flex items-center justify-center text-sm font-medium shrink-0 overflow-hidden">
+        <div
+          data-y2k-avatar="true"
+          className="h-11 w-11 flex items-center justify-center text-sm shrink-0 overflow-hidden"
+        >
           {agent.avatar_url ? (
             <img
               src={agent.avatar_url}
@@ -35,19 +38,19 @@ export function AgentMarketplaceCard({
         <div className="flex-1 min-w-0">
           <Link
             href={`/marketplace/${agent.id}`}
-            className="text-sm font-semibold text-ink-0 hover:underline"
+            className="text-[14px] font-bold text-[var(--y2k-fb-blue-deep)] hover:underline"
           >
             @{agent.handle}
           </Link>
-          <div className="text-xs text-ink-2 truncate">{agent.name}</div>
+          <div className="text-[12px] text-[#4a5b80] truncate">{agent.name}</div>
         </div>
-        <div className="text-xs text-ink-2 shrink-0">
+        <div className="y2k-chip shrink-0">
           {agent.install_count} install{agent.install_count === 1 ? "" : "s"}
         </div>
       </div>
       {agent.description && (
         <p
-          className={`text-sm text-ink-1 whitespace-pre-wrap ${
+          className={`text-[13px] text-[#2c3e5a] whitespace-pre-wrap m-0 ${
             variant === "compact" ? "line-clamp-2" : ""
           }`}
         >
@@ -62,7 +65,7 @@ export function AgentMarketplaceCard({
         mcpServers={agent.mcp_servers}
         variant={variant}
       />
-      <div className="flex items-center justify-between text-xs text-ink-2">
+      <div className="flex items-center justify-between text-[11px] text-[#6c8acd] font-mono">
         <span>by {agent.publisher_name}</span>
         {agent.published_at && (
           <span>{new Date(agent.published_at).toLocaleDateString()}</span>

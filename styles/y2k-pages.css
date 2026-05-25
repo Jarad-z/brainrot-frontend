@@ -1,0 +1,826 @@
+/* ================================================================
+   y2k-pages.css — bespoke iMac G3 + Facebook-2007 plastic restyle
+   ----------------------------------------------------------------
+   Scoped under .y2k-page so the rest of the app keeps its current
+   personality. Three pages opt in: /friends, /w/[wsId]/agents (the
+   "installed from marketplace" group), and the installed-agent
+   card inside that group.
+
+   Anchors:
+   - iMac G3 / Aqua: Bondi candy, mirror-line glossy lozenges,
+     pillow plastic with chunky outer shadow, LED traffic-light dots.
+   - Facebook 2007: deep navy blue palette (#3b5998 family), bold
+     Lucida display headings on white panels, hairline tabs with
+     a single "selected" lozenge that looks pressed-in.
+   ================================================================ */
+
+.y2k-page {
+  /* Local design tokens — kept on the wrapper so we don't bleed into
+     unrelated parts of the app. */
+  --y2k-fb-blue:        #3b5998;  /* the canonical 2007 Facebook chrome */
+  --y2k-fb-blue-deep:   #1e3a72;
+  --y2k-fb-blue-light:  #6c8acd;
+  --y2k-fb-blue-pale:   #d8dfea;
+
+  --y2k-aqua-top:    #c8e0f4;
+  --y2k-aqua-mid:    #6cb6ff;
+  --y2k-aqua-dark:   #2a78d8;
+  --y2k-aqua-deep:   #1a5cb0;
+
+  --y2k-bondi:       #0aa7c4;
+  --y2k-bondi-deep:  #006e87;
+  --y2k-bondi-glow:  #5fd6ec;
+
+  --y2k-strawberry:       #ff5d8f;
+  --y2k-strawberry-deep:  #c8385f;
+
+  --y2k-plastic-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    inset 0 -1px 0 rgba(0, 80, 110, 0.22),
+    0 0 0 1px rgba(255, 255, 255, 0.7),
+    0 0 0 2px rgba(20, 60, 110, 0.22),
+    0 10px 22px -10px rgba(0, 60, 90, 0.40),
+    0 3px 6px -2px rgba(0, 60, 90, 0.22);
+
+  font-family:
+    "Lucida Grande", "Lucida Sans Unicode", "Trebuchet MS",
+    "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
+}
+
+/* ----------------------------------------------------------------
+   Hero — page title in soft Lucida display with a 2-pass shadow
+   that fakes the early-Aqua "wet" text effect. The subline reads
+   like Facebook's old grey "find your friends" deck.
+   ---------------------------------------------------------------- */
+.y2k-page .y2k-hero {
+  font-family:
+    "Lucida Grande", "Lucida Sans Unicode", "Trebuchet MS",
+    system-ui, sans-serif;
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.005em;
+  line-height: 1.1;
+  color: var(--y2k-fb-blue-deep);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.85);
+  margin: 0;
+}
+.y2k-page .y2k-hero-sub {
+  font-family:
+    "Lucida Grande", "Lucida Sans Unicode", "Trebuchet MS",
+    system-ui, sans-serif;
+  font-size: 12px;
+  color: #2c3e5a;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);
+  letter-spacing: 0.01em;
+  margin-top: 2px;
+}
+
+/* ----------------------------------------------------------------
+   Section heading — uppercase tracking + Facebook-style pinstripe
+   rule that fills the rest of the row. Used for "从 MARKETPLACE
+   安装" and "自有 agent" group headings.
+   ---------------------------------------------------------------- */
+.y2k-page .y2k-section-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.y2k-page .y2k-section-heading > .y2k-section-label {
+  font-family:
+    "Lucida Grande", "Lucida Sans Unicode", "Trebuchet MS",
+    system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--y2k-fb-blue-deep);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);
+  flex-shrink: 0;
+}
+.y2k-page .y2k-section-heading > .y2k-section-rule {
+  flex: 1;
+  height: 6px;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      rgba(59, 89, 152, 0.30) 0px,
+      rgba(59, 89, 152, 0.30) 1px,
+      transparent 1px,
+      transparent 2px
+    );
+  border-radius: 1px;
+  margin-bottom: 2px;
+}
+
+/* ----------------------------------------------------------------
+   Plastic card — chunky pillow with snow-plastic crescent at the
+   top. Replaces the flat 1px-border list rows.
+   ---------------------------------------------------------------- */
+.y2k-page .y2k-card {
+  position: relative;
+  background:
+    radial-gradient(120% 60% at 50% 0%,
+      rgba(255, 255, 255, 0.95) 0%,
+      rgba(255, 255, 255, 0.45) 22%,
+      rgba(255, 255, 255, 0.12) 45%,
+      rgba(255, 255, 255, 0) 60%),
+    linear-gradient(180deg,
+      rgba(255, 255, 255, 0.85) 0%,
+      rgba(255, 255, 255, 0.40) 38%,
+      rgba(0, 60, 90, 0.08) 100%),
+    linear-gradient(180deg, #ffffff 0%, #eaf4fb 100%);
+  border: none;
+  border-radius: 18px;
+  box-shadow: var(--y2k-plastic-shadow);
+  padding: 14px 18px;
+  transition:
+    box-shadow 160ms ease,
+    transform 160ms ease,
+    filter 160ms ease;
+}
+.y2k-page .y2k-card:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.02) saturate(1.05);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    inset 0 -1px 0 rgba(0, 80, 110, 0.22),
+    0 0 0 1px rgba(255, 255, 255, 0.7),
+    0 0 0 2px rgba(20, 60, 110, 0.32),
+    0 14px 28px -10px rgba(0, 60, 90, 0.48),
+    0 3px 6px -2px rgba(0, 60, 90, 0.22),
+    0 0 18px rgba(108, 182, 255, 0.30);
+}
+
+/* ----------------------------------------------------------------
+   3D candy Bondi avatar — opt in via data-y2k-avatar. Turns any
+   square or rounded avatar tile into a glossy ball with a wet
+   highlight and a Bondi gradient core.
+   ---------------------------------------------------------------- */
+.y2k-page [data-y2k-avatar] {
+  background:
+    radial-gradient(circle at 30% 25%, #ffffff 0%, rgba(255, 255, 255, 0.45) 22%, transparent 55%),
+    radial-gradient(circle at 50% 60%, var(--y2k-bondi-glow) 0%, var(--y2k-bondi) 55%, var(--y2k-bondi-deep) 100%) !important;
+  color: #ffffff !important;
+  border-radius: 50% !important;
+  border: none !important;
+  text-shadow: 0 1px 1px rgba(0, 30, 50, 0.40);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.75),
+    inset 0 -2px 4px rgba(0, 30, 60, 0.30),
+    0 2px 4px rgba(0, 60, 90, 0.30),
+    0 0 0 1px rgba(0, 60, 90, 0.30) !important;
+  font-weight: 700;
+}
+/* The img inside an avatar still needs to clip to the circle. */
+.y2k-page [data-y2k-avatar] img {
+  border-radius: 50%;
+}
+
+/* ----------------------------------------------------------------
+   LED traffic-light status dot — replaces the open-circle/dot used
+   for "online / offline". Opt in via data-y2k-led="green|gray".
+   ---------------------------------------------------------------- */
+.y2k-page [data-y2k-led] {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background:
+    radial-gradient(circle at 30% 25%, #fff 0%, rgba(255, 255, 255, 0.30) 22%, transparent 55%),
+    radial-gradient(circle at 50% 60%,
+      var(--y2k-led-c, #58dd66) 0%,
+      var(--y2k-led-c-deep, #1d9c2b) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.65),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.22),
+    0 1px 1px rgba(0, 0, 0, 0.25),
+    0 0 0 1px rgba(0, 0, 0, 0.18);
+}
+.y2k-page [data-y2k-led="green"] {
+  --y2k-led-c: #58dd66;
+  --y2k-led-c-deep: #1d9c2b;
+  animation: y2k-led-pulse 2.2s ease-in-out infinite;
+}
+.y2k-page [data-y2k-led="gray"] {
+  --y2k-led-c: #c8d1d8;
+  --y2k-led-c-deep: #7a8896;
+}
+@keyframes y2k-led-pulse {
+  0%, 100% { filter: brightness(1) drop-shadow(0 0 0 rgba(88, 221, 102, 0)); }
+  50%      { filter: brightness(1.12) drop-shadow(0 0 4px rgba(88, 221, 102, 0.55)); }
+}
+
+/* ----------------------------------------------------------------
+   Status pill — the "● ONLINE / ○ OFFLINE" badge container. Mono
+   spaced uppercase with a subtle text shadow.
+   ---------------------------------------------------------------- */
+.y2k-page .y2k-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family:
+    "Lucida Console", "Courier New", "Microsoft YaHei", monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+.y2k-page .y2k-status-pill[data-online="true"]  { color: #1d9c2b; }
+.y2k-page .y2k-status-pill[data-online="false"] { color: #7a8896; }
+
+/* ----------------------------------------------------------------
+   AQUA / FACEBOOK BUTTONS
+   y2k-btn-primary — glossy blue lozenge with mirror line (Aqua).
+                     Uses the 2007 Facebook blue family for the
+                     bottom band instead of pure cyan; reads more
+                     "Profile / Add Friend" than "OS X 10.0".
+   y2k-btn-danger  — strawberry candy lozenge (delete/block/uninstall).
+   y2k-btn-ghost   — chiseled pale plastic for secondary actions.
+   ---------------------------------------------------------------- */
+.y2k-page .y2k-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-family:
+    "Lucida Grande", "Lucida Sans Unicode", "Trebuchet MS",
+    system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  padding: 6px 16px;
+  min-height: 26px;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+  transition:
+    filter 120ms ease,
+    box-shadow 120ms ease,
+    transform 80ms ease;
+}
+.y2k-page .y2k-btn:focus-visible {
+  outline: none;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.85),
+    inset 0 -2px 4px rgba(0, 20, 60, 0.30),
+    0 0 0 1px rgba(20, 60, 110, 0.55),
+    0 0 0 3px rgba(108, 182, 255, 0.55);
+}
+
+.y2k-page .y2k-btn-primary {
+  background:
+    /* top wet highlight */
+    linear-gradient(180deg,
+      rgba(255, 255, 255, 0.95) 0%,
+      rgba(255, 255, 255, 0.55) 8%,
+      rgba(255, 255, 255, 0.12) 45%,
+      rgba(255, 255, 255, 0) 50%),
+    /* Aqua pinstripe vertical lines */
+    repeating-linear-gradient(90deg,
+      rgba(255, 255, 255, 0.08) 0px,
+      rgba(255, 255, 255, 0.08) 1px,
+      transparent 1px,
+      transparent 3px),
+    /* color body — Facebook 2007 blue family */
+    linear-gradient(180deg,
+      var(--y2k-fb-blue-light) 0%,
+      var(--y2k-fb-blue) 50%,
+      var(--y2k-fb-blue-deep) 100%);
+  color: #ffffff;
+  text-shadow: 0 1px 0 rgba(0, 20, 60, 0.45);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.85),
+    inset 0 -2px 4px rgba(0, 20, 60, 0.35),
+    0 0 0 1px rgba(20, 60, 110, 0.55),
+    0 6px 12px -4px rgba(10, 60, 120, 0.45);
+}
+.y2k-page .y2k-btn-primary:hover {
+  filter: brightness(1.10) saturate(1.10);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    inset 0 -2px 4px rgba(0, 20, 60, 0.35),
+    0 0 0 1px rgba(20, 60, 110, 0.65),
+    0 8px 16px -4px rgba(10, 60, 120, 0.55),
+    0 0 18px rgba(108, 138, 205, 0.55);
+}
+.y2k-page .y2k-btn-primary:active {
+  transform: translateY(1px) scale(0.98);
+  filter: brightness(0.92);
+  box-shadow:
+    inset 0 2px 4px rgba(0, 20, 60, 0.45),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.40),
+    0 0 0 1px rgba(20, 60, 110, 0.65);
+}
+
+.y2k-page .y2k-btn-danger {
+  background:
+    linear-gradient(180deg,
+      rgba(255, 255, 255, 0.92) 0%,
+      rgba(255, 255, 255, 0.50) 8%,
+      rgba(255, 255, 255, 0.10) 45%,
+      rgba(255, 255, 255, 0) 50%),
+    repeating-linear-gradient(90deg,
+      rgba(255, 255, 255, 0.08) 0px,
+      rgba(255, 255, 255, 0.08) 1px,
+      transparent 1px,
+      transparent 3px),
+    linear-gradient(180deg, #ffa3bc 0%, var(--y2k-strawberry) 50%, var(--y2k-strawberry-deep) 100%);
+  color: #ffffff;
+  text-shadow: 0 1px 0 rgba(120, 20, 50, 0.45);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.85),
+    inset 0 -2px 4px rgba(120, 20, 50, 0.32),
+    0 0 0 1px rgba(160, 40, 80, 0.55),
+    0 6px 12px -4px rgba(160, 40, 80, 0.40);
+}
+.y2k-page .y2k-btn-danger:hover {
+  filter: brightness(1.08) saturate(1.10);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    inset 0 -2px 4px rgba(120, 20, 50, 0.35),
+    0 0 0 1px rgba(160, 40, 80, 0.65),
+    0 8px 16px -4px rgba(160, 40, 80, 0.55),
+    0 0 18px rgba(255, 93, 143, 0.50);
+}
+.y2k-page .y2k-btn-danger:active {
+  transform: translateY(1px) scale(0.98);
+  filter: brightness(0.94);
+}
+
+.y2k-page .y2k-btn-ghost {
+  background:
+    linear-gradient(180deg,
+      rgba(255, 255, 255, 0.95) 0%,
+      rgba(255, 255, 255, 0.50) 45%,
+      rgba(0, 0, 0, 0.04) 100%),
+    linear-gradient(180deg, #ffffff 0%, #e2e8ee 100%);
+  color: #2c3e5a;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.85);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    inset 0 -1px 0 rgba(80, 100, 130, 0.20),
+    0 0 0 1px rgba(120, 140, 165, 0.55),
+    0 2px 4px -1px rgba(80, 100, 130, 0.20);
+}
+.y2k-page .y2k-btn-ghost:hover {
+  filter: brightness(1.04);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    inset 0 -1px 0 rgba(80, 100, 130, 0.22),
+    0 0 0 1px rgba(80, 110, 160, 0.65),
+    0 4px 8px -2px rgba(80, 100, 130, 0.32);
+}
+.y2k-page .y2k-btn-ghost:active {
+  transform: translateY(1px) scale(0.985);
+  filter: brightness(0.96);
+  box-shadow:
+    inset 0 2px 3px rgba(80, 100, 130, 0.28),
+    0 0 0 1px rgba(80, 110, 160, 0.55);
+}
+
+.y2k-page .y2k-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  filter: saturate(0.6);
+}
+
+/* ----------------------------------------------------------------
+   AQUA TABS — selected tab becomes a pressed-in glossy lozenge,
+   inactive tabs are quiet text with a soft hover wash.
+   Mounted on a navy underline that recalls the 2007 FB top-tab strip.
+   ---------------------------------------------------------------- */
+.y2k-page .y2k-tabs {
+  display: inline-flex;
+  align-self: flex-start;
+  width: max-content;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  background:
+    linear-gradient(180deg, #ffffff 0%, #eaf0f7 100%);
+  border-radius: 999px;
+  box-shadow:
+    inset 0 1px 2px rgba(20, 50, 100, 0.18),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.85),
+    0 0 0 1px rgba(120, 140, 170, 0.45);
+}
+.y2k-page .y2k-tab {
+  font-family:
+    "Lucida Grande", "Lucida Sans Unicode", "Trebuchet MS",
+    system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  padding: 5px 14px;
+  min-height: 24px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: #4a5b80;
+  cursor: pointer;
+  transition: background 120ms ease, color 120ms ease, box-shadow 120ms ease;
+}
+.y2k-page .y2k-tab:hover {
+  background: rgba(108, 138, 205, 0.14);
+  color: var(--y2k-fb-blue-deep);
+}
+.y2k-page .y2k-tab-active,
+.y2k-page .y2k-tab[aria-selected="true"] {
+  background:
+    linear-gradient(180deg,
+      rgba(255, 255, 255, 0.95) 0%,
+      rgba(255, 255, 255, 0.55) 8%,
+      rgba(255, 255, 255, 0.12) 45%,
+      rgba(255, 255, 255, 0) 50%),
+    repeating-linear-gradient(90deg,
+      rgba(255, 255, 255, 0.08) 0px,
+      rgba(255, 255, 255, 0.08) 1px,
+      transparent 1px,
+      transparent 3px),
+    linear-gradient(180deg,
+      var(--y2k-fb-blue-light) 0%,
+      var(--y2k-fb-blue) 50%,
+      var(--y2k-fb-blue-deep) 100%);
+  color: #ffffff;
+  text-shadow: 0 1px 0 rgba(0, 20, 60, 0.40);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.80),
+    inset 0 -2px 3px rgba(0, 20, 60, 0.30),
+    0 0 0 1px rgba(20, 60, 110, 0.55),
+    0 2px 4px -1px rgba(10, 60, 120, 0.35);
+}
+
+/* ----------------------------------------------------------------
+   "Installed" badge — small glossy chip that sits next to the
+   uninstall button on marketplace cards.
+   ---------------------------------------------------------------- */
+.y2k-page .y2k-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family:
+    "Lucida Grande", "Lucida Sans Unicode", "Trebuchet MS",
+    system-ui, sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background:
+    linear-gradient(180deg,
+      rgba(255, 255, 255, 0.90) 0%,
+      rgba(255, 255, 255, 0.45) 45%,
+      rgba(0, 60, 90, 0.06) 100%),
+    linear-gradient(180deg, #e0ecf5 0%, #c6d7e8 100%);
+  color: #1e3a72;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.85);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.85),
+    0 0 0 1px rgba(80, 110, 160, 0.45);
+}
+
+/* ----------------------------------------------------------------
+   MESSAGES PAGE — thread list rail + thread row + empty pane.
+   ---------------------------------------------------------------- */
+
+/* Left rail — subtle vertical separator that recalls a window split */
+.y2k-page .y2k-rail {
+  position: relative;
+}
+.y2k-page .y2k-rail::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 1px;
+  background:
+    linear-gradient(180deg,
+      rgba(20, 60, 110, 0) 0%,
+      rgba(20, 60, 110, 0.20) 12%,
+      rgba(20, 60, 110, 0.20) 88%,
+      rgba(20, 60, 110, 0) 100%);
+  box-shadow: 1px 0 0 rgba(255, 255, 255, 0.6);
+}
+
+/* Thread row — a y2k-card variant tuned for tight stacking. */
+.y2k-page .y2k-thread {
+  padding: 10px 12px;
+  border-radius: 14px;
+  text-decoration: none;
+}
+.y2k-page .y2k-thread:hover {
+  text-decoration: none;
+}
+.y2k-page .y2k-thread-active {
+  background:
+    linear-gradient(180deg,
+      rgba(255, 255, 255, 0.95) 0%,
+      rgba(255, 255, 255, 0.55) 8%,
+      rgba(255, 255, 255, 0.15) 45%,
+      rgba(255, 255, 255, 0) 50%),
+    repeating-linear-gradient(90deg,
+      rgba(255, 255, 255, 0.08) 0px,
+      rgba(255, 255, 255, 0.08) 1px,
+      transparent 1px,
+      transparent 3px),
+    linear-gradient(180deg,
+      var(--y2k-fb-blue-light) 0%,
+      var(--y2k-fb-blue) 50%,
+      var(--y2k-fb-blue-deep) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.85),
+    inset 0 -2px 4px rgba(0, 20, 60, 0.30),
+    0 0 0 1px rgba(20, 60, 110, 0.55),
+    0 6px 14px -4px rgba(10, 60, 120, 0.45);
+}
+.y2k-page .y2k-thread-active *,
+.y2k-page .y2k-thread-active .text-\[\#1e3a72\],
+.y2k-page .y2k-thread-active .text-\[\#4a5b80\],
+.y2k-page .y2k-thread-active .text-\[\#6c8acd\] {
+  color: #ffffff !important;
+  text-shadow: 0 1px 0 rgba(0, 20, 60, 0.30);
+}
+
+/* Unread pip — small Bondi badge with white number */
+.y2k-page .y2k-unread-pip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 6px;
+  font-family:
+    "Lucida Grande", "Lucida Sans Unicode", "Trebuchet MS",
+    system-ui, sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  color: #ffffff;
+  text-shadow: 0 1px 0 rgba(120, 20, 50, 0.45);
+  border-radius: 999px;
+  background:
+    linear-gradient(180deg,
+      rgba(255, 255, 255, 0.85) 0%,
+      rgba(255, 255, 255, 0.30) 45%,
+      rgba(255, 255, 255, 0) 60%),
+    linear-gradient(180deg, var(--y2k-strawberry) 0%, var(--y2k-strawberry-deep) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.75),
+    inset 0 -1px 2px rgba(120, 20, 50, 0.30),
+    0 0 0 1px rgba(160, 40, 80, 0.50);
+}
+
+/* Chat header strip when a draft conversation is loaded */
+.y2k-page .y2k-thread-header {
+  padding: 12px 18px;
+  background:
+    linear-gradient(180deg,
+      rgba(255, 255, 255, 0.85) 0%,
+      rgba(255, 255, 255, 0.40) 100%),
+    linear-gradient(180deg, #ffffff 0%, #e6f2fa 100%);
+  border-bottom: 1px solid rgba(20, 60, 110, 0.18);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95);
+}
+.y2k-page .y2k-thread-header-name {
+  font-family:
+    "Lucida Grande", "Lucida Sans Unicode", "Trebuchet MS",
+    system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--y2k-fb-blue-deep);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.85);
+}
+
+/* Empty state — intentional "select a conversation" card */
+.y2k-page .y2k-empty-text {
+  font-family:
+    "Lucida Grande", "Lucida Sans Unicode", "Trebuchet MS",
+    system-ui, sans-serif;
+  font-size: 13px;
+  color: #2c3e5a;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+.y2k-page .y2k-empty-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 32px 40px;
+  max-width: 360px;
+  text-align: center;
+}
+.y2k-page .y2k-empty-glyph {
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  color: #ffffff;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 30% 25%, #ffffff 0%, rgba(255, 255, 255, 0.45) 22%, transparent 55%),
+    radial-gradient(circle at 50% 60%, var(--y2k-bondi-glow) 0%, var(--y2k-bondi) 55%, var(--y2k-bondi-deep) 100%);
+  text-shadow: 0 1px 1px rgba(0, 30, 50, 0.40);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.75),
+    inset 0 -2px 4px rgba(0, 30, 60, 0.30),
+    0 4px 10px rgba(0, 60, 90, 0.30),
+    0 0 0 1px rgba(0, 60, 90, 0.30);
+}
+.y2k-page .y2k-empty-title {
+  font-family:
+    "Lucida Grande", "Lucida Sans Unicode", "Trebuchet MS",
+    system-ui, sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--y2k-fb-blue-deep);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.85);
+}
+.y2k-page .y2k-empty-sub {
+  font-family:
+    "Lucida Grande", "Lucida Sans Unicode", "Trebuchet MS",
+    system-ui, sans-serif;
+  font-size: 12px;
+  color: #4a5b80;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+  max-width: 280px;
+  line-height: 1.5;
+}
+
+/* ----------------------------------------------------------------
+   MARKETPLACE PAGE — search input + agent tile.
+   ---------------------------------------------------------------- */
+.y2k-page .y2k-input {
+  font-family:
+    "Lucida Grande", "Lucida Sans Unicode", "Trebuchet MS",
+    system-ui, sans-serif;
+  font-size: 13px;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 999px;
+  background:
+    linear-gradient(180deg,
+      rgba(255, 255, 255, 0.85) 0%,
+      rgba(255, 255, 255, 0.95) 35%,
+      #ffffff 100%);
+  color: #1e3a72;
+  box-shadow:
+    inset 0 1px 3px rgba(20, 50, 100, 0.22),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.85),
+    0 0 0 1px rgba(120, 140, 170, 0.45);
+  outline: none;
+  transition: box-shadow 140ms ease;
+}
+.y2k-page .y2k-input::placeholder {
+  color: #8a99b8;
+}
+.y2k-page .y2k-input:focus-visible {
+  box-shadow:
+    inset 0 1px 3px rgba(20, 50, 100, 0.18),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.85),
+    0 0 0 1px rgba(20, 60, 110, 0.55),
+    0 0 0 3px rgba(108, 138, 205, 0.45);
+}
+
+/* Marketplace agent tile — y2k-card with stronger lift on hover */
+.y2k-page .y2k-marketplace-tile {
+  padding: 16px 18px;
+}
+.y2k-page .y2k-marketplace-tile a {
+  text-decoration: none;
+}
+
+/* ----------------------------------------------------------------
+   CHAT BUBBLES — peer = snow plastic, mine = Aqua candy pill.
+   Both lozenge-shaped with the iconic mirror-line glossy top.
+   ---------------------------------------------------------------- */
+.y2k-page .y2k-bubble-peer,
+.y2k-page .y2k-bubble-mine {
+  font-family:
+    "Lucida Grande", "Lucida Sans Unicode", "Trebuchet MS",
+    "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  padding: 9px 16px;
+  border-radius: 20px;
+  border: none;
+  position: relative;
+}
+
+/* Peer bubble — snow-white plastic with wet crescent top */
+.y2k-page .y2k-bubble-peer {
+  background:
+    radial-gradient(120% 60% at 50% 0%,
+      rgba(255, 255, 255, 0.95) 0%,
+      rgba(255, 255, 255, 0.45) 22%,
+      rgba(255, 255, 255, 0.12) 45%,
+      rgba(255, 255, 255, 0) 60%),
+    linear-gradient(180deg,
+      rgba(255, 255, 255, 0.90) 0%,
+      rgba(255, 255, 255, 0.45) 45%,
+      rgba(0, 60, 90, 0.08) 100%),
+    linear-gradient(180deg, #ffffff 0%, #eaf4fb 100%);
+  color: var(--y2k-fb-blue-deep);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    inset 0 -1px 0 rgba(0, 80, 110, 0.20),
+    0 0 0 1px rgba(255, 255, 255, 0.7),
+    0 0 0 1px rgba(80, 110, 160, 0.30),
+    0 4px 10px -4px rgba(0, 60, 90, 0.28);
+}
+
+/* Mine bubble — Aqua candy pill with mirror line + pinstripe */
+.y2k-page .y2k-bubble-mine {
+  background:
+    linear-gradient(180deg,
+      rgba(255, 255, 255, 0.95) 0%,
+      rgba(255, 255, 255, 0.55) 8%,
+      rgba(255, 255, 255, 0.12) 45%,
+      rgba(255, 255, 255, 0) 50%),
+    repeating-linear-gradient(90deg,
+      rgba(255, 255, 255, 0.08) 0px,
+      rgba(255, 255, 255, 0.08) 1px,
+      transparent 1px,
+      transparent 3px),
+    linear-gradient(180deg,
+      var(--y2k-fb-blue-light) 0%,
+      var(--y2k-fb-blue) 50%,
+      var(--y2k-fb-blue-deep) 100%);
+  color: #ffffff;
+  text-shadow: 0 1px 0 rgba(0, 20, 60, 0.40);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.85),
+    inset 0 -2px 4px rgba(0, 20, 60, 0.30),
+    0 0 0 1px rgba(20, 60, 110, 0.55),
+    0 6px 14px -4px rgba(10, 60, 120, 0.40);
+}
+
+/* ----------------------------------------------------------------
+   COMPOSER — pill input + glossy Send pinned to the right.
+   ---------------------------------------------------------------- */
+.y2k-page .y2k-composer-bar {
+  padding: 14px 18px 16px;
+  background:
+    linear-gradient(180deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.55) 100%);
+  border-top: 1px solid rgba(20, 60, 110, 0.18);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95);
+}
+
+.y2k-page .y2k-composer-shell {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.y2k-page .y2k-composer-input {
+  flex: 1;
+  resize: none;
+  min-height: 44px;
+  max-height: 200px;
+  padding: 10px 16px;
+  font-family:
+    "Lucida Grande", "Lucida Sans Unicode", "Trebuchet MS",
+    "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--y2k-fb-blue-deep);
+  background:
+    linear-gradient(180deg,
+      rgba(255, 255, 255, 0.85) 0%,
+      rgba(255, 255, 255, 0.95) 35%,
+      #ffffff 100%);
+  border: none;
+  border-radius: 22px;
+  box-shadow:
+    inset 0 1px 3px rgba(20, 50, 100, 0.22),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.85),
+    0 0 0 1px rgba(120, 140, 170, 0.45);
+  outline: none;
+  transition: box-shadow 140ms ease;
+}
+.y2k-page .y2k-composer-input::placeholder {
+  color: #8a99b8;
+}
+.y2k-page .y2k-composer-input:focus-visible {
+  box-shadow:
+    inset 0 1px 3px rgba(20, 50, 100, 0.18),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.85),
+    0 0 0 1px rgba(20, 60, 110, 0.55),
+    0 0 0 3px rgba(108, 138, 205, 0.45);
+}
+
+.y2k-page .y2k-composer-send {
+  height: 36px;
+  padding-left: 22px;
+  padding-right: 22px;
+  flex-shrink: 0;
+}

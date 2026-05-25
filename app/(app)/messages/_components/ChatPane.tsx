@@ -41,17 +41,23 @@ export function ChatPane({ convId, peer }: ChatPaneProps) {
   }, [msgs.data]);
 
   if (msgs.isLoading) {
-    return <div className="p-4 text-sm text-ink-2">Loading messages…</div>;
+    return (
+      <div className="flex-1 flex items-center justify-center">
+        <span className="y2k-empty-text">Loading messages…</span>
+      </div>
+    );
   }
 
   // Server returns DESC (newest first); display ASC so the bottom is newest.
   const items = (msgs.data ?? []).slice().reverse();
 
   return (
-    <div className="flex-1 overflow-y-auto p-4">
+    <div className="flex-1 overflow-y-auto px-6 py-5 flex flex-col gap-2.5">
       {items.length === 0 && (
-        <div className="text-center text-sm text-ink-2 py-12">
-          No messages yet. Say hi to {peer.name}.
+        <div className="flex-1 flex items-center justify-center">
+          <span className="y2k-empty-text">
+            No messages yet. Say hi to {peer.name}.
+          </span>
         </div>
       )}
       {items.map((m) => (
@@ -69,11 +75,11 @@ interface BubbleProps {
 
 function MessageBubble({ msg, mine }: BubbleProps) {
   return (
-    <div className={mine ? "flex justify-end my-1" : "flex justify-start my-1"}>
+    <div className={mine ? "flex justify-end" : "flex justify-start"}>
       <div
         className={
-          "max-w-[70%] rounded-lg px-3 py-2 text-sm whitespace-pre-wrap break-words " +
-          (mine ? "bg-ink-0 text-paper-0" : "bg-hairline text-ink-0")
+          "max-w-[70%] whitespace-pre-wrap break-words " +
+          (mine ? "y2k-bubble-mine" : "y2k-bubble-peer")
         }
       >
         {msg.body}
