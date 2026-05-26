@@ -52,4 +52,18 @@ export const queryKeys = {
   installs: {
     workspace: (wsId: string) => ["installs", "workspace", wsId] as const,
   },
+  plugins: {
+    // Plugins owned by a workspace (author side).
+    ownedBy: (wsId: string) => ["plugins", "owned-by", wsId] as const,
+    // A single plugin by id (detail page, marketplace detail).
+    detail: (pluginId: string) => ["plugins", pluginId] as const,
+    // Version list for a plugin.
+    versions: (pluginId: string) => ["plugins", pluginId, "versions"] as const,
+    // Marketplace search (consumer side).
+    marketplace: (q: string) => ["plugins", "marketplace", q] as const,
+    // Plugin installs in a workspace (consumer side).
+    workspaceInstalls: (wsId: string) => ["plugins", "ws-installs", wsId] as const,
+    // Plugins attached to an agent (agent detail page).
+    agentAttachments: (agentId: string) => ["plugins", "agent", agentId] as const,
+  },
 } as const;

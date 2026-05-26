@@ -384,6 +384,64 @@ export interface InstallView {
   installed_at: string;
 }
 
+// Plugin system (additive overlay on top of agent intrinsics).
+//
+// A plugin is a reusable bundle of skills/commands/subagents/hooks. It can
+// be installed into a workspace (plugin_install) and attached to a specific
+// agent (agent_plugin). On task claim the daemon overlays the attached
+// plugins onto the agent's own intrinsic plugin tree. See backend spec
+// 2026-05-26-brainrot-cli-and-plugin-system-design.md for the full design.
+
+export interface PluginView {
+  id: string;
+  owner_workspace_id: string;
+  name: string;
+  description: string;
+  latest_version_id?: string;
+  /** Filled in by detail/marketplace responses; empty string in list responses. */
+  latest_version?: string;
+  visibility: "private" | "public";
+  published_at?: string;
+  archived: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PluginVersionView {
+  id: string;
+  plugin_id: string;
+  version: string;
+  /** Parsed plugin.json. Already a decoded object — do not atob/JSON.parse. */
+  manifest: Record<string, unknown>;
+  checksum_sha256: string;
+  created_at: string;
+}
+
+/** Workspace-level "this plugin is installed here". */
+export interface PluginInstallView {
+  id: string;
+  workspace_id: string;
+  source_plugin_id: string;
+  pinned_version_id?: string;
+  installed_by?: string;
+  installed_at: string;
+  plugin_name: string;
+  plugin_description: string;
+}
+
+/** Agent-level "this plugin install is attached to this agent". */
+export interface AgentPluginView {
+  agent_id: string;
+  plugin_install_id: string;
+  source_plugin_id: string;
+  pinned_version_id?: string;
+  plugin_name: string;
+  /** From the JOIN with plugin.description — saves an N+1 in the UI. */
+  plugin_description: string;
+  enabled: boolean;
+  attached_at: string;
+}
+
 // AgentRefView — extends the existing Agent type with marketplace-aware fields.
 // The backend's AgentRefView embeds the full AgentView shape and adds these.
 //

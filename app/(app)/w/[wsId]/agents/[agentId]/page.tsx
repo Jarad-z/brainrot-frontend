@@ -10,6 +10,7 @@ import { useSession } from "@/hooks/useSession";
 import { AgentForm } from "@/components/agents/AgentForm";
 import { ArchiveAgentButton } from "@/components/agents/ArchiveAgentButton";
 import { PublishAgentToggle } from "@/components/agent/PublishAgentToggle";
+import { AgentPluginsPanel } from "@/components/agent/AgentPluginsPanel";
 import { ApiError } from "@/lib/api/client";
 import { messages } from "@/lib/messages";
 import type { AgentInput } from "@/lib/api/types";
@@ -81,6 +82,9 @@ export default function AgentDetailPage() {
       {isMine && !agent.archived && agentRef && (
         <PublishAgentToggle agent={agentRef} />
       )}
+      {isMine && !agent.archived ? (
+        <AgentPluginsPanel agentId={agentId} wsId={wsId} />
+      ) : null}
     </main>
   );
 }
