@@ -32,6 +32,18 @@ export interface DesktopListResult {
   running: string[];
 }
 
+export interface DesktopOpenAssetPayload {
+  projectId: string;
+  assetId: string;
+  filename: string;
+  sha256: string;
+}
+
+export interface DesktopOpenAssetResult {
+  ok: boolean;
+  error?: string;
+}
+
 interface DesktopBridge {
   bootstrap: (payload: DesktopWorkspacePayload) => Promise<DesktopBootstrapResult>;
   sync: (payload: DesktopWorkspacePayload) => Promise<DesktopSyncResult>;
@@ -39,6 +51,7 @@ interface DesktopBridge {
   getDaemonLogs: (wsId?: string) => Promise<string | Record<string, string>>;
   listDaemons: () => Promise<DesktopListResult>;
   getServerUrl: () => Promise<string>;
+  openAsset: (payload: DesktopOpenAssetPayload) => Promise<DesktopOpenAssetResult>;
 }
 
 declare global {
