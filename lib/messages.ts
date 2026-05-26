@@ -270,6 +270,9 @@
     pasteUploadedHint: (filename: string) =>
       `已上传 ${filename}（见右栏 Assets）`,
     pasteUploadFailed: "截图上传失败",
+    deleteCta: "删除",
+    deleteConfirm: (filename: string) => `确认删除「${filename}」？此操作不可恢复。`,
+    deleteFailed: "删除失败",
   },
   artifacts: {
     exclude: "排除",

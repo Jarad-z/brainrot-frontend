@@ -21,3 +21,15 @@ export async function fetchProjectAssets(projectId: string): Promise<Asset[]> {
 export function assetDownloadURL(projectId: string, assetId: string): string {
   return `/api/v1/projects/${projectId}/assets/${assetId}`;
 }
+
+/**
+ * DELETE /api/v1/projects/{project_id}/assets/{asset_id}
+ *
+ * Removes the asset row and its blob. Caller must be workspace owner or
+ * editor. Returns nothing on success (204).
+ */
+export async function deleteAsset(projectId: string, assetId: string): Promise<void> {
+  await apiFetch<void>(`/api/v1/projects/${projectId}/assets/${assetId}`, {
+    method: "DELETE",
+  });
+}
