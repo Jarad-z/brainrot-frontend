@@ -2,8 +2,8 @@
 
 > 给"前端设计 + 前端工程"agent 的合并指南。
 >
-> - **API 细节**：见 [`API.md`](./API.md)，本文不重复 schema。
-> - **后端定位 / 数据模型**：见 [`ARCHITECTURE.md`](./ARCHITECTURE.md) 与 spec。
+> - **API 细节**：见 [`backend/docs/API.md`](../../backend/docs/API.md)（单一权威源，只在后端目录），本文不重复 schema。
+> - **后端定位 / 数据模型**：见 [`backend/docs/ARCHITECTURE.md`](../../backend/docs/ARCHITECTURE.md) 与 spec。
 > - **范围**：v1 Web 前端（桌面优先，移动可降级）。
 > - **状态**：从零起步，本文档即权威基线。
 
@@ -247,7 +247,7 @@ App
 
 ### 4.2 流式增量渲染
 
-- **历史走 REST**：`GET /api/v1/tasks/{task_id}/messages`（注意：API.md 老版本未列出此接口，但路由已存在；用它拉历史 + 分页）。
+- **历史走 REST**：`GET /api/v1/tasks/{task_id}/messages`。⚠️ 生产环境**始终带 `?limit=N`**（推荐 50，上限 500），返回 `{ messages, next_cursor }`；下一页用 `?before=<next_cursor>&limit=N`。不带 `limit` 会全量返回，长 task 一次能拉数千行。
 - **增量走 WS**：订阅 `task` scope 后，`message.appended` 事件持续追加。
 - agent 消息会带 `seq`，**按 seq 排序**插入；同一条消息 `id` 的多次更新以最新 `content` 为准（dedupe by `id`）。
 - 渲染长聊天流用**虚拟化列表**（推荐 `@tanstack/react-virtual`）。
@@ -448,7 +448,7 @@ class WSClient {
    - ⚠️ **WS 例外**：`approval.requested` WS 事件里的 `tool_input` 已是**解码后的 JSON 对象**——直接用，不要再 `atob`。REST 的 `ApprovalRequest.tool_input` 仍是 base64。
 2. **EnqueuedRun 是 PascalCase**：`{RunID, AgentID, RuntimeID}`，而其他对象是 snake_case。类型定义里别搞混。
 3. **首屏初始化**：`GET /api/v1/workspaces` 拿工作区集合（空数组就引导新建），`GET /api/v1/workspaces/{ws_id}/runtimes` 拿 daemon 初始集合；之后用 `runtime.online/offline` WS 事件维护增量。前端可把上次选过的 `wsId` 缓存到 localStorage，下次启动 hydrate 默认值。
-4. **审批超时**：每条 pending 审批有 `expires_at`，UI 倒计时显示；客户端时钟和服务器有偏差时**以 `expires_at` 为准**（不要本地累加）。
+4. **审批超时**：每条 pending 审批有 `expires_at`，UI 倒计时显示；客户端时钟和服务器有偏差时**以 `expires_at` 为准**（不要本地累加）。审批 `decision` 三选：`approved` / `denied` / `approved_with_edits`（带改动批准——UI 可以让用户在文本框里编辑工具参数后再提交）；hub 的 `?status=` 过滤同样支持这五种状态：`pending|approved|denied|approved_with_edits|timeout`。
 5. **取消 run**：`POST /tasks/{id}/cancel-run` 把**当前活跃 run** 置为 `canceled`（活跃 = `pending`/`claimed`/`running`/`awaiting_approval`），并通过 WS 通知 daemon 中止本地进程。**同一事务内**还会把这张 card 上所有 `metadata.queued=true` 的用户消息清掉 `queued` 标记——避免未来一次 run 完成时 `promoteQueued` 把这些旧消息"复活"成新 run。⚠️ 后端**不会**自动晋升被取消那一轮背后的排队消息（见 API.md "cancel-run 语义"）；UI 不要承诺"队列会接着跑"，要让排队的 @agent 再跑得让用户重新 @mention。
    - **幂等返回 400**：重复调用 / race 下后端会因 `pgx.ErrNoRows` 返回 `400`（没有活跃 run 可取消）。前端应当作"已被取消过"静默处理，**不要**弹红色错误 toast。
 6. **同 agent 排队**：判断"是否排队"的**唯一可靠信号**是发送响应里 `message.metadata`（base64 解码后）含 `queued: true`——这表示此用户消息因目标 agent 已有 active run 被延后；它会在当前 run 结束后被自动晋升触发。`runs` 字段总是会带上被 mention 的 agent，**不能用 runs 长度判断**。

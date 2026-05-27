@@ -64,7 +64,7 @@ See `docs/superpowers/specs/2026-05-16-s1-nextjs-skeleton-design.md` §2 for the
 ## Docs
 
 - `docs/FRONTEND.md` — engineering baseline (technology choices, conventions)
-- `docs/API.md` — REST + WebSocket contract
+- `../backend/docs/API.md` — REST + WebSocket contract (single source of truth, lives only in backend)
 - `docs/BACKEND_GAPS.md` — accumulated list of backend gaps discovered during frontend work
 - `docs/superpowers/specs/` — milestone specs (S0 prototype, S1 skeleton, …)
 
