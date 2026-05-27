@@ -490,3 +490,31 @@
   - 最低门槛版：`lib/log.ts` + 全局 `window.onerror` + `window.onunhandledrejection` 监听 + `apiFetch` 失败时分级上报
   - 完整版：选 Sentry 的话就 `@sentry/nextjs` 一行 init；选自建就维护多一点
 - **优先级**：🟢 低 — 没用户 / 没 prod / 没 SLA 之前过早做
+
+## Agent identity — current borrows runtime owner PAT (option A)
+
+- **状态**：临时实现已落地（2026-05-28）
+- **发现**：2026-05-27，给 brainrot CLI 加 task create/update/dispatch 时验证 `brainrot whoami` 在 agent 进程里返回 401，发现 daemon 从未实际注入过 `BRAINROT_TOKEN`，design spec 的承诺漏实现了
+- **当前实现**：
+  - `service.Runtime.ClaimTasks` 在 claim 一个 run 时，给 `agent_runtime.user_id`（即注册这台 daemon 的人）铸一个 2h TTL 的 PAT
+  - PAT 通过 `protocol.ClaimedTask.BrainrotToken` 传到 daemon
+  - Daemon 在 `cmd.Env` 的最后追加 `BRAINROT_TOKEN=<PAT>`，spawn agent 时透传
+  - Token 全程不写盘，agent 进程死掉就失去引用
+  - 代码：`internal/service/runtime.go:ClaimTasks` / `internal/daemon/backend/claude/claude.go:181` / `pkg/protocol/tasks.go:ClaimedTask.BrainrotToken`
+- **已知风险（option A 的固有缺陷，**未来必须迁移到 option B**）**：
+  1. **审计日志混淆**：agent 自动发的消息和人手打的消息 `author_id` 一样。出问题查不到是谁干的。
+  2. **owner 离职即雪崩**：注册 daemon 的那个人账号被删，该 daemon spawn 的**所有** agent 同时 401。
+  3. **agent 拥有 owner 全部权限**：能 patch workspace、邀请成员、删项目、铸新 PAT、生成 install token。Prompt injection 一旦得手就是完整的 workspace takeover。
+  4. **approval self-batch**：approval 机制假设「请求方」和「批准方」不同身份。现在 agent 用 owner token 调 `POST /approvals/{id}/decide` 直接通过自己的审批——circuit breaker 失效。
+- **未来计划（option B — service-account）**：
+  - 给每个 agent 在 `app_user` 表里加一条 row（`users.id = agent.id`，`kind='agent'`），或者建独立 `agent_principal` 表配 RBAC
+  - 给 agent service-account 一套**收紧的 role**，介于 viewer 和 editor 之间：能写 message、能调 approval-protected tool，但**不能** patch workspace、邀请成员、铸 PAT
+  - daemon 用 agent 自己的 service-account mint PAT，不再借用 owner 身份
+  - audit log 上 agent ≠ 人
+  - approval：让 service-account 没有 decide 权限，强制由真人审批
+- **触发时机**：以下任一发生时立刻做
+  - 加入第二个真实用户（multi-user workspace）
+  - 启用 marketplace 第三方 plugin
+  - 跑生产数据 / 涉及 PII / 涉及外部 API key
+  - 任何一条满足都应该把 option B 提上来。当前 prototype/单人 dev 阶段勉强可接受。
+- **优先级**：🟡 中 — 不阻塞当前 dev，但是上线门槛之一

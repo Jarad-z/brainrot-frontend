@@ -279,6 +279,12 @@ export interface CreateTaskInput {
   sort_order?: number;
 }
 
+export interface PatchTaskInput {
+  status?: TaskStatus;
+  title?: string;
+  summary?: string;
+}
+
 export interface WorkspaceMember {
   workspace_id: string;
   user_id: string;

@@ -24,7 +24,7 @@ export function ChatPane({ wsId, taskId, projectId, task }: ChatPaneProps) {
           "inset 0 1px 0 rgba(255,255,255,0.75), inset 0 -1px 0 rgba(20,62,107,0.10), 0 2px 8px rgba(20,62,107,0.12)",
       }}
     >
-      <TaskHeader task={task} taskId={taskId} />
+      <TaskHeader task={task} taskId={taskId} projectId={projectId} />
       <div className="flex-1 min-h-0 overflow-hidden relative">
         <MessageList taskId={taskId} wsId={wsId} />
       </div>

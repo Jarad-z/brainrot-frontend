@@ -1,5 +1,5 @@
 import { apiFetch } from "./client";
-import type { CreateTaskInput, TaskCard, TaskStatus } from "./types";
+import type { CreateTaskInput, PatchTaskInput, TaskCard } from "./types";
 
 export const tasksApi = {
   list: (projectId: string) => apiFetch<TaskCard[]>(`/api/v1/projects/${projectId}/tasks`),
@@ -8,7 +8,7 @@ export const tasksApi = {
       method: "POST",
       body: JSON.stringify(input),
     }),
-  patch: (taskId: string, input: { status?: TaskStatus }) =>
+  patch: (taskId: string, input: PatchTaskInput) =>
     apiFetch<void>(`/api/v1/tasks/${taskId}`, {
       method: "PATCH",
       body: JSON.stringify(input),

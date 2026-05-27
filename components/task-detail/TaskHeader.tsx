@@ -1,16 +1,21 @@
 "use client";
+import { useState } from "react";
+import { Pencil } from "lucide-react";
 import { StatusChip } from "@/components/brand/status-chip";
 import { IconButton } from "@/components/brand/icon-button";
 import { CancelRunButton } from "./CancelRunButton";
+import { RenameTaskDialog } from "./RenameTaskDialog";
 import type { TaskCard } from "@/lib/api/types";
 
 interface TaskHeaderProps {
   task: TaskCard | null | undefined;
   taskId: string;
+  projectId: string;
 }
 
-export function TaskHeader({ task, taskId }: TaskHeaderProps) {
+export function TaskHeader({ task, taskId, projectId }: TaskHeaderProps) {
   const busy = Boolean(task?.busy);
+  const [editOpen, setEditOpen] = useState(false);
 
   return (
     <header
@@ -63,11 +68,26 @@ export function TaskHeader({ task, taskId }: TaskHeaderProps) {
 
         <div className="flex items-center gap-1.5 shrink-0">
           <CancelRunButton taskId={taskId} busy={busy} />
+          <IconButton
+            aria-label="Edit task"
+            disabled={!task}
+            onClick={() => task && setEditOpen(true)}
+          >
+            <Pencil className="size-4" />
+          </IconButton>
           <IconButton disabled aria-label="更多">
             ⋯
           </IconButton>
         </div>
       </div>
+      {task && (
+        <RenameTaskDialog
+          task={task}
+          projectId={projectId}
+          open={editOpen}
+          onOpenChange={setEditOpen}
+        />
+      )}
     </header>
   );
 }
