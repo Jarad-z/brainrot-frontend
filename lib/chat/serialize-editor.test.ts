@@ -126,5 +126,31 @@ describe("serializeEditor", () => {
       const ed = mockEditor({ descendants: (cb) => { for (const n of nodes) cb(n); } });
       expect(serializeEditor(ed, [])).toEqual({ text: "@writer hi", mentions: [] });
     });
+
+    // Regression: a stray "@handle" in the middle of a word — e.g. CJK prose
+    // like "agent就@writer" where the user is *referring* to the handle, not
+    // mentioning it — must NOT dispatch an unintended run.
+    // See docs/superpowers/reports/2026-05-28-mention-fallback-overmatch.md.
+    it("does not resolve @handle attached to the end of another word", () => {
+      const nodes = [paragraphNode(), mentionNode("a1", "writer"), textNode(" 测试 agent就@writer")];
+      const ed = mockEditor({ descendants: (cb) => { for (const n of nodes) cb(n); } });
+      // Only the real mention node contributes; the embedded "@writer" is prose.
+      expect(serializeEditor(ed, agents)).toEqual({
+        text: "@writer 测试 agent就@writer",
+        mentions: ["a1"],
+      });
+    });
+
+    it("does not resolve @handle when preceded by a non-space ASCII char", () => {
+      const nodes = [paragraphNode(), textNode("foo@writer bar")];
+      const ed = mockEditor({ descendants: (cb) => { for (const n of nodes) cb(n); } });
+      expect(serializeEditor(ed, agents)).toEqual({ text: "foo@writer bar", mentions: [] });
+    });
+
+    it("still resolves @handle after a newline", () => {
+      const nodes = [paragraphNode(), textNode("line 1"), paragraphNode(), textNode("@writer hi")];
+      const ed = mockEditor({ descendants: (cb) => { for (const n of nodes) cb(n); } });
+      expect(serializeEditor(ed, agents)).toEqual({ text: "line 1\n@writer hi", mentions: ["a1"] });
+    });
   });
 });

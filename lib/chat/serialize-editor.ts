@@ -30,11 +30,18 @@ export function serializeEditor(
   // popup produces a plain text token, no mention node. Resolve any
   // @handle substrings against the supplied agent lookup so the backend
   // still gets a real agent id and dispatches a run.
+  //
+  // Only treat @handle as a mention when it sits at the start of the text or
+  // after whitespace — same trigger rule as activePrefix() in mention-parse.ts.
+  // Without this guard, a literal "@handle" embedded mid-word (e.g. the user
+  // writing "agent就@writer" as instructional prose to another agent) gets
+  // mis-parsed as a real mention and dispatches an unintended run. See
+  // docs/superpowers/reports/2026-05-28-mention-fallback-overmatch.md.
   if (agents && agents.length > 0) {
     const seen = new Set(mentions);
     const byHandle = new Map<string, string>();
     for (const a of agents) byHandle.set(a.handle.toLowerCase(), a.id);
-    const re = /@([A-Za-z0-9_-]+)/g;
+    const re = /(?:^|\s)@([A-Za-z0-9_-]+)/g;
     let m: RegExpExecArray | null;
     while ((m = re.exec(trimmed)) !== null) {
       const handle = m[1];
