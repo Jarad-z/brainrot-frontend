@@ -135,6 +135,30 @@ function normalizeToolResultPayload(p: unknown): { tool_use_id: string; is_error
   return { tool_use_id: "", is_error: false, content: undefined };
 }
 
+// Claude CLI emits `{type:"user", message:{content:[...]}}` envelopes for
+// synthetic prompts injected by hooks, Skill launches, and tool_result
+// turn-arounds. The daemon persists these as messages with role=agent and
+// content `{type:"user", payload:"<envelope>"}`. They are NOT real user input
+// — surfacing them as user bubbles is both visually wrong (a blue "排队中"
+// bubble for hook output) and unsafe (no `text` field, crashes MentionedText).
+// Summarize down to a short SystemLine instead.
+function summarizeSyntheticUserEvent(p: unknown): string {
+  if (p && typeof p === "object") {
+    const obj = p as Record<string, unknown>;
+    const msg = obj.message as Record<string, unknown> | undefined;
+    const content = msg?.content;
+    if (Array.isArray(content) && content.length > 0) {
+      const c0 = content[0] as Record<string, unknown>;
+      if (c0?.type === "tool_result") return "tool_result · injected";
+      if (c0?.type === "text" && typeof c0.text === "string") {
+        const t = c0.text.replace(/\s+/g, " ").trim();
+        return t.length > 120 ? `${t.slice(0, 120)}…` : t;
+      }
+    }
+  }
+  return "synthetic user event";
+}
+
 export function parseMessageContent(content: Record<string, unknown> | string | null | undefined): ParsedMessage {
   const raw = coerceContent(content) as RawWithType;
   if (!raw.type) {
@@ -156,6 +180,9 @@ export function parseMessageContent(content: Record<string, unknown> | string | 
   }
   if (raw.type === "assistant_text") {
     return { type: "assistant_text", payload: normalizeAssistantTextPayload(payload) };
+  }
+  if (raw.type === "user") {
+    return { type: "system", payload: summarizeSyntheticUserEvent(payload) };
   }
   return { type: raw.type, payload } as ParsedMessage;
 }
