@@ -42,4 +42,12 @@ describe("AgentTraceModal", () => {
     fireEvent.keyDown(getByRole("dialog"), { key: "Escape" });
     expect(useChatUIStore.getState().byTask["t1"]!.traceAgentId).toBeNull();
   });
+
+  it("clears traceAgentId when the modal unmounts (no stale re-open)", () => {
+    useChatUIStore.getState().openTrace("t1", "agentA");
+    const { unmount } = wrap(<AgentTraceModal taskId="t1" wsId="w1" />);
+    expect(useChatUIStore.getState().byTask["t1"]!.traceAgentId).toBe("agentA");
+    unmount();
+    expect(useChatUIStore.getState().byTask["t1"]!.traceAgentId).toBeNull();
+  });
 });

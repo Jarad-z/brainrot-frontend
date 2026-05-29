@@ -1,4 +1,5 @@
 "use client";
+import { useEffect } from "react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/brand/dialog";
 import { agentColor } from "@/components/brand/avatar";
 import { EmptyState } from "@/components/common/EmptyState";
@@ -24,6 +25,12 @@ export function AgentTraceModal({ taskId, wsId }: AgentTraceModalProps) {
   const color = agentColor(handle);
   const open = traceAgentId !== null;
   const runCount = groups.filter((g) => g.runId !== null).length;
+
+  // Clear this task's open-trace state when the pane unmounts or the task
+  // changes, so navigating away and back doesn't re-open a stale modal.
+  useEffect(() => {
+    return () => closeTrace(taskId);
+  }, [taskId, closeTrace]);
 
   return (
     <Dialog
