@@ -48,4 +48,20 @@ describe("TraceRunSection", () => {
     );
     expect(getByText(/运行 \(未知\)/)).toBeInTheDocument();
   });
+
+  it("renders '未关联运行' for the null-run (unassigned) group", () => {
+    const { getByText } = render(
+      <TraceRunSection group={{ ...group, runId: null, run: null }} index={0} defaultOpen />,
+    );
+    expect(getByText(/未关联运行/)).toBeInTheDocument();
+  });
+
+  it("shows the running status badge label", () => {
+    const runningGroup = {
+      ...group,
+      run: { ...group.run!, status: "running" as const },
+    };
+    const { getByText } = render(<TraceRunSection group={runningGroup} index={0} defaultOpen />);
+    expect(getByText(/运行中/)).toBeInTheDocument();
+  });
 });
