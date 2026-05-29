@@ -21,6 +21,7 @@ export default defineConfig({
         "lib/api/auth.ts",
         "lib/api/projects.ts",
         "lib/api/tasks.ts",
+        "lib/api/task.ts",
         // WebSocket provider — React-Context-only; exercised via component renders in S2
         "lib/ws/provider.tsx",
         // constant object — no branches or functions to exercise
