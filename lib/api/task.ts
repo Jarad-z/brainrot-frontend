@@ -1,5 +1,5 @@
 import { apiFetch, ApiError } from "./client";
-import type { TaskCard } from "./types";
+import type { RunView, TaskCard } from "./types";
 
 // API.md does not document a single-task GET; this calls the implied route
 // and falls through to a sentinel undefined response so callers can fall
@@ -13,4 +13,8 @@ export async function fetchTask(taskId: string): Promise<TaskCard | undefined> {
     }
     throw e;
   }
+}
+
+export function fetchTaskRuns(taskId: string): Promise<RunView[]> {
+  return apiFetch<RunView[]>(`/api/v1/tasks/${taskId}/runs`);
 }
