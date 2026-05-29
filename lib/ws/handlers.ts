@@ -6,6 +6,7 @@ import type {
   ClientMessage,
   DirectMessage,
   User,
+  Artifact,
 } from "@/lib/api/types";
 // run.completed payload lacks project_id/ws_id (see lib/ws/events.ts), so we
 // reverse-look projectId from the task detail cache to scope invalidation.
@@ -42,6 +43,15 @@ export type WSEvent =
       scope: "task";
       id: string;
       payload: { run_id: string; status: "done" | "failed" | "canceled"; error?: string };
+    }
+  | {
+      type: "artifact.added";
+      scope: "project";
+      id: string;
+      // Scope is "project" (an artifact belongs to a project), but the artifact
+      // carries task_card_id, which is what we invalidate. See API.md
+      // "artifact.added" row.
+      payload: { artifact: Artifact };
     }
   | {
       type: "approval.requested";
@@ -116,6 +126,8 @@ export function registerHandlers(
         return onTaskMutation(data, queryClient);
       case "run.completed":
         return onRunCompleted(data, queryClient);
+      case "artifact.added":
+        return onArtifactAdded(data, queryClient);
       case "approval.decided":
         return onApprovalDecided(data, chatUI());
       case "friend.request.sent":
@@ -182,6 +194,21 @@ export function onRunCompleted(
   if (projectId) {
     qc.invalidateQueries({ queryKey: queryKeys.projects.tasks(projectId) });
   }
+}
+
+// onArtifactAdded reacts to an agent uploading a new artifact mid-session.
+// The artifact belongs to a task card (task_card_id); the card's artifacts
+// list is fetched card-level (queryKeys.tasks.artifacts), aggregating every
+// run's outputs. Invalidating it makes the new file appear live instead of
+// only after run.completed. Defensive: ignore a malformed payload missing the
+// card id rather than invalidating an undefined key.
+export function onArtifactAdded(
+  ev: Extract<WSEvent, { type: "artifact.added" }>,
+  qc: QueryClient,
+): void {
+  const cardId = ev.payload?.artifact?.task_card_id;
+  if (!cardId) return;
+  qc.invalidateQueries({ queryKey: queryKeys.tasks.artifacts(cardId) });
 }
 
 export function onApprovalDecided(

@@ -5,6 +5,7 @@ import {
   onTaskMutation,
   onApprovalDecided,
   onRunCompleted,
+  onArtifactAdded,
   onFriendEvent,
   onInvitationEvent,
   onDMSent,
@@ -107,6 +108,53 @@ describe("WS handlers", () => {
     expect(invSpy).toHaveBeenCalledWith({ queryKey: queryKeys.tasks.detail(taskId) });
     expect(invSpy).toHaveBeenCalledWith({ queryKey: queryKeys.tasks.runs(taskId) });
     expect(invSpy).toHaveBeenCalledWith({ queryKey: queryKeys.projects.tasks(projectId) });
+  });
+
+  it("onArtifactAdded invalidates the owning card's artifacts so the new file appears live", () => {
+    const qc = new QueryClient();
+    const cardId = "card-7";
+    const invSpy = vi.spyOn(qc, "invalidateQueries");
+    onArtifactAdded(
+      {
+        type: "artifact.added",
+        scope: "project",
+        id: "p1",
+        payload: {
+          artifact: {
+            id: "a1",
+            project_id: "p1",
+            filename: "out.mp4",
+            mime_type: "video/mp4",
+            size_bytes: 10,
+            blob_key: "k",
+            sha256: "abc",
+            created_at: "",
+            task_card_id: cardId,
+            task_run_id: "r1",
+            source: "agent",
+            excluded: false,
+          },
+        },
+      },
+      qc,
+    );
+    expect(invSpy).toHaveBeenCalledWith({ queryKey: queryKeys.tasks.artifacts(cardId) });
+  });
+
+  it("onArtifactAdded is a no-op when the payload has no task_card_id", () => {
+    const qc = new QueryClient();
+    const invSpy = vi.spyOn(qc, "invalidateQueries");
+    onArtifactAdded(
+      {
+        type: "artifact.added",
+        scope: "project",
+        id: "p1",
+        // @ts-expect-error intentionally malformed payload (defensive path)
+        payload: { artifact: { id: "a1" } },
+      },
+      qc,
+    );
+    expect(invSpy).not.toHaveBeenCalled();
   });
 });
 
