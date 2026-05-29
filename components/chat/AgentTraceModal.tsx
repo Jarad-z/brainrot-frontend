@@ -23,6 +23,7 @@ export function AgentTraceModal({ taskId, wsId }: AgentTraceModalProps) {
   const handle = agent?.handle ?? "agent";
   const color = agentColor(handle);
   const open = traceAgentId !== null;
+  const runCount = groups.filter((g) => g.runId !== null).length;
 
   return (
     <Dialog
@@ -55,7 +56,7 @@ export function AgentTraceModal({ taskId, wsId }: AgentTraceModalProps) {
               「{name}」的执行轨迹
             </DialogTitle>
             <div className="text-[12px] text-ink-3">
-              @{handle} · 本任务共 {groups.length} 个运行
+              @{handle} · 本任务共 {runCount} 个运行
             </div>
           </div>
         </div>

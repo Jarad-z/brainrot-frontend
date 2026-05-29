@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { render } from "@testing-library/react";
+import { render, fireEvent } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AgentTraceModal } from "./AgentTraceModal";
 import { useChatUIStore } from "@/lib/store/chat-ui";
@@ -33,5 +33,13 @@ describe("AgentTraceModal", () => {
     expect(getByRole("dialog")).toBeInTheDocument();
     expect(getByText(/Writer/)).toBeInTheDocument();
     expect(getByText(/还没有/)).toBeInTheDocument();
+  });
+
+  it("closes (clears traceAgentId) when the dialog requests close via Escape", () => {
+    useChatUIStore.getState().openTrace("t1", "agentA");
+    const { getByRole } = wrap(<AgentTraceModal taskId="t1" wsId="w1" />);
+    expect(getByRole("dialog")).toBeInTheDocument();
+    fireEvent.keyDown(getByRole("dialog"), { key: "Escape" });
+    expect(useChatUIStore.getState().byTask["t1"]!.traceAgentId).toBeNull();
   });
 });
