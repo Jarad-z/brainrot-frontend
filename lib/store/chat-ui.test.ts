@@ -39,4 +39,16 @@ describe("ChatUIStore", () => {
     expect(useChatUIStore.getState().byTask["t1"]).toBeUndefined();
     expect(useChatUIStore.getState().byTask["t2"]).toBeDefined();
   });
+
+  it("openTrace sets traceAgentId, closeTrace clears it", () => {
+    useChatUIStore.getState().openTrace("t1", "agentA");
+    expect(useChatUIStore.getState().byTask["t1"]!.traceAgentId).toBe("agentA");
+    useChatUIStore.getState().closeTrace("t1");
+    expect(useChatUIStore.getState().byTask["t1"]!.traceAgentId).toBeNull();
+  });
+
+  it("traceAgentId defaults to null on a fresh task", () => {
+    useChatUIStore.getState().setActiveTab("t9", "artifacts");
+    expect(useChatUIStore.getState().byTask["t9"]!.traceAgentId).toBeNull();
+  });
 });
