@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { ChevronDown, ChevronRight, CheckCircle2, XCircle } from "lucide-react";
 import type { TraceStepData } from "@/lib/chat/build-agent-trace";
+import { stringifyToolResult } from "@/lib/chat/stringify-tool-result";
 
 interface TraceStepProps {
   step: TraceStepData;
@@ -76,18 +77,14 @@ export function TraceStep({ step }: TraceStepProps) {
     const inp = input && typeof input === "object" ? (input as Record<string, unknown>) : {};
     const isError = result?.parsed.type === "tool_result" && result.parsed.payload.is_error;
     const succeeded = result && !isError;
-    const resultContent: string | null = (() => {
-      if (result?.parsed.type !== "tool_result") return null;
-      const c = result.parsed.payload.content;
-      if (c == null) return "";
-      return typeof c === "string" ? c : JSON.stringify(c);
-    })();
+    const resultContent = stringifyToolResult(result);
 
     return (
       <div className="text-[12px]">
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
+          aria-expanded={open}
           className="w-full flex items-center gap-2 py-1 px-2 text-left hover:bg-bg-tertiary rounded transition-colors min-w-0"
         >
           <span className="text-ink-3 shrink-0">{time}</span>

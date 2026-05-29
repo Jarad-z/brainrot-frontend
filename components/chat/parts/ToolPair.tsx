@@ -3,6 +3,7 @@
 import { ChevronDown, ChevronRight, CheckCircle2, XCircle } from "lucide-react";
 import type { ClientMessage } from "@/lib/api/types";
 import { useChatUIStore } from "@/lib/store/chat-ui";
+import { stringifyToolResult } from "@/lib/chat/stringify-tool-result";
 
 interface ToolPairProps {
   useMsg: ClientMessage;
@@ -23,17 +24,7 @@ export function ToolPair({ useMsg, resultMsg, taskId }: ToolPairProps) {
 
   const isError =
     resultMsg?.parsed.type === "tool_result" && resultMsg.parsed.payload.is_error;
-  const resultContent: string | null = (() => {
-    if (resultMsg?.parsed.type !== "tool_result") return null;
-    const c = resultMsg.parsed.payload.content;
-    if (c == null) return "";
-    if (typeof c === "string") return c;
-    try {
-      return JSON.stringify(c);
-    } catch {
-      return String(c);
-    }
-  })();
+  const resultContent = stringifyToolResult(resultMsg);
 
   const succeeded = resultMsg && !isError;
 
