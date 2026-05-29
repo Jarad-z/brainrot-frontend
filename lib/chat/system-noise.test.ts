@@ -12,10 +12,24 @@ function mk(parsed: ClientMessage["parsed"]): ClientMessage {
 }
 
 describe("isSystemNoise", () => {
-  it("flags hook_started / hook_response / init / notification system payloads", () => {
+  it("does not flag stringified subtype payloads (system payload is a string on the wire)", () => {
     for (const subtype of ["hook_started", "hook_response", "init", "notification"]) {
       expect(isSystemNoise(mk({ type: "system", payload: JSON.stringify({ subtype }) }))).toBe(false);
     }
+  });
+
+  it("flags system messages whose object payload has a noisy subtype", () => {
+    for (const subtype of ["hook_started", "hook_response", "init", "notification"]) {
+      expect(
+        isSystemNoise(mk({ type: "system", payload: { subtype } as unknown as string })),
+      ).toBe(true);
+    }
+  });
+
+  it("does not flag a system object payload with a non-noisy subtype", () => {
+    expect(
+      isSystemNoise(mk({ type: "system", payload: { subtype: "result" } as unknown as string })),
+    ).toBe(false);
   });
 
   it("non-system message is never noise", () => {
