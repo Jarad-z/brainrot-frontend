@@ -126,6 +126,18 @@ describe("buildAgentTrace", () => {
     expect(groups[0]!.run).toBeNull();
   });
 
+  it("orders by created_at when seq is null", () => {
+    const groups = buildAgentTrace(
+      [
+        msg({ id: "late", task_run_id: "r1", seq: null, created_at: "2026-05-30T10:05:00Z", parsed: { type: "assistant_text", payload: { text: "late" } } }),
+        msg({ id: "early", task_run_id: "r1", seq: null, created_at: "2026-05-30T10:01:00Z", parsed: { type: "assistant_text", payload: { text: "early" } } }),
+      ],
+      [run({ id: "r1" })],
+      "agentA",
+    );
+    expect(groups[0]!.steps.map((s) => s.msg.id)).toEqual(["early", "late"]);
+  });
+
   it("filters out system-noise messages", () => {
     const groups = buildAgentTrace(
       [
