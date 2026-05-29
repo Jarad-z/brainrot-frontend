@@ -8,6 +8,7 @@ interface AssistantMessageProps {
   msg: ClientMessage;
   taskId: string;
   agent: { name: string; handle: string };
+  agentId?: string | null;
   isFirstInGroup?: boolean;
 }
 
@@ -20,12 +21,14 @@ export function AssistantMessage({
   msg,
   taskId,
   agent,
+  agentId,
   isFirstInGroup = true,
 }: AssistantMessageProps) {
   const expanded = useChatUIStore(
     (s) => s.byTask[taskId]?.expandedThinkings.has(msg.id) ?? false,
   );
   const toggle = useChatUIStore((s) => s.toggleThinking);
+  const openTrace = useChatUIStore((s) => s.openTrace);
 
   if (msg.parsed.type !== "assistant_text" && msg.parsed.type !== "thinking") {
     return null;
@@ -48,9 +51,16 @@ export function AssistantMessage({
     <div className={`flex gap-2.5 ${isFirstInGroup ? "mt-4" : "mt-1"}`}>
       <div className="shrink-0" style={{ width: avatarSize }}>
         {isFirstInGroup && (
-          <span
+          <button
+            type="button"
             data-chat="avatar"
-            className="grid place-items-center text-white font-semibold"
+            onClick={() => {
+              if (agentId) openTrace(taskId, agentId);
+            }}
+            disabled={!agentId}
+            aria-label={`查看 ${agent.name} 的执行轨迹`}
+            title={`查看 ${agent.name} 的执行轨迹`}
+            className="grid place-items-center text-white font-semibold transition-[filter] hover:brightness-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-default cursor-pointer"
             style={{
               width: avatarSize,
               height: avatarSize,
@@ -61,10 +71,9 @@ export function AssistantMessage({
               boxShadow: `inset 0 1px 0 rgba(255,255,255,0.55), inset 0 -1px 0 rgba(0,0,0,0.15), 0 1px 2px ${color}55, 0 4px 10px ${color}33`,
               textShadow: "0 -1px 0 rgba(0,0,0,0.2)",
             }}
-            aria-hidden
           >
             {agent.name.slice(0, 1).toUpperCase()}
-          </span>
+          </button>
         )}
       </div>
 

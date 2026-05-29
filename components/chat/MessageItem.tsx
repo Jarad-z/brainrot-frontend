@@ -37,7 +37,15 @@ export function MessageItem({ msg, pairing, taskId, authors, isNew, isFirstInGro
     case "thinking": {
       const a = msg.author_agent_id ? authors.agents[msg.author_agent_id] : undefined;
       const agent = a ?? { name: "agent", handle: "agent" };
-      inner = <AssistantMessage msg={msg} taskId={taskId} agent={agent} isFirstInGroup={isFirstInGroup} />;
+      inner = (
+        <AssistantMessage
+          msg={msg}
+          taskId={taskId}
+          agent={agent}
+          agentId={msg.author_agent_id}
+          isFirstInGroup={isFirstInGroup}
+        />
+      );
       break;
     }
     case "tool_use":

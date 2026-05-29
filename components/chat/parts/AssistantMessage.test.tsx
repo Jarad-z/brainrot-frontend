@@ -55,4 +55,14 @@ describe("AssistantMessage", () => {
     );
     expect(container.firstChild).toBeNull();
   });
+
+  it("clicking the avatar opens the trace for that agent", async () => {
+    const { useChatUIStore } = await import("@/lib/store/chat-ui");
+    useChatUIStore.setState({ byTask: {} });
+    const { getByLabelText } = render(
+      <AssistantMessage msg={textMsg} taskId="t1" agent={baseAuthor} agentId="a1" />,
+    );
+    fireEvent.click(getByLabelText(/执行轨迹/));
+    expect(useChatUIStore.getState().byTask["t1"]!.traceAgentId).toBe("a1");
+  });
 });
