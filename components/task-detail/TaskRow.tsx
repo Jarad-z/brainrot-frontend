@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useWorkspaceAgents } from "@/hooks/useWorkspaceAgents";
+import { useActiveRuns } from "@/hooks/useActiveRuns";
 import { relativeTime } from "@/lib/format";
 import { agentColor } from "@/components/brand/avatar";
 import type { TaskCard } from "@/lib/api/types";
@@ -25,6 +26,20 @@ export function TaskRow({ task, wsId, projectId, active }: TaskRowProps) {
   const agentsMap = new Map(agents.map((a) => [a.id, a]));
   const taskAgents = (task.agents ?? []).slice(0, 3);
 
+  // Running indicator: show *which* agent is running, live. We can't use
+  // task.busy here — it only refreshes on task.updated / run.completed, so it
+  // stays false for the whole duration of an in-flight run (the run-start
+  // event is message.appended, which doesn't touch the task cache). Instead we
+  // share useActiveRuns with the in-chat ThinkingBar: it polls /runs every 5s
+  // and is keyed per task, so TanStack dedupes — one request per card, not per
+  // mounted row. This keeps the list badge in lockstep with "在思考".
+  const activeRuns = useActiveRuns(task.id);
+  const runningAgents = activeRuns
+    .map((r) => (r.agentId ? agentsMap.get(r.agentId) : undefined))
+    .filter((a): a is NonNullable<typeof a> => Boolean(a));
+  const running = activeRuns.length > 0;
+  const leadAgent = runningAgents[0];
+
   return (
     <Link
       href={`/w/${wsId}/p/${projectId}/t/${task.id}`}
@@ -40,7 +55,7 @@ export function TaskRow({ task, wsId, projectId, active }: TaskRowProps) {
         <span
           aria-hidden
           className={`w-1.5 h-1.5 rounded-full shrink-0 ${STATUS_DOT[task.status]} ${
-            task.busy ? "animate-status-pulse" : ""
+            running ? "animate-status-pulse" : ""
           }`}
         />
         <span
@@ -53,6 +68,27 @@ export function TaskRow({ task, wsId, projectId, active }: TaskRowProps) {
           {task.title}
         </span>
       </div>
+
+      {running && (
+        <div className="flex items-center gap-1.5 mt-1 pl-3.5 min-w-0">
+          <span className="relative w-1.5 h-1.5 rounded-full shrink-0 bg-accent">
+            <span className="absolute inset-0 rounded-full bg-accent animate-ping opacity-60" />
+          </span>
+          {leadAgent && (
+            <span
+              className="text-[10.5px] font-semibold truncate"
+              style={{ color: active ? "#fff" : agentColor(leadAgent.handle) }}
+              title={runningAgents.map((a) => `@${a.handle}`).join(", ")}
+            >
+              @{leadAgent.handle}
+              {runningAgents.length > 1 && ` +${runningAgents.length - 1}`}
+            </span>
+          )}
+          <span className={`text-[10.5px] shrink-0 ${active ? "text-white/85" : "text-ink-3"}`}>
+            正在运行…
+          </span>
+        </div>
+      )}
 
       <div className="flex items-center justify-between gap-2 mt-1 pl-3.5">
         <span className={`text-[10.5px] truncate ${active ? "text-white/85" : "text-ink-3"}`}>
