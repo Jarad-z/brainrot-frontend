@@ -1,6 +1,7 @@
 "use client";
 import { MessageList } from "@/components/chat/MessageList";
 import { Composer } from "@/components/chat/Composer";
+import { AgentTraceModal } from "@/components/chat/AgentTraceModal";
 import { TaskHeader } from "./TaskHeader";
 import { ThinkingBar } from "./ThinkingBar";
 import type { TaskCard } from "@/lib/api/types";
@@ -32,6 +33,7 @@ export function ChatPane({ wsId, taskId, projectId, task }: ChatPaneProps) {
       <div className="px-4 pb-3 pt-1">
         <Composer wsId={wsId} taskId={taskId} projectId={projectId} />
       </div>
+      <AgentTraceModal taskId={taskId} wsId={wsId} />
     </section>
   );
 }

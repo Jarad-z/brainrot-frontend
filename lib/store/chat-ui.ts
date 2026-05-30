@@ -13,6 +13,7 @@ export interface TaskUIState {
   scrollAnchor: "bottom" | "manual";
   activeTab: "artifacts" | "assets" | "approvals";
   decisions: Record<string, DecisionRecord>;
+  traceAgentId: string | null;
 }
 
 export interface ChatUIStore {
@@ -23,6 +24,8 @@ export interface ChatUIStore {
   setActiveTab: (taskId: string, tab: TaskUIState["activeTab"]) => void;
   recordDecision: (approvalId: string, d: DecisionRecord) => void;
   clearDecision: (approvalId: string) => void;
+  openTrace: (taskId: string, agentId: string) => void;
+  closeTrace: (taskId: string) => void;
   clearTask: (taskId: string) => void;
 }
 
@@ -32,6 +35,7 @@ const DEFAULT_TASK = (): TaskUIState => ({
   scrollAnchor: "bottom",
   activeTab: "artifacts",
   decisions: {},
+  traceAgentId: null,
 });
 
 const GLOBAL_DECISIONS_KEY = "_global";
@@ -105,6 +109,22 @@ export const useChatUIStore = create<ChatUIStore>((set) => ({
       delete next[approvalId];
       return {
         byTask: { ...state.byTask, [GLOBAL_DECISIONS_KEY]: { ...slot, decisions: next } },
+      };
+    }),
+
+  openTrace: (taskId, agentId) =>
+    set((state) => {
+      const byTask = ensureTask(state.byTask, taskId);
+      return {
+        byTask: { ...byTask, [taskId]: { ...byTask[taskId]!, traceAgentId: agentId } },
+      };
+    }),
+
+  closeTrace: (taskId) =>
+    set((state) => {
+      const byTask = ensureTask(state.byTask, taskId);
+      return {
+        byTask: { ...byTask, [taskId]: { ...byTask[taskId]!, traceAgentId: null } },
       };
     }),
 
